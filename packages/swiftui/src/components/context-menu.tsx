@@ -91,7 +91,7 @@ export function ContextMenuHost() {
 					>
 						<Menu.Portal>
 							<Menu.Positioner side="bottom" align="start">
-								<Menu.Popup testId="context-menu">
+								<Menu.Popup testId="context-menu" highlightOnOpen={false}>
 									<For each={current.items}>
 										{(item) => (
 											<Menu.Item

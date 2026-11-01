@@ -90,6 +90,11 @@ export async function shortcutRecorderScenario(shot: Shot) {
 	await shot.keys('Meta+Shift+Space');
 	shot.expectText('shortcut-value', 'Shift+Cmd+Space');
 
+	await shot.hover('shortcut-clear');
+	await shot.wait(900);
+	shot.expectPresent('shortcut-clear-tooltip');
+	await shot.capture('clear-tooltip');
+
 	await shot.click('shortcut-clear');
 	shot.expectText('shortcut-value', 'null');
 }

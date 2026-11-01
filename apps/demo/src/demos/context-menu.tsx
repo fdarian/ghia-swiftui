@@ -137,10 +137,11 @@ export async function contextMenuScenario(shot: Shot) {
 	shot.expectText('context-menu-picked', 'dismissed');
 	shot.expectAbsent('context-menu');
 
-	// Keyboard: ArrowDown steps past the lit first row, Enter picks.
+	// No row is lit on open, as in NSMenu: the first ArrowDown lights the first row, the second the next.
 	await shot.rightClick('track-three');
 	await shot.wait(200);
-	await shot.keys('ArrowDown Enter');
+	await shot.capture('open-unlit');
+	await shot.keys('ArrowDown ArrowDown Enter');
 	await shot.wait(300);
 	shot.expectText('context-menu-picked', 'three: copy');
 

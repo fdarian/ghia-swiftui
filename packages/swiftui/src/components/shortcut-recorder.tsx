@@ -1,6 +1,11 @@
 import type { StyleDesc } from '@ghia/solid';
 import { createSignal, Show } from 'solid-js';
 import { Button } from '#src/components/button.tsx';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '#src/components/tooltip.tsx';
 import { Icon } from '#src/icons/icon.tsx';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
@@ -301,19 +306,32 @@ export function ShortcutRecorder(props: ShortcutRecorderProps) {
 				</text>
 			</div>
 			<Show when={props.value && !isRecording()}>
-				<Button
-					testId={
-						props.testId === undefined ? undefined : `${props.testId}-clear`
-					}
-					variant="transparent"
-					size={props.size ?? 'medium'}
-					iconOnly
-					disabled={isDisabled()}
-					onClick={() => props.onValueChange(null)}
-					aria-label="Clear shortcut"
-				>
-					<Icon name="x" />
-				</Button>
+				<Tooltip>
+					<TooltipTrigger>
+						<Button
+							testId={
+								props.testId === undefined ? undefined : `${props.testId}-clear`
+							}
+							variant="transparent"
+							size={props.size ?? 'medium'}
+							iconOnly
+							disabled={isDisabled()}
+							onClick={() => props.onValueChange(null)}
+							aria-label="Clear shortcut"
+						>
+							<Icon name="x" />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent
+						testId={
+							props.testId === undefined
+								? undefined
+								: `${props.testId}-clear-tooltip`
+						}
+					>
+						Clear shortcut
+					</TooltipContent>
+				</Tooltip>
 			</Show>
 		</div>
 	);

@@ -223,12 +223,23 @@ function remapEmacsNavigationKey(event: KeyEvent): KeyEvent {
 
 export interface MenuPopupProps extends Omit<GlassPanelProps, 'onKeyDown'> {
 	onKeyDown?: (event: KeyEvent) => void;
+	/**
+	 * Whether a pointer open lights the first enabled row. `false` leaves every
+	 * row unlit until the pointer or a key moves, as NSMenu does; `showContextMenu`
+	 * sets it. Not in syne: its `Menu` is always the lit-on-open one.
+	 */
+	highlightOnOpen?: boolean;
 }
 
 /** The menu surface: a `GlassPanel` that owns the keyboard, the highlight and the open and close motion. */
 export function MenuPopup(props: MenuPopupProps) {
 	const root = useMenuScope();
-	const [own, rest] = splitProps(props, ['style', 'onKeyDown', 'children']);
+	const [own, rest] = splitProps(props, [
+		'style',
+		'onKeyDown',
+		'highlightOnOpen',
+		'children',
+	]);
 	const [highlighted, setHighlighted] = createSignal<number | null>(null);
 	let rowCount = 0;
 	const list = createMenuList({
@@ -254,7 +265,7 @@ export function MenuPopup(props: MenuPopupProps) {
 			onMouseMove: () => {},
 			onMouseLeave: () => setHighlighted(null),
 		},
-		openFocusMs: OPEN_FOCUS_MS,
+		openFocusMs: own.highlightOnOpen === false ? null : OPEN_FOCUS_MS,
 	});
 	root.watchPopupFocus(list.containsFocus);
 	const panelProps = list.popupProps({
