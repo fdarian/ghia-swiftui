@@ -82,7 +82,7 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 									<SidebarListItem
 										testId={`nav-${demo.name}`}
 										item={demo}
-										title={demo.name}
+										title={demo.title}
 									/>
 								)}
 							</For>

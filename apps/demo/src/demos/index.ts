@@ -55,7 +55,10 @@ import { ToolbarDemo, toolbarScenario } from '#src/demos/toolbar.tsx';
 import { TooltipDemo, tooltipScenario } from '#src/demos/tooltip.tsx';
 
 export interface Demo {
+	/** The slug the scripts and the test ids use. */
 	name: string;
+	/** The sidebar label: the component's name, or what the demo shows. */
+	title: string;
 	/** The sidebar section the demo is listed under. */
 	group: string;
 	component: Component;
@@ -64,79 +67,170 @@ export interface Demo {
 }
 
 const entries: Omit<Demo, 'group'>[] = [
-	{ name: 'tokens', component: TokensDemo, scenario: tokensScenario },
-	{ name: 'text', component: TextDemo },
-	{ name: 'separator', component: SeparatorDemo },
-	{ name: 'label', component: LabelDemo, scenario: labelScenario },
-	{ name: 'badge', component: BadgeDemo },
-	{ name: 'status', component: StatusDemo, scenario: statusScenario },
-	{ name: 'button', component: ButtonDemo, scenario: buttonScenario },
+	{
+		name: 'tokens',
+		title: 'Tokens',
+		component: TokensDemo,
+		scenario: tokensScenario,
+	},
+	{ name: 'text', title: 'Text', component: TextDemo },
+	{ name: 'separator', title: 'Separator', component: SeparatorDemo },
+	{
+		name: 'label',
+		title: 'Label',
+		component: LabelDemo,
+		scenario: labelScenario,
+	},
+	{ name: 'badge', title: 'Badge', component: BadgeDemo },
+	{
+		name: 'status',
+		title: 'Status',
+		component: StatusDemo,
+		scenario: statusScenario,
+	},
+	{
+		name: 'button',
+		title: 'Button',
+		component: ButtonDemo,
+		scenario: buttonScenario,
+	},
 	{
 		name: 'button-defaults-provider',
+		title: 'ButtonDefaultsProvider',
 		component: ButtonDefaultsProviderDemo,
 		scenario: buttonDefaultsProviderScenario,
 	},
-	{ name: 'callout', component: CalloutDemo, scenario: calloutScenario },
+	{
+		name: 'callout',
+		title: 'Callout',
+		component: CalloutDemo,
+		scenario: calloutScenario,
+	},
 	{
 		name: 'empty-state',
+		title: 'EmptyState',
 		component: EmptyStateDemo,
 		scenario: emptyStateScenario,
 	},
 	{
 		name: 'error-boundary-view',
+		title: 'ErrorBoundaryView',
 		component: ErrorBoundaryViewDemo,
 		scenario: errorBoundaryViewScenario,
 	},
 	{
 		name: 'glass-panel',
+		title: 'GlassPanel',
 		component: GlassPanelDemo,
 		scenario: glassPanelScenario,
 	},
 	{
 		name: 'liquid-glass',
+		title: 'Liquid glass',
 		component: LiquidGlassDemo,
 		scenario: liquidGlassScenario,
 	},
-	{ name: 'checkbox', component: CheckboxDemo, scenario: checkboxScenario },
-	{ name: 'field', component: FieldDemo, scenario: fieldScenario },
-	{ name: 'input', component: InputDemo, scenario: inputScenario },
+	{
+		name: 'checkbox',
+		title: 'Checkbox',
+		component: CheckboxDemo,
+		scenario: checkboxScenario,
+	},
+	{
+		name: 'field',
+		title: 'Field',
+		component: FieldDemo,
+		scenario: fieldScenario,
+	},
+	{
+		name: 'input',
+		title: 'Input',
+		component: InputDemo,
+		scenario: inputScenario,
+	},
 	{
 		name: 'number-input',
+		title: 'NumberInput',
 		component: NumberInputDemo,
 		scenario: numberInputScenario,
 	},
 	{
 		name: 'shortcut-recorder',
+		title: 'ShortcutRecorder',
 		component: ShortcutRecorderDemo,
 		scenario: shortcutRecorderScenario,
 	},
-	{ name: 'settings', component: SettingsDemo, scenario: settingsScenario },
-	{ name: 'select', component: SelectDemo, scenario: selectScenario },
-	{ name: 'tooltip', component: TooltipDemo, scenario: tooltipScenario },
-	{ name: 'menu', component: MenuDemo, scenario: menuScenario },
-	{ name: 'toast', component: ToastDemo, scenario: toastScenario },
+	{
+		name: 'settings',
+		title: 'Settings',
+		component: SettingsDemo,
+		scenario: settingsScenario,
+	},
+	{
+		name: 'select',
+		title: 'Select',
+		component: SelectDemo,
+		scenario: selectScenario,
+	},
+	{
+		name: 'tooltip',
+		title: 'Tooltip',
+		component: TooltipDemo,
+		scenario: tooltipScenario,
+	},
+	{ name: 'menu', title: 'Menu', component: MenuDemo, scenario: menuScenario },
+	{
+		name: 'toast',
+		title: 'Toaster',
+		component: ToastDemo,
+		scenario: toastScenario,
+	},
 	{
 		name: 'context-menu',
+		title: 'showContextMenu',
 		component: ContextMenuDemo,
 		scenario: contextMenuScenario,
 	},
 	{
 		name: 'radio-group',
+		title: 'RadioGroup',
 		component: RadioGroupDemo,
 		scenario: radioGroupScenario,
 	},
 	{
 		name: 'scroll-area',
+		title: 'ScrollArea',
 		component: ScrollAreaDemo,
 		scenario: scrollAreaScenario,
 	},
-	{ name: 'list', component: ListDemo, scenario: listScenario },
-	{ name: 'panel', component: PanelDemo, scenario: panelScenario },
-	{ name: 'sidebar', component: SidebarDemo, scenario: sidebarScenario },
-	{ name: 'split-view', component: SplitViewDemo, scenario: splitViewScenario },
-	{ name: 'toolbar', component: ToolbarDemo, scenario: toolbarScenario },
+	{ name: 'list', title: 'List', component: ListDemo, scenario: listScenario },
+	{
+		name: 'panel',
+		title: 'Panel',
+		component: PanelDemo,
+		scenario: panelScenario,
+	},
+	{
+		name: 'sidebar',
+		title: 'Sidebar',
+		component: SidebarDemo,
+		scenario: sidebarScenario,
+	},
+	{
+		name: 'split-view',
+		title: 'SplitView',
+		component: SplitViewDemo,
+		scenario: splitViewScenario,
+	},
+	{
+		name: 'toolbar',
+		title: 'Toolbar',
+		component: ToolbarDemo,
+		scenario: toolbarScenario,
+	},
 	{
 		name: 'syne-main-window',
+		title: 'Syne main window',
 		component: SyneMainWindowDemo,
 		scenario: syneMainWindowScenario,
 	},
