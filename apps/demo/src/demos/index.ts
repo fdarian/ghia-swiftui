@@ -23,6 +23,10 @@ import {
 import { RadioGroupDemo, radioGroupScenario } from '#src/demos/radio-group.tsx';
 import { SelectDemo, selectScenario } from '#src/demos/select.tsx';
 import { SeparatorDemo } from '#src/demos/separator.tsx';
+import {
+	ShortcutRecorderDemo,
+	shortcutRecorderScenario,
+} from '#src/demos/shortcut-recorder.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 import { StatusDemo, statusScenario } from '#src/demos/status.tsx';
 import { TextDemo } from '#src/demos/text.tsx';
@@ -71,6 +75,11 @@ export const demos: readonly Demo[] = [
 		name: 'number-input',
 		component: NumberInputDemo,
 		scenario: numberInputScenario,
+	},
+	{
+		name: 'shortcut-recorder',
+		component: ShortcutRecorderDemo,
+		scenario: shortcutRecorderScenario,
 	},
 	{ name: 'select', component: SelectDemo, scenario: selectScenario },
 	{

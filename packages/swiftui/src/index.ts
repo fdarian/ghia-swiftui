@@ -87,6 +87,11 @@ export {
 } from '#src/components/select.tsx';
 export { Separator, type SeparatorProps } from '#src/components/separator.tsx';
 export {
+	ShortcutRecorder,
+	type ShortcutRecorderProps,
+	type ShortcutRecorderSize,
+} from '#src/components/shortcut-recorder.tsx';
+export {
 	Status,
 	type StatusProps,
 	type StatusVariant,
