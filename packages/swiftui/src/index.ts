@@ -36,6 +36,12 @@ export {
 	GlassPanel,
 	type GlassPanelProps,
 } from '#src/components/glass-panel.tsx';
+export {
+	Input,
+	type InputProps,
+	type InputSize,
+	type InputVariant,
+} from '#src/components/input.tsx';
 export { Label, type LabelProps } from '#src/components/label.tsx';
 export {
 	RadioGroup,
