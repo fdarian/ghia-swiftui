@@ -22,6 +22,7 @@ import { isInvalid } from '#src/aria.ts';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
+import { PopupShadow, SHADOW_PAD } from '#src/popup.tsx';
 import { over, withAlpha } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
@@ -42,11 +43,6 @@ const EXIT_MS = 160;
 const PICK_HOLD_MS = 100;
 /** Gap between trigger and popup when no item is aligned over the trigger. */
 const UNALIGNED_GAP = 4;
-/**
- * Transparent room the layer keeps round the popup so its shadow is not cut
- * square at the layer's edge; the placement is shifted back by it.
- */
-const SHADOW_PAD = 24;
 
 interface SelectOption {
 	value: string;
@@ -485,19 +481,7 @@ export function SelectContent(props: SelectContentProps) {
 						maxHeight: maxHeight(),
 					}}
 				>
-					{/* Its own element: a shadow on the backdrop-filtered surface is cut square at the surface's box. */}
-					<div
-						style={{
-							position: 'absolute',
-							top: 0,
-							right: 0,
-							bottom: 0,
-							left: 0,
-							borderRadius: styleTokens.radiusPopover,
-							boxShadow: styleTokens.shadowPopover,
-							pointerEvents: 'none',
-						}}
-					/>
+					<PopupShadow />
 					<div
 						style={{
 							display: 'flex',

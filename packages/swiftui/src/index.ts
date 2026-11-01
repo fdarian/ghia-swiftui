@@ -102,6 +102,16 @@ export {
 	type TextProps,
 	type TextVariant,
 } from '#src/components/text.tsx';
+export {
+	Tooltip,
+	TooltipContent,
+	type TooltipContentProps,
+	type TooltipProps,
+	TooltipProvider,
+	type TooltipProviderProps,
+	TooltipTrigger,
+	type TooltipTriggerProps,
+} from '#src/components/tooltip.tsx';
 export { Icon, type IconName, type IconProps } from '#src/icons/icon.tsx';
 export { IconSizeContext } from '#src/icons/icon-size.ts';
 export { setAccentColor } from '#src/tokens/accent.ts';

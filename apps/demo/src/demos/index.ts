@@ -32,6 +32,7 @@ import type { Shot } from '#src/demos/shot.ts';
 import { StatusDemo, statusScenario } from '#src/demos/status.tsx';
 import { TextDemo } from '#src/demos/text.tsx';
 import { TokensDemo, tokensScenario } from '#src/demos/tokens.tsx';
+import { TooltipDemo, tooltipScenario } from '#src/demos/tooltip.tsx';
 
 export interface Demo {
 	name: string;
@@ -84,6 +85,7 @@ export const demos: readonly Demo[] = [
 	},
 	{ name: 'settings', component: SettingsDemo, scenario: settingsScenario },
 	{ name: 'select', component: SelectDemo, scenario: selectScenario },
+	{ name: 'tooltip', component: TooltipDemo, scenario: tooltipScenario },
 	{
 		name: 'radio-group',
 		component: RadioGroupDemo,
