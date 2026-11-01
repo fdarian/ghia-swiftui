@@ -4,7 +4,12 @@
 	"packageManager": "pnpm@12.16.1",
 	"scripts": {
 		"format": "biome check --write",
-		"check": "turbo run check"
+		"check": "turbo run check",
+		"start": "pnpm --filter ghia-swiftui-demo start",
+		"screenshot": "pnpm --filter ghia-swiftui-demo screenshot",
+		"live-capture": "pnpm --filter ghia-swiftui-demo live-capture",
+		"glass-check": "pnpm --filter ghia-swiftui-demo glass-check",
+		"window-check": "pnpm --filter ghia-swiftui-demo window-check"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.4",

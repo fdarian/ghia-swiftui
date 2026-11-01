@@ -1,0 +1,172 @@
+# ghia-swiftui
+
+SwiftUI-look [Solid](https://www.solidjs.com) components for macOS apps on [ghia](https://github.com/fdarian/ghia) (`@ghia/solid`, Bun runtime, no webview). The component names, props and variants are those of [syne](https://github.com/fdarian/syne)'s `@syne/ui`, so a syne screen moves over by changing imports and React idioms to Solid ones. Surfaces such as the sidebar, panels, popups and glass buttons are real liquid glass (`NSGlassEffectView`).
+
+| Light                                                                                | Dark                                                |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| ![The syne main window composed from the library, light](docs/main-window-light.png) | ![The same window, dark](docs/main-window-dark.png) |
+
+## Install
+
+macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. `ghia-swiftui` is not on npm; take it from git.
+
+```jsonc
+// package.json
+"dependencies": {
+	"@ghia/native": "0.11.0",
+	"@ghia/solid": "0.11.0",
+	"ghia-swiftui": "github:fdarian/ghia-swiftui#path:/packages/swiftui",
+	"solid-js": "1.9.15"
+}
+```
+
+`ghia-swiftui` builds on [`base-ui-solid-gpuix`](https://github.com/fdarian/base-ui-solid-gpuix), which is also a git dependency and imports ghia under its old name, `@gpuix/solid`. Settings a dependency declares do not reach your install, so repeat them:
+
+```yaml
+# pnpm-workspace.yaml
+overrides:
+  "@gpuix/solid": "npm:@ghia/solid@0.11.0"
+  "@gpuix/native": "npm:@ghia/native@0.11.0"
+packageExtensions:
+  base-ui-solid-gpuix:
+    dependencies:
+      "@ghia/solid": "0.11.0"
+# base-ui-solid-gpuix arrives through ghia-swiftui, as a git subdependency.
+blockExoticSubdeps: false
+```
+
+pnpm may also ask you to exempt the two `@ghia/*` versions from `minimumReleaseAge`; it adds the `minimumReleaseAgeExclude` entries itself.
+
+Both preloads go in `bunfig.toml`, `ghia-swiftui/preload` second. The first compiles your JSX for ghia; the second compiles the TSX that `base-ui-solid-gpuix` ships as source, which Bun would otherwise compile with a JSX runtime that reads props once.
+
+```toml
+# bunfig.toml
+preload = ["@ghia/solid/preload", "ghia-swiftui/preload"]
+
+[test]
+preload = ["@ghia/solid/preload", "ghia-swiftui/preload"]
+```
+
+For TypeScript, set `"jsx": "preserve"` and `"jsxImportSource": "@ghia/solid"`, and leave the DOM lib out (`@total-typescript/tsconfig/bundler/no-dom/app` does): with it, the library's source reports errors.
+
+<details>
+<summary>Installing from a local checkout</summary>
+
+Point the dependency at the package folder, `"ghia-swiftui": "file:../ghia-swiftui/packages/swiftui"`. The pnpm settings above stay the same.
+
+</details>
+
+## Use it
+
+An app renders inside four things, once, at its root:
+
+- `setPanelStorage(...)` before the first render, if any `SplitView` or `PanelGroup` has a `storageKey`. There is no default location; `createFilePanelStorage({ appName })` keeps layouts under `~/Library/Application Support/<appName>/`.
+- `ColorSchemeProvider` around everything. It binds the tokens to the window's appearance; a token read outside it throws.
+- `ContextMenuHost`, where `showContextMenu` draws its menu.
+- `Toaster`, where `toast.*` draws.
+
+`TooltipProvider` goes around anything that holds a `Tooltip`.
+
+```tsx
+import { render } from '@ghia/solid';
+import {
+	Button,
+	ColorSchemeProvider,
+	ContextMenuHost,
+	createFilePanelStorage,
+	setPanelStorage,
+	Text,
+	Toaster,
+	TooltipProvider,
+	toast,
+} from 'ghia-swiftui';
+
+setPanelStorage(createFilePanelStorage({ appName: 'my-app' }));
+
+render(
+	() => (
+		<ColorSchemeProvider>
+			<TooltipProvider>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'flex-start',
+						gap: 12,
+						padding: 24,
+					}}
+				>
+					<Text variant="heading1">Hello</Text>
+					<Button variant="accent" onClick={() => toast.success('Saved')}>
+						Save
+					</Button>
+				</div>
+				<ContextMenuHost />
+				<Toaster />
+			</TooltipProvider>
+		</ColorSchemeProvider>
+	),
+	{
+		title: 'my-app',
+		width: 480,
+		height: 320,
+		titlebarTransparent: true,
+		windowBackground: 'blurred',
+	},
+);
+```
+
+`bun src/main.tsx` opens it. An app shell is a `SplitView` with a `Sidebar` in its `sidebar` slot: [`apps/demo/src/app.tsx`](apps/demo/src/app.tsx) is one.
+
+Tokens are plain objects of getters over the colour scheme, imported from their own modules (`import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors'`). The accent is `#138af2` until the app calls `setAccentColor('#rrggbb')`, since ghia cannot read the system accent. `applyColorScheme(true | false)` forces a scheme and `followSystemColorScheme()` returns to the OS.
+
+## Components
+
+| Section     | Components                                                                                                                                                                                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Foundations | `Text`, `Separator`, `Label`, `Badge`, `Status`, `Icon`, tokens                                                                                                                                                                                           |
+| Actions     | `Button`, `ButtonDefaultsProvider`                                                                                                                                                                                                                        |
+| Feedback    | `Callout`, `EmptyState` (`Media`, `Title`, `Description`, `Actions`), `ErrorBoundaryView`, `toast`, `Toaster`                                                                                                                                             |
+| Surfaces    | `GlassPanel`                                                                                                                                                                                                                                              |
+| Forms       | `Checkbox`, `RadioGroup`, `RadioGroupItem`, `Field` (`FieldSet`, `FieldGroup`, `FieldLabel`, `FieldDescription`, `FieldError`, ...), `Input`, `NumberInput`, `ShortcutRecorder`, `Select` (`SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`) |
+| Overlays    | `Tooltip`, `TooltipProvider`, `Menu`, `showContextMenu`, `ContextMenuHost`                                                                                                                                                                                |
+| Layout      | `ScrollArea`, `List`, `Panel`, `PanelGroup`, `Sidebar` (`SidebarList`, `SidebarListItem`, `SidebarFooter`), `SplitView`, `Toolbar` (`ToolbarRow`, `ToolbarContent`, `ToolbarTitle`, `ToolbarDescription`, `ToolbarActions`)                               |
+
+What syne has and this does not, and the reverse, is in [`packages/swiftui/DRIFT.md`](packages/swiftui/DRIFT.md): one row per component, with the cause. `Select` and `showContextMenu` are in-window popups, not `NSMenu`; there is no StyleX, `render` prop or `data-slot`.
+
+## Liquid glass
+
+`GlassPanel`, `Sidebar`, `Menu`, the `Select` popup, `Toast`, glass `Button`s and the selected row of a `List` with `glassSelection` are real `NSGlassEffectView`s on macOS 26 and later. They sample what is painted beneath them in the window, GPU content included, and follow the window appearance. No native addon or build step makes them: the view is created from JS with `bun:ffi` on the Objective-C runtime, inside ghia's `<nativeview>`.
+
+![Glass panels, controls and a list selection over colour stripes](docs/liquid-glass-light.png)
+
+Elsewhere a surface wears an in-window material, a neutral tint over a 24px backdrop blur, so none renders empty. That is what shows on macOS before 26, in a window that is not on screen (so `pnpm screenshot` shows it), and for glass inside glass, since a native view cannot nest.
+
+<details>
+<summary>What real glass costs you</summary>
+
+- A `backdropFilter` painted over a native view blurs nothing, so a `Sidebar` fades its list out under its toolbar and footer instead of blurring it.
+- Each glass is a native view and a layer. Prefer a few large surfaces over many small ones.
+- `captureScreenshot` is the Metal frame and holds no AppKit view. `pnpm live-capture` captures the composited window.
+
+</details>
+
+## Running the demo
+
+The demo in `apps/demo` shows every component, in light and dark, in a native window. Clone, `pnpm install`, then from the root:
+
+```bash
+pnpm start                      # the demo window
+pnpm screenshot <demo>          # offscreen captures to apps/demo/screenshots/<demo>/, light and dark
+GPUIX_BACKGROUND=1 pnpm live-capture <demo> [step...]   # a real window, glass included
+pnpm glass-check                # real glass present, by window pixels and the view tree
+pnpm window-check               # layout against the traffic lights, resize, collapse, glass
+```
+
+`live-capture`, `glass-check` and `window-check` open windows behind the active app and read their own pixels; they post no input and touch no other app. A window another app covers is given no frames, so they wait for it to be uncovered. `live-capture` also takes steps (`shot=`, `click=`, `wheel=`, `dark`, `light`, `move=`; see its header).
+
+`pnpm check` at the root runs the type and lint checks.
+
+## License
+
+[MIT](LICENSE)
