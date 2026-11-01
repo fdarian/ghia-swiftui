@@ -1,5 +1,5 @@
 import { Button, ErrorBoundaryView, Text } from 'ghia-swiftui';
-import { createSignal, ErrorBoundary, type JSX } from 'solid-js';
+import { createSignal, ErrorBoundary, type JSX, Show } from 'solid-js';
 import { Cell, Page, Row, Section, Surface } from '#src/demo-kit.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 
@@ -11,9 +11,8 @@ function Pane(props: { children: JSX.Element }) {
 	);
 }
 
-function Recoverable(props: { thrown: () => unknown; armed: boolean }) {
-	if (props.armed) throw props.thrown();
-	return <Text>Rendered without error.</Text>;
+function Bomb(props: { thrown: () => unknown }): JSX.Element {
+	throw props.thrown();
 }
 
 export function ErrorBoundaryViewDemo() {
@@ -45,12 +44,16 @@ export function ErrorBoundaryViewDemo() {
 										height: '100%',
 									}}
 								>
-									<Recoverable
-										armed={armed()}
-										thrown={() =>
-											new Error('Cannot read properties of undefined')
-										}
-									/>
+									<Show
+										when={armed()}
+										fallback={<Text>Rendered without error.</Text>}
+									>
+										<Bomb
+											thrown={() =>
+												new Error('Cannot read properties of undefined')
+											}
+										/>
+									</Show>
 									<Button testId="error-throw" onClick={() => setArmed(true)}>
 										Throw an error
 									</Button>
@@ -65,7 +68,7 @@ export function ErrorBoundaryViewDemo() {
 									<ErrorBoundaryView error={error} />
 								)}
 							>
-								<Recoverable armed thrown={() => 'a thrown string'} />
+								<Bomb thrown={() => 'a thrown string'} />
 							</ErrorBoundary>
 						</Pane>
 					</Cell>
@@ -80,4 +83,7 @@ export async function errorBoundaryViewScenario(shot: Shot) {
 	await shot.click('error-throw');
 	shot.expectAbsent('error-throw');
 	await shot.capture('thrown');
+	await shot.clickText('Reload');
+	shot.expectPresent('error-throw');
+	await shot.capture('reloaded');
 }

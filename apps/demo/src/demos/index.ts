@@ -18,6 +18,7 @@ import { SeparatorDemo } from '#src/demos/separator.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 import { StatusDemo, statusScenario } from '#src/demos/status.tsx';
 import { TextDemo } from '#src/demos/text.tsx';
+import { TokensDemo, tokensScenario } from '#src/demos/tokens.tsx';
 
 export interface Demo {
 	name: string;
@@ -27,6 +28,7 @@ export interface Demo {
 }
 
 export const demos: readonly Demo[] = [
+	{ name: 'tokens', component: TokensDemo, scenario: tokensScenario },
 	{ name: 'text', component: TextDemo },
 	{ name: 'separator', component: SeparatorDemo },
 	{ name: 'label', component: LabelDemo, scenario: labelScenario },

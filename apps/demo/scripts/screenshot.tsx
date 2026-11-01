@@ -78,6 +78,23 @@ const shot: Shot = {
 		renderer.nativeSimulateClick(pointer.x, pointer.y);
 		await settle();
 	},
+	async clickText(text) {
+		let element = renderer.findByText(text);
+		if (element === undefined) throw new Error(`no text element with ${text}`);
+		let bounds = renderer.getElementBounds(element.id);
+		while (bounds === null && element?.parentId != null) {
+			element = renderer.getElement(element.parentId);
+			bounds =
+				element === undefined ? null : renderer.getElementBounds(element.id);
+		}
+		if (bounds === null) throw new Error(`no box for text ${text}`);
+		pointer = {
+			x: bounds.x + bounds.width / 2,
+			y: bounds.y + bounds.height / 2,
+		};
+		renderer.nativeSimulateClick(pointer.x, pointer.y);
+		await settle();
+	},
 	async clickEnd(testId) {
 		const bounds = renderer.getElementBounds(elementByTestId(testId).id);
 		if (bounds === null) throw new Error(`no box for ${testId}`);

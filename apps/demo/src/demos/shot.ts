@@ -1,6 +1,8 @@
 /** What a demo's `scenario` can do while `pnpm screenshot` renders it offscreen. */
 export interface Shot {
 	click(testId: string): Promise<void>;
+	/** Clicks the first text element containing `text`, for controls that take no test id. */
+	clickText(text: string): Promise<void>;
 	/** Clicks 20px in from the element's right edge, where a trailing control sits. */
 	clickEnd(testId: string): Promise<void>;
 	/** Moves the pointer over the element's centre and leaves it there. */
