@@ -84,6 +84,7 @@ export function Input(props: InputProps) {
 				selectionColor: colors.selection40,
 				borderWidth: 1,
 				borderStyle: 'solid',
+				keyboardFocusDim: false,
 				...sizes[own.size ?? 'medium'],
 				...variantStyle(own.variant ?? 'default'),
 				...(isInvalid(rest['aria-invalid'])

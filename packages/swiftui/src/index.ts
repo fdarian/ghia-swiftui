@@ -33,6 +33,22 @@ export {
 } from '#src/components/empty-state.tsx';
 export { ErrorBoundaryView } from '#src/components/error-boundary-view.tsx';
 export {
+	Field,
+	FieldContent,
+	FieldDescription,
+	FieldError,
+	type FieldErrorProps,
+	FieldGroup,
+	FieldLabel,
+	FieldLegend,
+	type FieldLegendProps,
+	type FieldProps,
+	FieldSeparator,
+	FieldSet,
+	type FieldSetProps,
+	FieldTitle,
+} from '#src/components/field.tsx';
+export {
 	GlassPanel,
 	type GlassPanelProps,
 } from '#src/components/glass-panel.tsx';

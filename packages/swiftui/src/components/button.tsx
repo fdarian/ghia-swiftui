@@ -23,6 +23,13 @@ export type ButtonVariant =
 	| 'glassAccent'
 	| 'transparent';
 
+/** The root elements `Button` made, so `Field` can tell a row of buttons from other children. */
+const buttonElements = new WeakSet<object>();
+
+export function isButtonElement(node: unknown): boolean {
+	return typeof node === 'object' && node !== null && buttonElements.has(node);
+}
+
 const sizes = {
 	small: { height: 28, paddingInline: 8, gap: 6, icon: 16 },
 	medium: { height: 32, paddingInline: 12, gap: 6, icon: 18 },
@@ -120,7 +127,7 @@ export function Button(props: ButtonProps) {
 			'onKeyUp',
 			'tabIndex',
 		],
-		['variant', 'size', 'iconOnly', 'radius', 'style', 'children'],
+		['variant', 'size', 'iconOnly', 'radius', 'style', 'children', 'ref'],
 	);
 	const variant = () => own.variant ?? defaults.variant ?? 'filled';
 	const size = () => sizes[own.size ?? defaults.size ?? 'medium'];
@@ -135,6 +142,10 @@ export function Button(props: ButtonProps) {
 		<div
 			{...rest}
 			{...buttonProps(behavior, renderer)}
+			ref={(element) => {
+				buttonElements.add(element);
+				own.ref?.(element);
+			}}
 			tabIndex={
 				behavior.disabled === true && behavior.focusableWhenDisabled !== true
 					? -1

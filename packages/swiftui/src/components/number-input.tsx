@@ -194,6 +194,7 @@ export function NumberInput(props: NumberInputProps) {
 					minWidth: 0,
 					alignSelf: 'stretch',
 					backgroundColor: 'transparent',
+					keyboardFocusDim: false,
 					...typography.variants.regular,
 					fontVariantNumeric: 'tabular-nums',
 					color: semanticColors.textPrimary,

@@ -12,6 +12,7 @@ import {
 	ErrorBoundaryViewDemo,
 	errorBoundaryViewScenario,
 } from '#src/demos/error-boundary-view.tsx';
+import { FieldDemo, fieldScenario } from '#src/demos/field.tsx';
 import { GlassPanelDemo, glassPanelScenario } from '#src/demos/glass-panel.tsx';
 import { InputDemo, inputScenario } from '#src/demos/input.tsx';
 import { LabelDemo, labelScenario } from '#src/demos/label.tsx';
@@ -63,6 +64,7 @@ export const demos: readonly Demo[] = [
 		scenario: glassPanelScenario,
 	},
 	{ name: 'checkbox', component: CheckboxDemo, scenario: checkboxScenario },
+	{ name: 'field', component: FieldDemo, scenario: fieldScenario },
 	{ name: 'input', component: InputDemo, scenario: inputScenario },
 	{
 		name: 'number-input',

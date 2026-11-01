@@ -23,9 +23,21 @@ export function Page(props: { title: string; children: JSX.Element }) {
 	);
 }
 
-export function Section(props: { title: string; children: JSX.Element }) {
+export function Section(props: {
+	title: string;
+	/** Fixes the section's width, to lay several side by side. */
+	width?: number;
+	children: JSX.Element;
+}) {
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 10,
+				...(props.width === undefined ? {} : { width: props.width }),
+			}}
+		>
 			<Text variant="smallStrong" color="secondary">
 				{props.title}
 			</Text>
