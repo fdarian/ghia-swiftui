@@ -1,0 +1,13 @@
+{
+	"name": "ghia-swiftui-workspace",
+	"private": true,
+	"packageManager": "pnpm@12.16.1",
+	"scripts": {
+		"format": "biome check --write",
+		"check": "turbo run check"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.4",
+		"turbo": "2.11.10"
+	}
+}

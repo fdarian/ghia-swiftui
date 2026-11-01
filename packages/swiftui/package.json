@@ -1,0 +1,30 @@
+{
+	"name": "ghia-swiftui",
+	"version": "0.0.0",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"imports": {
+		"#src/*": "./src/*"
+	},
+	"scripts": {
+		"check:type": "tsc",
+		"check:lint": "biome check"
+	},
+	"dependencies": {
+		"base-ui-solid-gpuix": "github:fdarian/base-ui-solid-gpuix#2528eb57d43d01d49f84b9cf7787fbcecc8496dc"
+	},
+	"peerDependencies": {
+		"@ghia/solid": "0.11.0",
+		"solid-js": "1.9.15"
+	},
+	"devDependencies": {
+		"@ghia/native": "0.11.0",
+		"@ghia/solid": "0.11.0",
+		"@total-typescript/tsconfig": "1.0.4",
+		"@types/bun": "1.4.4",
+		"solid-js": "1.9.15",
+		"typescript": "7.0.2"
+	}
+}

@@ -1,0 +1,4 @@
+preload = ["@ghia/solid/preload"]
+
+[test]
+preload = ["@ghia/solid/preload"]

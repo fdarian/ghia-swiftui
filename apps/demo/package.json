@@ -1,0 +1,27 @@
+{
+	"name": "ghia-swiftui-demo",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"imports": {
+		"#src/*": "./src/*"
+	},
+	"scripts": {
+		"start": "bun --hot src/main.tsx",
+		"screenshot": "bun scripts/screenshot.tsx",
+		"check:single-instance": "bun scripts/check-single-instance.ts",
+		"check:type": "tsc",
+		"check:lint": "biome check"
+	},
+	"dependencies": {
+		"@ghia/native": "0.11.0",
+		"@ghia/solid": "0.11.0",
+		"ghia-swiftui": "workspace:*",
+		"solid-js": "1.9.15"
+	},
+	"devDependencies": {
+		"@total-typescript/tsconfig": "1.0.4",
+		"@types/bun": "1.4.4",
+		"typescript": "7.0.2"
+	}
+}
