@@ -5,7 +5,9 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./preload": "./src/preload.ts",
-		"./tokens/*": "./src/tokens/*.ts"
+		"./tokens/*": "./src/tokens/*.ts",
+		"./native-glass": "./src/native-glass.ts",
+		"./objc": "./src/objc.ts"
 	},
 	"imports": {
 		"#src/*": "./src/*"
