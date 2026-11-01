@@ -15,6 +15,10 @@ import {
 import { GlassPanelDemo, glassPanelScenario } from '#src/demos/glass-panel.tsx';
 import { InputDemo, inputScenario } from '#src/demos/input.tsx';
 import { LabelDemo, labelScenario } from '#src/demos/label.tsx';
+import {
+	NumberInputDemo,
+	numberInputScenario,
+} from '#src/demos/number-input.tsx';
 import { RadioGroupDemo, radioGroupScenario } from '#src/demos/radio-group.tsx';
 import { SeparatorDemo } from '#src/demos/separator.tsx';
 import type { Shot } from '#src/demos/shot.ts';
@@ -60,6 +64,11 @@ export const demos: readonly Demo[] = [
 	},
 	{ name: 'checkbox', component: CheckboxDemo, scenario: checkboxScenario },
 	{ name: 'input', component: InputDemo, scenario: inputScenario },
+	{
+		name: 'number-input',
+		component: NumberInputDemo,
+		scenario: numberInputScenario,
+	},
 	{
 		name: 'radio-group',
 		component: RadioGroupDemo,

@@ -44,6 +44,12 @@ export {
 } from '#src/components/input.tsx';
 export { Label, type LabelProps } from '#src/components/label.tsx';
 export {
+	NumberInput,
+	type NumberInputProps,
+	type NumberInputSize,
+	type NumberInputVariant,
+} from '#src/components/number-input.tsx';
+export {
 	RadioGroup,
 	RadioGroupItem,
 	type RadioGroupItemProps,
