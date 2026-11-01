@@ -166,6 +166,8 @@ overrides:
   '@gpuix/solid': npm:@ghia/solid@0.11.0
   '@gpuix/native': npm:@ghia/native@0.11.0
 
+packageExtensionsChecksum: sha256-vdy8mex5w1CYteT2T5o/EEvRaNB8qlZ5I9CLlENnL4w=
+
 importers:
 
   .:
@@ -204,6 +206,15 @@ importers:
 
   packages/swiftui:
     dependencies:
+      '@babel/core':
+        specifier: 7.29.7
+        version: 7.29.7
+      '@babel/preset-typescript':
+        specifier: 7.29.7
+        version: 7.29.7(@babel/core@7.29.7)
+      babel-preset-solid:
+        specifier: 1.9.15
+        version: 1.9.15(@babel/core@7.29.7)(solid-js@1.9.15)
       base-ui-solid-gpuix:
         specifier: github:fdarian/base-ui-solid-gpuix#2528eb57d43d01d49f84b9cf7787fbcecc8496dc
         version: https://codeload.github.com/fdarian/base-ui-solid-gpuix/tar.gz/2528eb57d43d01d49f84b9cf7787fbcecc8496dc(@ghia/solid@0.11.0(solid-js@1.9.15))(solid-js@1.9.15)
@@ -217,6 +228,9 @@ importers:
       '@total-typescript/tsconfig':
         specifier: 1.0.4
         version: 1.0.4
+      '@types/babel__core':
+        specifier: 7.20.5
+        version: 7.20.5
       '@types/bun':
         specifier: 1.4.4
         version: 1.4.4
@@ -487,6 +501,18 @@ packages:
     resolution: {integrity: sha512-xOkEjF3ws/b/YNlc+bvJHMYBn+vL+QbEISZFVi0qS+ImmhA1X3/gmNmBrjjIG3dg6aeN+n6gQitzSkXQ286qJQ==}
     cpu: [arm64]
     os: [win32]
+
+  '@types/babel__core@7.20.5':
+    resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
+
+  '@types/babel__generator@7.27.0':
+    resolution: {integrity: sha512-ufFd2Xi92OAVPYsy+P4n7/U7e68fex0+Ee8gSG9KX7eo084CWiQ4sdxktvdl0bOPupXtVJPY19zk6EwWqUQ8lg==}
+
+  '@types/babel__template@7.4.4':
+    resolution: {integrity: sha512-h/NUaSyG5EyxBIp8YRxo4RMe2/qQgvyowRwVMzhYhBCONbW8PUsg4lkFMrhgZhUe5z3L3MiLDuvyJ/CaPa2A8A==}
+
+  '@types/babel__traverse@7.28.0':
+    resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
   '@types/bun@1.4.4':
     resolution: {integrity: sha512-9wkRDXUXK124pEnAutE6n/l18j+i9GC5IAHK8TmX/2nlySETmky0OU6yL5U8pW1AoKh++AN9auDCr647BfurjQ==}
@@ -1050,6 +1076,27 @@ snapshots:
   '@turbo/windows-arm64@2.11.10':
     optional: true
 
+  '@types/babel__core@7.20.5':
+    dependencies:
+      '@babel/parser': 7.29.12
+      '@babel/types': 7.29.11
+      '@types/babel__generator': 7.27.0
+      '@types/babel__template': 7.4.4
+      '@types/babel__traverse': 7.28.0
+
+  '@types/babel__generator@7.27.0':
+    dependencies:
+      '@babel/types': 7.29.11
+
+  '@types/babel__template@7.4.4':
+    dependencies:
+      '@babel/parser': 7.29.12
+      '@babel/types': 7.29.11
+
+  '@types/babel__traverse@7.28.0':
+    dependencies:
+      '@babel/types': 7.29.11
+
   '@types/bun@1.4.4':
     dependencies:
       bun-types: 1.4.4
@@ -1136,8 +1183,11 @@ snapshots:
 
   base-ui-solid-gpuix@https://codeload.github.com/fdarian/base-ui-solid-gpuix/tar.gz/2528eb57d43d01d49f84b9cf7787fbcecc8496dc(@ghia/solid@0.11.0(solid-js@1.9.15))(solid-js@1.9.15):
     dependencies:
+      '@ghia/solid': 0.11.0(solid-js@1.9.15)
       '@gpuix/solid': '@ghia/solid@0.11.0(solid-js@1.9.15)'
       solid-js: 1.9.15
+    transitivePeerDependencies:
+      - supports-color
 
   baseline-browser-mapping@2.11.34: {}
 

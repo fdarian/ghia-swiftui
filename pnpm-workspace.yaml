@@ -8,3 +8,8 @@ minimumReleaseAgeExclude:
 overrides:
   "@gpuix/solid": "npm:@ghia/solid@0.11.0"
   "@gpuix/native": "npm:@ghia/native@0.11.0"
+# base-ui-solid-gpuix is compiled by the Solid preload, which emits imports of `@ghia/solid`, and TypeScript resolves `jsxImportSource` from the file; neither is the alias name it declares.
+packageExtensions:
+  base-ui-solid-gpuix:
+    dependencies:
+      "@ghia/solid": "0.11.0"
