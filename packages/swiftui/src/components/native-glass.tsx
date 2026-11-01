@@ -23,11 +23,6 @@ import { parse } from '#src/tokens/color-math.ts';
  */
 const NativeGlassContext = createContext(false);
 
-/** Whether a `NativeGlass` here would be real glass, for callers that must pick a layout by it. */
-export function useInsideNativeGlass(): boolean {
-	return useContext(NativeGlassContext);
-}
-
 export interface NativeGlassProps extends HostAttributes {
 	/** A colour laid over the glass; its alpha is the strength. No tint by default. */
 	tint?: string;
