@@ -12,7 +12,8 @@
 		"check:single-instance": "bun scripts/check-single-instance.ts",
 		"check:type": "tsc",
 		"check:lint": "biome check",
-		"window-check": "bun scripts/window-check.ts"
+		"window-check": "bun scripts/window-check.ts",
+		"live-capture": "bun scripts/live-capture.tsx"
 	},
 	"dependencies": {
 		"@ghia/native": "0.11.0",

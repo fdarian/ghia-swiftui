@@ -20,6 +20,10 @@ import { FieldDemo, fieldScenario } from '#src/demos/field.tsx';
 import { GlassPanelDemo, glassPanelScenario } from '#src/demos/glass-panel.tsx';
 import { InputDemo, inputScenario } from '#src/demos/input.tsx';
 import { LabelDemo, labelScenario } from '#src/demos/label.tsx';
+import {
+	LiquidGlassDemo,
+	liquidGlassScenario,
+} from '#src/demos/liquid-glass.tsx';
 import { ListDemo, listScenario } from '#src/demos/list.tsx';
 import { MenuDemo, menuScenario } from '#src/demos/menu.tsx';
 import {
@@ -88,6 +92,11 @@ const entries: Omit<Demo, 'group'>[] = [
 		component: GlassPanelDemo,
 		scenario: glassPanelScenario,
 	},
+	{
+		name: 'liquid-glass',
+		component: LiquidGlassDemo,
+		scenario: liquidGlassScenario,
+	},
 	{ name: 'checkbox', component: CheckboxDemo, scenario: checkboxScenario },
 	{ name: 'field', component: FieldDemo, scenario: fieldScenario },
 	{ name: 'input', component: InputDemo, scenario: inputScenario },
@@ -138,7 +147,7 @@ const groups: Record<string, readonly string[]> = {
 	Foundations: ['tokens', 'text', 'separator', 'label', 'badge', 'status'],
 	Actions: ['button', 'button-defaults-provider'],
 	Feedback: ['callout', 'empty-state', 'error-boundary-view', 'toast'],
-	Surfaces: ['glass-panel'],
+	Surfaces: ['glass-panel', 'liquid-glass'],
 	Forms: [
 		'checkbox',
 		'radio-group',

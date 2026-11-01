@@ -9,22 +9,30 @@ import {
 	useContext,
 } from 'solid-js';
 import { ButtonDefaultsProvider } from '#src/components/button-defaults-context.tsx';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import { ProgressiveBlur } from '#src/components/progressive-blur.tsx';
 import { ScrollArea } from '#src/components/scroll-area.tsx';
 import { useScrollAreaContext } from '#src/components/scroll-area-context.ts';
 import { SidebarContext } from '#src/components/sidebar-context.ts';
 import { Text } from '#src/components/text.tsx';
 import { Toolbar, ToolbarRow } from '#src/components/toolbar.tsx';
-import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { hasNodes } from '#src/resolved.ts';
 import { createRevealOnSelect } from '#src/reveal.ts';
+import { colorScheme } from '#src/tokens/color-scheme.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 
 const SIDEBAR_INSET = 10;
 const ICON_SIZE = 16;
+
+/**
+ * syne scales the subdued material up so it samples a uniform patch and lays a
+ * 40% black scrim over it in dark mode. NSGlassEffectView has no subdued
+ * material, so the scrim becomes the glass's tint.
+ */
+const SIDEBAR_SCRIM = '#00000066';
 
 export interface SidebarProps extends HostAttributes {
 	/** Escape hatch: pass a fully custom Toolbar. Overrides `actions`. */
@@ -78,15 +86,16 @@ export function Sidebar(props: SidebarProps) {
 					...own.style,
 				}}
 			>
-				<div
+				<NativeGlass
 					aria-hidden
+					radius={0}
+					tint={colorScheme() === 'dark' ? SIDEBAR_SCRIM : undefined}
 					style={{
 						position: 'absolute',
 						top: 0,
 						right: 0,
 						bottom: 0,
 						left: 0,
-						...glass.material(),
 					}}
 				/>
 				<div

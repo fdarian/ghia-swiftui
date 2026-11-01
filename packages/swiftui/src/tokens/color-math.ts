@@ -1,4 +1,4 @@
-interface Rgba {
+export interface Rgba {
 	red: number;
 	green: number;
 	blue: number;
@@ -10,7 +10,8 @@ const HEX =
 const RGBA =
 	/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/;
 
-function parse(color: string): Rgba {
+/** `#rrggbb`, `#rrggbbaa` or `rgb()`/`rgba()` as 0-255 channels and a 0-1 alpha. */
+export function parse(color: string): Rgba {
 	const hex = HEX.exec(color);
 	if (hex !== null) {
 		return {

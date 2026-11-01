@@ -11,6 +11,7 @@ import {
 	splitProps,
 } from 'solid-js';
 import { Button, type ButtonProps } from '#src/components/button.tsx';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import { Panel, PanelGroup } from '#src/components/panel.tsx';
 import { useSidebarContext } from '#src/components/sidebar-context.ts';
 import {
@@ -28,11 +29,9 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '#src/components/tooltip.tsx';
-import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
 import { panelStorage } from '#src/panel-storage.ts';
-import { style as styleTokens } from '#src/tokens/style.ts';
 
 const SIDEBAR_DEFAULT_SIZE = 200;
 const SIDEBAR_MIN_SIZE = 180;
@@ -518,17 +517,16 @@ function SidebarToggle(props: SplitViewToggleProps) {
 					}
 				>
 					<Show when={pinned()} fallback={icon()}>
-						<span
+						<NativeGlass
 							aria-hidden
+							radius={TOGGLE_SIZE / 2}
 							style={{
 								position: 'absolute',
 								top: 0,
 								right: 0,
 								bottom: 0,
 								left: 0,
-								borderRadius: styleTokens.radiusPill,
 								pointerEvents: 'none',
-								...glass.material(),
 								opacity: split.sidebarCollapsed ? 1 : 0,
 								transition: `opacity ${TOGGLE_DURATION_MS}ms ${TOGGLE_EASE_IN}`,
 							}}

@@ -34,6 +34,12 @@ export function nativeGlassAvailable(): boolean {
 	return objcClass('NSGlassEffectView') !== null;
 }
 
+/** The `bigint` address `<nativeview onAttach>` hands over, as an FFI pointer: addresses fit a double exactly. */
+function asPointer(address: bigint): Pointer {
+	if (address === 0n) throw new Error('The nativeview content view is nil');
+	return Number(address) as unknown as Pointer;
+}
+
 function srgbColor(tint: NativeGlassOptions['tint']): Pointer | null {
 	if (tint.alpha === 0) return null;
 	return required(
@@ -69,6 +75,17 @@ function apply(glass: Pointer, options: NativeGlassOptions) {
 }
 
 /**
+ * Whether the window holding `content` is on a screen. The offscreen window of
+ * `createTestRoot` is not (AppKit gives it no `screen`): there a glass view
+ * would be real but never in a capture, so the caller keeps its fallback look.
+ */
+export function contentIsOnScreen(content: bigint): boolean {
+	const window = send.object(asPointer(content), selector('window'));
+	if (window === null) return false;
+	return send.object(window, selector('screen')) !== null;
+}
+
+/**
  * Adds an NSGlassEffectView filling `content` (the address `<nativeview
  * onAttach>` hands over). Must run on the main thread, inside `onAttach`.
  */
@@ -77,10 +94,7 @@ export function attachNativeGlass(
 	options: NativeGlassOptions,
 ): NativeGlassHandle {
 	assertMainThread('attachNativeGlass');
-	const contentView = required(
-		Number(content) as unknown as Pointer,
-		'the nativeview content view',
-	);
+	const contentView = asPointer(content);
 	const bounds = readRect(contentView, 'bounds');
 	const glass = required(
 		send.objectWithFourDoubles(
