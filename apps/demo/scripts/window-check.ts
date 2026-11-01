@@ -62,6 +62,13 @@ async function until(done: () => Promise<boolean>, timeoutMs = 6000) {
 	const end = Date.now() + timeoutMs;
 	while (!(await done()) && Date.now() < end) await settle(100);
 }
+/**
+ * The sidebar's collapse and expand are transitions, and a window another
+ * app's window covers is given no frames: the click lands and the width stays
+ * put until the cover moves. So these waits are long, and a width that never
+ * moved is reported as a covered window, not as a broken toggle.
+ */
+const TRANSITION_WAIT_MS = 30_000;
 const failures: string[] = [];
 function expect(ok: boolean, what: string) {
 	console.log(`${ok ? 'ok  ' : 'FAIL'} ${what}`);
@@ -84,7 +91,7 @@ try {
 		!overlaps(toggle, lights),
 		`the sidebar toggle (${toggle.x},${toggle.y} ${toggle.width}x${toggle.height}) is clear of the traffic lights`,
 	);
-	const title = await first.getByText('Tokens').bounds();
+	const title = await first.getByTestId('page').getByText('Tokens').bounds();
 	expect(
 		!overlaps(title, lights),
 		`the page title (${title.x},${title.y}) is clear of the traffic lights`,
@@ -107,14 +114,20 @@ try {
 	await first.getByTestId('sidebar-toggle').click();
 	await until(
 		async () => (await first.getByTestId('shell-sidebar').bounds()).width < 2,
+		TRANSITION_WAIT_MS,
 	);
 	await settle(300);
 	const collapsed = await first.getByTestId('shell-sidebar').bounds();
-	const titleAfter = await first.getByText('Tokens').bounds();
+	const titleAfter = await first
+		.getByTestId('page')
+		.getByText('Tokens')
+		.bounds();
 	const toggleAfter = await first.getByTestId('sidebar-toggle').bounds();
 	expect(
 		collapsed.width < 2,
-		`the toggle collapses the sidebar (${collapsed.width} wide)`,
+		collapsed.width === wider.width
+			? `the toggle collapses the sidebar: not checkable, the window stayed covered for ${TRANSITION_WAIT_MS / 1000}s and got no frames (${collapsed.width} wide)`
+			: `the toggle collapses the sidebar (${collapsed.width} wide)`,
 	);
 	expect(
 		titleAfter.x >= toggleAfter.x + toggleAfter.width,
@@ -145,6 +158,7 @@ try {
 			Math.abs(
 				(await second.getByTestId('shell-sidebar').bounds()).width - savedWidth,
 			) < 2,
+		TRANSITION_WAIT_MS,
 	);
 	await settle(300);
 	const restored = await second.getByTestId('shell-sidebar').bounds();
