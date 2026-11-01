@@ -17,5 +17,5 @@ export async function checkboxScenario(shot: Shot) {
 	shot.expectChecked('checkbox-spike', false);
 	await shot.click('checkbox-spike');
 	shot.expectChecked('checkbox-spike', true);
-	shot.capture('checked');
+	await shot.capture('checked');
 }
