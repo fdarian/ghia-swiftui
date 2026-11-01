@@ -65,6 +65,8 @@ export {
 	type InputVariant,
 } from '#src/components/input.tsx';
 export { Label, type LabelProps } from '#src/components/label.tsx';
+export type { ListRef, ListRootProps } from '#src/components/list.tsx';
+export * as List from '#src/components/list.tsx';
 export type {
 	MenuItemProps,
 	MenuPopupProps,
@@ -81,11 +83,23 @@ export {
 	type NumberInputVariant,
 } from '#src/components/number-input.tsx';
 export {
+	Panel,
+	PanelGroup,
+	type PanelGroupProps,
+	type PanelOrientation,
+	type PanelProps,
+} from '#src/components/panel.tsx';
+export {
 	RadioGroup,
 	RadioGroupItem,
 	type RadioGroupItemProps,
 	type RadioGroupProps,
 } from '#src/components/radio-group.tsx';
+export {
+	ScrollArea,
+	type ScrollAreaControl,
+	type ScrollAreaProps,
+} from '#src/components/scroll-area.tsx';
 export {
 	Select,
 	SelectContent,
@@ -107,6 +121,23 @@ export {
 	type ShortcutRecorderSize,
 } from '#src/components/shortcut-recorder.tsx';
 export {
+	Sidebar,
+	SidebarFooter,
+	type SidebarFooterProps,
+	SidebarList,
+	SidebarListItem,
+	type SidebarListItemProps,
+	type SidebarListProps,
+	type SidebarProps,
+} from '#src/components/sidebar.tsx';
+export {
+	type SlotSize,
+	SplitView,
+	type SplitViewProps,
+	type SplitViewToggleProps,
+	useSplitView,
+} from '#src/components/split-view.tsx';
+export {
 	Status,
 	type StatusProps,
 	type StatusVariant,
@@ -125,6 +156,21 @@ export {
 	type ToastType,
 } from '#src/components/toaster.tsx';
 export {
+	Toolbar,
+	ToolbarActions,
+	type ToolbarActionsProps,
+	ToolbarContent,
+	type ToolbarContentProps,
+	ToolbarDescription,
+	type ToolbarDescriptionProps,
+	type ToolbarInset,
+	type ToolbarProps,
+	ToolbarRow,
+	type ToolbarRowProps,
+	ToolbarTitle,
+	type ToolbarTitleProps,
+} from '#src/components/toolbar.tsx';
+export {
 	Tooltip,
 	TooltipContent,
 	type TooltipContentProps,
@@ -136,6 +182,11 @@ export {
 } from '#src/components/tooltip.tsx';
 export { Icon, type IconName, type IconProps } from '#src/icons/icon.tsx';
 export { IconSizeContext } from '#src/icons/icon-size.ts';
+export {
+	createFilePanelStorage,
+	type PanelStorage,
+	setPanelStorage,
+} from '#src/panel-storage.ts';
 export { setAccentColor } from '#src/tokens/accent.ts';
 export {
 	applyColorScheme,

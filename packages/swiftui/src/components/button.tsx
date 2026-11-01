@@ -166,6 +166,8 @@ export function Button(props: ButtonProps) {
 				borderStyle: 'solid',
 				borderColor: 'transparent',
 				cursor: 'default',
+				// A button in a drag region (a toolbar) cuts its own box out of it, as syne's `deep` drag region does.
+				appRegion: 'no-drag',
 				keyboardFocusDim: false,
 				focusVisible: {
 					boxShadow: `0 0 0 1px ${semanticColors.borderPrimary}`,
