@@ -16,6 +16,7 @@ import { FieldDemo, fieldScenario } from '#src/demos/field.tsx';
 import { GlassPanelDemo, glassPanelScenario } from '#src/demos/glass-panel.tsx';
 import { InputDemo, inputScenario } from '#src/demos/input.tsx';
 import { LabelDemo, labelScenario } from '#src/demos/label.tsx';
+import { MenuDemo, menuScenario } from '#src/demos/menu.tsx';
 import {
 	NumberInputDemo,
 	numberInputScenario,
@@ -86,6 +87,7 @@ export const demos: readonly Demo[] = [
 	{ name: 'settings', component: SettingsDemo, scenario: settingsScenario },
 	{ name: 'select', component: SelectDemo, scenario: selectScenario },
 	{ name: 'tooltip', component: TooltipDemo, scenario: tooltipScenario },
+	{ name: 'menu', component: MenuDemo, scenario: menuScenario },
 	{
 		name: 'radio-group',
 		component: RadioGroupDemo,

@@ -28,3 +28,27 @@ export function PopupShadow(props: { radius?: number }) {
 		/>
 	);
 }
+
+type Side = 'top' | 'right' | 'bottom' | 'left';
+type Align = 'start' | 'center' | 'end';
+
+/**
+ * The `<anchored>` `gap` and `offset` that put a popup `sideOffset` away from
+ * its anchor and `alignOffset` along it, for a layer padded by `SHADOW_PAD`.
+ */
+export function anchoredShift(
+	side: Side,
+	align: Align,
+	sideOffset: number,
+	alignOffset: number,
+) {
+	const along =
+		alignOffset +
+		(align === 'start' ? -SHADOW_PAD : 0) +
+		(align === 'end' ? SHADOW_PAD : 0);
+	const vertical = side === 'left' || side === 'right';
+	return {
+		gap: sideOffset - SHADOW_PAD,
+		offset: vertical ? { x: 0, y: along } : { x: along, y: 0 },
+	};
+}

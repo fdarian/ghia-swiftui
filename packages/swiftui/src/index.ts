@@ -59,6 +59,15 @@ export {
 	type InputVariant,
 } from '#src/components/input.tsx';
 export { Label, type LabelProps } from '#src/components/label.tsx';
+export type {
+	MenuItemProps,
+	MenuPopupProps,
+	MenuPortalProps,
+	MenuPositionerProps,
+	MenuRootProps,
+	MenuTriggerProps,
+} from '#src/components/menu.tsx';
+export * as Menu from '#src/components/menu.tsx';
 export {
 	NumberInput,
 	type NumberInputProps,
