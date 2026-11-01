@@ -8,7 +8,7 @@
  *   pnpm live-capture <demo> [step...] [--out dir]
  *
  * Steps run in order: `shot=<name>` writes `<name>.png`, `click=<testId>`,
- * `rightclick=<testId>`, `hover=<testId>`, `wait=<ms>`, `dark`, `light`,
+ * `rightclick=<testId>`, `hover=<testId>`, `wheel=<testId>:<deltaY>`, `key=<key>`, `wait=<ms>`, `dark`, `light`,
  * `system` (the shell's scheme choices). `--backdrop` paints an opaque window
  * under the app, so what the glass samples does not depend on the desktop.
  */
@@ -94,6 +94,21 @@ for (const step of steps) {
 			else if (name === 'click') await target.click();
 			else await target.click({ button: 2 });
 			await sleep(500);
+			break;
+		}
+		case 'wheel': {
+			const [testId, delta] = (value ?? '').split(':');
+			if (testId === undefined || delta === undefined) {
+				throw new Error('wheel needs <testId>:<deltaY>');
+			}
+			await app.getByTestId(testId).wheel(0, Number(delta));
+			await sleep(500);
+			break;
+		}
+		case 'key': {
+			if (value === undefined) throw new Error('key needs a key');
+			await app.getByTestId('page').press(value);
+			await sleep(400);
 			break;
 		}
 		case 'wait':

@@ -8,6 +8,7 @@ import {
 	Show,
 } from 'solid-js';
 import { Button } from '#src/components/button.tsx';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import { Text } from '#src/components/text.tsx';
 import { glass } from '#src/glass.ts';
 import { Icon, type IconName } from '#src/icons/icon.tsx';
@@ -22,6 +23,7 @@ import {
 	type ToastType,
 	toasts,
 } from '#src/toast-store.ts';
+import { colorScheme } from '#src/tokens/color-scheme.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
@@ -38,6 +40,9 @@ const OFFSET = 24;
 const MAX_WIDTH = 400;
 /** `min(9999px, calc(1.5rem + 0.5lh))` at the 18px line height of `strong`. */
 const PILL_RADIUS = 33;
+
+/** syne's `bg-glass-toast` lays 70% white over the media-controls material in light mode. */
+const TOAST_LIGHT_TINT = '#ffffffb3';
 
 const icons: Record<ToastType, { name: IconName; color: () => string }> = {
 	success: { name: 'circle-check', color: () => colors.green },
@@ -114,7 +119,10 @@ export function Toast(props: ToastProps) {
 			</div>
 			<div style={{ position: 'relative', display: 'flex' }}>
 				<PopupShadow radius={PILL_RADIUS} />
-				<div
+				<NativeGlass
+					radius={PILL_RADIUS}
+					tint={colorScheme() === 'dark' ? undefined : TOAST_LIGHT_TINT}
+					fallback={glass.toast()}
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
@@ -123,9 +131,7 @@ export function Toast(props: ToastProps) {
 						gap: 10,
 						paddingInline: 16,
 						paddingBlock: 12,
-						borderRadius: PILL_RADIUS,
 						outline: `1px solid ${semanticColors.borderSecondary}`,
-						...glass.toast(),
 					}}
 				>
 					<Show when={props.type}>
@@ -171,7 +177,7 @@ export function Toast(props: ToastProps) {
 							</Button>
 						)}
 					</For>
-				</div>
+				</NativeGlass>
 			</div>
 		</div>
 	);

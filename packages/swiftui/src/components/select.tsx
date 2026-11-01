@@ -19,6 +19,7 @@ import {
 	useContext,
 } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
@@ -482,14 +483,15 @@ export function SelectContent(props: SelectContentProps) {
 					}}
 				>
 					<PopupShadow />
-					<div
+					<NativeGlass
+						radius={styleTokens.radiusPopover}
+						fallback={glass.tinted(
+							withAlpha(semanticColors.surfacePopover, 0.7),
+						)}
 						style={{
 							display: 'flex',
 							flexDirection: 'column',
-							borderRadius: styleTokens.radiusPopover,
 							outline: `1px solid ${semanticColors.borderSecondary}`,
-							...glass.tinted(withAlpha(semanticColors.surfacePopover, 0.7)),
-							overflow: 'hidden',
 							maxHeight: maxHeight(),
 						}}
 					>
@@ -512,7 +514,7 @@ export function SelectContent(props: SelectContentProps) {
 								)}
 							</For>
 						</div>
-					</div>
+					</NativeGlass>
 				</motion.div>
 			</anchored>
 		</Show>

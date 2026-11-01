@@ -324,7 +324,6 @@ export function MenuPopup(props: MenuPopupProps) {
 					style={{
 						flexDirection: 'column',
 						alignItems: 'stretch',
-						borderRadius: styleTokens.radiusPopover,
 						outline: `1px solid ${semanticColors.borderSecondary}`,
 						keyboardFocusDim: false,
 						...own.style,

@@ -3,12 +3,14 @@ import {
 	GlassPanel,
 	Icon,
 	List,
+	Menu,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 	Status,
+	showContextMenu,
 	Text,
 	toast,
 } from 'ghia-swiftui';
@@ -132,6 +134,61 @@ export function LiquidGlassDemo() {
 					>
 						Show a toast
 					</Button>
+				</Colourful>
+			</Section>
+			<Section title="Popups over colour: Menu, Select, context menu">
+				<Colourful height={150}>
+					<Menu.Root>
+						<Menu.Trigger>
+							<Button testId="liquid-menu-trigger" variant="filled">
+								Menu
+							</Button>
+						</Menu.Trigger>
+						<Menu.Portal>
+							<Menu.Positioner side="bottom" align="start" sideOffset={4}>
+								<Menu.Popup testId="liquid-menu-popup">
+									<Menu.Item label="Show in Apple Music">
+										<Icon name="external-link" />
+										Show in Apple Music
+									</Menu.Item>
+									<Menu.Item label="Delete Entry">
+										<Icon name="trash" />
+										Delete Entry
+									</Menu.Item>
+								</Menu.Popup>
+							</Menu.Positioner>
+						</Menu.Portal>
+					</Menu.Root>
+					<Select defaultValue="tidal">
+						<SelectTrigger testId="liquid-select" variant="default">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="spotify">Spotify</SelectItem>
+							<SelectItem value="tidal">Tidal</SelectItem>
+							<SelectItem value="youtube">YouTube Music</SelectItem>
+						</SelectContent>
+					</Select>
+					<div
+						testId="liquid-context"
+						onContextMenu={(event) => {
+							void showContextMenu({
+								items: [
+									{ id: 'copy', label: 'Copy Link' },
+									{ id: 'remove', label: 'Remove from History' },
+								],
+								x: event.clientX ?? 0,
+								y: event.clientY ?? 0,
+							});
+						}}
+						style={{
+							padding: 12,
+							borderRadius: 8,
+							backgroundColor: '#00000066',
+						}}
+					>
+						<Text style={{ color: '#ffffff' }}>Right-click me</Text>
+					</div>
 				</Colourful>
 			</Section>
 		</Page>
