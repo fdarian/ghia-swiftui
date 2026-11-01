@@ -5,6 +5,7 @@ import {
 	ContextMenuHost,
 	followSystemColorScheme,
 	Text,
+	Toaster,
 	TooltipProvider,
 } from 'ghia-swiftui';
 import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors';
@@ -127,6 +128,7 @@ export function App(props: { initial?: string }) {
 					</div>
 				</div>
 				<ContextMenuHost />
+				<Toaster />
 			</TooltipProvider>
 		</ColorSchemeProvider>
 	);

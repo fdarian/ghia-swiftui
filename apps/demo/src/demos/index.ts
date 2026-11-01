@@ -36,6 +36,7 @@ import {
 import type { Shot } from '#src/demos/shot.ts';
 import { StatusDemo, statusScenario } from '#src/demos/status.tsx';
 import { TextDemo } from '#src/demos/text.tsx';
+import { ToastDemo, toastScenario } from '#src/demos/toast.tsx';
 import { TokensDemo, tokensScenario } from '#src/demos/tokens.tsx';
 import { TooltipDemo, tooltipScenario } from '#src/demos/tooltip.tsx';
 
@@ -92,6 +93,7 @@ export const demos: readonly Demo[] = [
 	{ name: 'select', component: SelectDemo, scenario: selectScenario },
 	{ name: 'tooltip', component: TooltipDemo, scenario: tooltipScenario },
 	{ name: 'menu', component: MenuDemo, scenario: menuScenario },
+	{ name: 'toast', component: ToastDemo, scenario: toastScenario },
 	{
 		name: 'context-menu',
 		component: ContextMenuDemo,
