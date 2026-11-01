@@ -95,6 +95,11 @@ const shot: Shot = {
 		renderer.nativeSimulateClick(pointer.x, pointer.y);
 		await settle();
 	},
+	async rightClick(testId) {
+		pointer = centre(testId);
+		renderer.nativeSimulateClick(pointer.x, pointer.y, 2);
+		await settle();
+	},
 	async clickEnd(testId) {
 		const bounds = renderer.getElementBounds(elementByTestId(testId).id);
 		if (bounds === null) throw new Error(`no box for ${testId}`);

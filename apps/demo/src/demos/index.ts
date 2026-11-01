@@ -7,6 +7,10 @@ import {
 } from '#src/demos/button-defaults-provider.tsx';
 import { CalloutDemo, calloutScenario } from '#src/demos/callout.tsx';
 import { CheckboxDemo, checkboxScenario } from '#src/demos/checkbox.tsx';
+import {
+	ContextMenuDemo,
+	contextMenuScenario,
+} from '#src/demos/context-menu.tsx';
 import { EmptyStateDemo, emptyStateScenario } from '#src/demos/empty-state.tsx';
 import {
 	ErrorBoundaryViewDemo,
@@ -88,6 +92,11 @@ export const demos: readonly Demo[] = [
 	{ name: 'select', component: SelectDemo, scenario: selectScenario },
 	{ name: 'tooltip', component: TooltipDemo, scenario: tooltipScenario },
 	{ name: 'menu', component: MenuDemo, scenario: menuScenario },
+	{
+		name: 'context-menu',
+		component: ContextMenuDemo,
+		scenario: contextMenuScenario,
+	},
 	{
 		name: 'radio-group',
 		component: RadioGroupDemo,

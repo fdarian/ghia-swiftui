@@ -142,6 +142,14 @@ export async function menuScenario(shot: Shot) {
 	await shot.wait(300);
 	shot.expectAbsent('menu-popup');
 
+	// A press outside closes it.
+	await shot.click('menu-trigger');
+	await shot.wait(200);
+	shot.expectPresent('menu-popup');
+	await shot.click('menu-picked');
+	await shot.wait(300);
+	shot.expectAbsent('menu-popup');
+
 	// A pointer open hands focus back to the trigger on close.
 	await shot.click('menu-trigger');
 	await shot.wait(200);

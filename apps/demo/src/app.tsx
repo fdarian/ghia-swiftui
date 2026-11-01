@@ -2,6 +2,7 @@ import {
 	applyColorScheme,
 	Button,
 	ColorSchemeProvider,
+	ContextMenuHost,
 	followSystemColorScheme,
 	Text,
 	TooltipProvider,
@@ -35,8 +36,11 @@ export function App(props: { initial?: string }) {
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
-						width: '100%',
-						height: '100%',
+						position: 'fixed',
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0,
 						backgroundColor: semanticColors.backgroundSolid,
 					}}
 				>
@@ -122,6 +126,7 @@ export function App(props: { initial?: string }) {
 						</Show>
 					</div>
 				</div>
+				<ContextMenuHost />
 			</TooltipProvider>
 		</ColorSchemeProvider>
 	);

@@ -24,6 +24,12 @@ export {
 	type CheckedState,
 } from '#src/components/checkbox.tsx';
 export {
+	ContextMenuHost,
+	type ContextMenuItem,
+	type ShowContextMenuOptions,
+	showContextMenu,
+} from '#src/components/context-menu.tsx';
+export {
 	EmptyState,
 	EmptyStateActions,
 	EmptyStateDescription,
