@@ -14,6 +14,12 @@ export interface Shot {
 	leave(): Promise<void>;
 	/** Moves keyboard focus to the element, as Tab would: it shows its focus ring. */
 	focus(testId: string): Promise<void>;
+	/**
+	 * Presses keys on whatever holds focus, as `ArrowDown`, `Shift+Tab`, `Meta+k`, `a`: a
+	 * space-separated sequence, each press a keydown then a keyup, typed keys inserted into a
+	 * focused input.
+	 */
+	keys(keystrokes: string): Promise<void>;
 	/** Lets time pass, for animations. */
 	wait(ms: number): Promise<void>;
 	/** Throws unless the element's accessibility node reports this `checked` state. */

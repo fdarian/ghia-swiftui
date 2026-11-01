@@ -128,6 +128,10 @@ const shot: Shot = {
 		renderer.focusElement(elementByTestId(testId).id);
 		await settle();
 	},
+	async keys(keystrokes) {
+		renderer.simulateKeystrokes(keystrokes);
+		await settle();
+	},
 	wait: (ms) => settle(ms),
 	expectChecked(testId, checked) {
 		const id = elementByTestId(testId).customProps?.id;

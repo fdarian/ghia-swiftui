@@ -14,6 +14,7 @@ import {
 } from '#src/demos/error-boundary-view.tsx';
 import { GlassPanelDemo, glassPanelScenario } from '#src/demos/glass-panel.tsx';
 import { LabelDemo, labelScenario } from '#src/demos/label.tsx';
+import { RadioGroupDemo, radioGroupScenario } from '#src/demos/radio-group.tsx';
 import { SeparatorDemo } from '#src/demos/separator.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 import { StatusDemo, statusScenario } from '#src/demos/status.tsx';
@@ -57,4 +58,9 @@ export const demos: readonly Demo[] = [
 		scenario: glassPanelScenario,
 	},
 	{ name: 'checkbox', component: CheckboxDemo, scenario: checkboxScenario },
+	{
+		name: 'radio-group',
+		component: RadioGroupDemo,
+		scenario: radioGroupScenario,
+	},
 ];

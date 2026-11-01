@@ -92,9 +92,10 @@ export function Checkbox(props: CheckboxProps) {
 					? colors.accent
 					: semanticColors.surfaceControl,
 				color: semanticColors.accentContrast,
-				boxShadow: isInvalid(own['aria-invalid'])
-					? `0 0 0 1px ${colors.red}`
-					: `0 1px 2px 0 ${colors.fg5}`,
+				boxShadow: `0 1px 2px 0 ${colors.fg5}`,
+				...(isInvalid(own['aria-invalid'])
+					? { outline: `1px solid ${colors.red}` }
+					: {}),
 				cursor: 'default',
 				keyboardFocusDim: false,
 				active: {
@@ -102,7 +103,8 @@ export function Checkbox(props: CheckboxProps) {
 						? semanticColors.accentHover
 						: semanticColors.surfaceControlActive,
 				},
-				focusVisible: { boxShadow: `0 0 0 3px ${colors.fg20}` },
+				// An outline, not a box-shadow ring: ghia gives a shadow's spread the element's own radius, so the ring's corners would be too tight.
+				focusVisible: { outline: `3px solid ${colors.fg20}` },
 				...(isDisabled() ? { pointerEvents: 'none', opacity: 0.5 } : {}),
 				...own.style,
 			}}

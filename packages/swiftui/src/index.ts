@@ -37,6 +37,12 @@ export {
 	type GlassPanelProps,
 } from '#src/components/glass-panel.tsx';
 export { Label, type LabelProps } from '#src/components/label.tsx';
+export {
+	RadioGroup,
+	RadioGroupItem,
+	type RadioGroupItemProps,
+	type RadioGroupProps,
+} from '#src/components/radio-group.tsx';
 export { Separator, type SeparatorProps } from '#src/components/separator.tsx';
 export {
 	Status,
