@@ -24,6 +24,7 @@ import { Button } from '#src/components/button.tsx';
 import { ButtonDefaultsProvider } from '#src/components/button-defaults-context.tsx';
 import { usePanelContext } from '#src/components/panel-context.ts';
 import { ScrollAreaContext } from '#src/components/scroll-area-context.ts';
+import { useSidebarContext } from '#src/components/sidebar-context.ts';
 import { useSplitViewColumnContext } from '#src/components/split-view-column-context.ts';
 import {
 	Toolbar,
@@ -42,6 +43,8 @@ import { colors } from '#src/tokens/colors.ts';
 const LAST_COLUMN_SCROLLBAR_BOTTOM_OFFSET = 18;
 const AT_BOTTOM_THRESHOLD_PX = 5;
 const FADE_SIZE = 32;
+/** How far content fades out over the toolbar's bottom edge and ahead of the footer's top edge. */
+const INSET_FADE_SIZE = 16;
 /** The bar's 3px margin plus its 12px width under the pointer: the track keeps this hit target while the visible bar widens inside it. */
 const TRACK_SIZE = 15;
 const BAR_MARGIN = 3;
@@ -268,6 +271,10 @@ function BuiltToolbarContent(props: {
  * The scroller is a native `overflow: 'scroll'` box with its own bar hidden;
  * the bars are drawn here from base-ui's scroll-area geometry, so they stay
  * between the toolbar and the footer.
+ *
+ * Inside a `Sidebar` the content fades out under the toolbar and the footer
+ * instead of being blurred by them: the sidebar's glass is a native view, and
+ * a `backdropFilter` painted over a native view blurs nothing.
  */
 export function ScrollArea(props: ScrollAreaProps) {
 	const [own, rest] = splitProps(props, [
@@ -447,6 +454,30 @@ export function ScrollArea(props: ScrollAreaProps) {
 		return `linear-gradient(to bottom, black calc(100% - ${FADE_SIZE}px), transparent 100%)`;
 	};
 
+	const overGlass = useSidebarContext();
+	/**
+	 * Opaque between the insets, fading to clear over the toolbar's bottom edge.
+	 * Ahead of the footer the fade is as long as the scroll left, so a list at
+	 * its end is not dimmed where it comes to rest against the footer.
+	 */
+	const insetMask = () => {
+		const top = toolbarHeight();
+		const bottom = footerHeight();
+		const remaining = Math.max(
+			0,
+			(root.thumb('y')?.maxScroll ?? 0) - root.offset().y,
+		);
+		const bottomFade = Math.min(INSET_FADE_SIZE, remaining);
+		const stops = [
+			`transparent ${Math.max(0, top - INSET_FADE_SIZE)}px`,
+			`black ${top}px`,
+			`black calc(100% - ${bottom + bottomFade}px)`,
+			`transparent calc(100% - ${bottom}px)`,
+		];
+		return `linear-gradient(to bottom, ${stops.join(', ')})`;
+	};
+	const viewportMask = () => (overGlass ? insetMask() : fadeMask());
+
 	const verticalBar = createScrollAreaScrollbar(root, 'y', { thumbInset: 0 });
 	const horizontalBar = createScrollAreaScrollbar(root, 'x', {
 		thumbInset: 0,
@@ -521,7 +552,7 @@ export function ScrollArea(props: ScrollAreaProps) {
 						height: '100%',
 						paddingTop: toolbarHeight(),
 						paddingBottom: footerHeight(),
-						maskImage: fadeMask(),
+						maskImage: viewportMask(),
 						overflowX: hasHorizontalScrollbar() ? 'scroll' : 'hidden',
 						overflowY: hasVerticalScrollbar() ? 'scroll' : 'hidden',
 						overscrollBehaviorX: hasHorizontalScrollbar() ? 'contain' : 'auto',

@@ -90,6 +90,21 @@ const writeToFile = bind<[Pointer, Pointer, Pointer, boolean], boolean>(
 	FFIType.bool,
 );
 
+const setOrigin = bind<[Pointer, Pointer, number, number], void>(
+	[P, P, D, D],
+	VOID,
+);
+
+/**
+ * Moves the window's bottom-left corner to a point in screen coordinates
+ * (origin bottom-left). A window under other apps' windows gets no frames, so
+ * a capture parks it with a strip on the screen's edge showing: the rest of
+ * the window may hang off the screen and is still drawn and captured.
+ */
+export function moveWindow(x: number, y: number) {
+	setOrigin(visibleWindow(), selector('setFrameOrigin:'), x, y);
+}
+
 function visibleWindow(): Pointer {
 	const app = required(
 		send.object(requiredClass('NSApplication'), selector('sharedApplication')),

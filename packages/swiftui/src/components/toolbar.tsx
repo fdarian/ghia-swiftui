@@ -172,7 +172,8 @@ export function Toolbar(props: ToolbarProps) {
 					...own.style,
 				}}
 			>
-				<Show when={background() === 'progressive-blur'}>
+				{/* A sidebar's glass is a native view, which a backdrop blur over it cannot see; `ScrollArea` fades the list out there instead. */}
+				<Show when={background() === 'progressive-blur' && !inSidebar}>
 					<ProgressiveBlur
 						position={position()}
 						height="100%"

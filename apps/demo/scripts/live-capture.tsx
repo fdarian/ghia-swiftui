@@ -9,14 +9,14 @@
  *
  * Steps run in order: `shot=<name>` writes `<name>.png`, `click=<testId>`,
  * `rightclick=<testId>`, `hover=<testId>`, `wheel=<testId>:<deltaY>`, `key=<key>`, `wait=<ms>`, `dark`, `light`,
- * `system` (the shell's scheme choices). `--backdrop` paints an opaque window
+ * `system` (the shell's scheme choices), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--backdrop` paints an opaque window
  * under the app, so what the glass samples does not depend on the desktop.
  */
 import { mkdirSync } from 'node:fs';
 import { applyColorScheme } from 'ghia-swiftui';
 import { demos } from '#src/demos/index.ts';
 import { openLiveWindow, sleep } from './live-window.tsx';
-import { captureWindow, countViews } from './window-pixels.ts';
+import { captureWindow, countViews, moveWindow } from './window-pixels.ts';
 
 const args = process.argv.slice(2);
 const outFlag = args.indexOf('--out');
@@ -58,6 +58,15 @@ for (const step of steps) {
 			else if (name === 'click') await target.click();
 			else await target.click({ button: 2 });
 			await sleep(500);
+			break;
+		}
+		case 'move': {
+			const [x, y] = (value ?? '').split(':');
+			if (x === undefined || y === undefined) {
+				throw new Error('move needs <x>:<y>');
+			}
+			moveWindow(Number(x), Number(y));
+			await sleep(600);
 			break;
 		}
 		case 'count':

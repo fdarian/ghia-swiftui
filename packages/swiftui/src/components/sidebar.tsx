@@ -10,7 +10,6 @@ import {
 } from 'solid-js';
 import { ButtonDefaultsProvider } from '#src/components/button-defaults-context.tsx';
 import { NativeGlass } from '#src/components/native-glass.tsx';
-import { ProgressiveBlur } from '#src/components/progressive-blur.tsx';
 import { ScrollArea } from '#src/components/scroll-area.tsx';
 import { useScrollAreaContext } from '#src/components/scroll-area-context.ts';
 import { SidebarContext } from '#src/components/sidebar-context.ts';
@@ -441,12 +440,11 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 
 export interface SidebarFooterProps extends HostAttributes {}
 
-/** The footer slot's content: blurs what scrolls under it, with the flush layout's 10px inset. */
+/** The footer slot's content, with the flush layout's 10px inset. The list fades out above it (see `ScrollArea`). */
 export function SidebarFooter(props: SidebarFooterProps) {
 	const [own, rest] = splitProps(props, ['style', 'children']);
 	return (
 		<div {...rest} style={{ position: 'relative', ...own.style }}>
-			<ProgressiveBlur position="bottom" height="100%" />
 			<div
 				style={{
 					position: 'relative',
