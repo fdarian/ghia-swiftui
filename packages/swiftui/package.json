@@ -4,7 +4,8 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./preload": "./src/preload.ts"
+		"./preload": "./src/preload.ts",
+		"./tokens/*": "./src/tokens/*.ts"
 	},
 	"imports": {
 		"#src/*": "./src/*"
