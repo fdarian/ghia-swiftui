@@ -21,6 +21,7 @@ import {
 	numberInputScenario,
 } from '#src/demos/number-input.tsx';
 import { RadioGroupDemo, radioGroupScenario } from '#src/demos/radio-group.tsx';
+import { SelectDemo, selectScenario } from '#src/demos/select.tsx';
 import { SeparatorDemo } from '#src/demos/separator.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 import { StatusDemo, statusScenario } from '#src/demos/status.tsx';
@@ -71,6 +72,7 @@ export const demos: readonly Demo[] = [
 		component: NumberInputDemo,
 		scenario: numberInputScenario,
 	},
+	{ name: 'select', component: SelectDemo, scenario: selectScenario },
 	{
 		name: 'radio-group',
 		component: RadioGroupDemo,

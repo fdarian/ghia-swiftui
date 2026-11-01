@@ -71,6 +71,20 @@ export {
 	type RadioGroupItemProps,
 	type RadioGroupProps,
 } from '#src/components/radio-group.tsx';
+export {
+	Select,
+	SelectContent,
+	type SelectContentProps,
+	SelectItem,
+	type SelectItemProps,
+	type SelectProps,
+	SelectTrigger,
+	type SelectTriggerProps,
+	type SelectTriggerSize,
+	type SelectTriggerVariant,
+	SelectValue,
+	type SelectValueProps,
+} from '#src/components/select.tsx';
 export { Separator, type SeparatorProps } from '#src/components/separator.tsx';
 export {
 	Status,
