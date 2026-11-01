@@ -1,25 +1,26 @@
 import type { StyleDesc } from '@ghia/solid';
-import { Text } from 'ghia-swiftui';
+import { ScrollArea, Text } from 'ghia-swiftui';
 import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors';
 import type { JSX } from 'solid-js';
 
-export function Page(props: { title: string; children: JSX.Element }) {
+export function Page(props: {
+	title: string;
+	subtitle?: string;
+	children: JSX.Element;
+}) {
 	return (
-		<div
-			style={{
-				display: 'flex',
-				flexDirection: 'column',
-				gap: 24,
-				height: '100%',
-				overflow: 'auto',
-				padding: 24,
-			}}
-		>
-			<Text variant="heading2" as="h1">
-				{props.title}
-			</Text>
-			{props.children}
-		</div>
+		<ScrollArea testId="page" title={props.title} subtitle={props.subtitle}>
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					gap: 24,
+					padding: 24,
+				}}
+			>
+				{props.children}
+			</div>
+		</ScrollArea>
 	);
 }
 
@@ -91,6 +92,36 @@ export function Surface(props: { children: JSX.Element; style?: StyleDesc }) {
 				borderWidth: 1,
 				borderStyle: 'solid',
 				borderColor: semanticColors.borderSecondary,
+				...props.style,
+			}}
+		>
+			{props.children}
+		</div>
+	);
+}
+
+/** A bordered, clipped window-in-a-window for components that fill their parent: a scroll area, a split view. */
+export function Frame(props: {
+	height: number;
+	width?: number | string;
+	testId?: string;
+	children: JSX.Element;
+	style?: StyleDesc;
+}) {
+	return (
+		<div
+			testId={props.testId}
+			style={{
+				position: 'relative',
+				height: props.height,
+				width: props.width ?? '100%',
+				flexShrink: 0,
+				overflow: 'hidden',
+				borderRadius: 12,
+				borderWidth: 1,
+				borderStyle: 'solid',
+				borderColor: semanticColors.borderSecondary,
+				backgroundColor: semanticColors.backgroundSolid,
 				...props.style,
 			}}
 		>

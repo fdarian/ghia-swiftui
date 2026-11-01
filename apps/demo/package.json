@@ -11,7 +11,8 @@
 		"screenshot": "bun scripts/screenshot.tsx",
 		"check:single-instance": "bun scripts/check-single-instance.ts",
 		"check:type": "tsc",
-		"check:lint": "biome check"
+		"check:lint": "biome check",
+		"window-check": "bun scripts/window-check.ts"
 	},
 	"dependencies": {
 		"@ghia/native": "0.11.0",

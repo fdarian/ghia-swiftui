@@ -22,6 +22,16 @@ export interface Shot {
 	 * focused input.
 	 */
 	keys(keystrokes: string): Promise<void>;
+	/** Turns the wheel over the element's centre by `deltaY` px, positive scrolling down. */
+	wheel(testId: string, deltaY: number): Promise<void>;
+	/** Scrolls whatever scrolls around the element until it is in view, as `scrollIntoView` does. */
+	reveal(testId: string): Promise<void>;
+	/** Scrolls the element to `top` px, as `scrollTo` does. */
+	scrollTo(testId: string, top: number): Promise<void>;
+	/** Drags the primary button from the element's centre by `dx`, `dy` px and releases it. */
+	drag(testId: string, dx: number, dy: number): Promise<void>;
+	/** Presses on the element's centre and reports whether the window was asked to move: it sits in an `appRegion: 'drag'` box. */
+	isDragRegion(testId: string): Promise<boolean>;
 	/** Lets time pass, for animations. */
 	wait(ms: number): Promise<void>;
 	/** Throws unless the element's accessibility node reports this `checked` state. */
@@ -30,8 +40,18 @@ export interface Shot {
 	expectText(testId: string, text: string): void;
 	/** Throws unless the element holds keyboard focus. */
 	expectFocused(testId: string): void;
+	/** The element's border box in window coordinates. */
+	box(testId: string): { x: number; y: number; width: number; height: number };
+	/** The element's `[scrollTop, scrollHeight, clientHeight]`. */
+	scrollMetrics(testId: string): {
+		scrollTop: number;
+		scrollHeight: number;
+		clientHeight: number;
+	};
 	/** Throws unless an element with this test id is in the tree. */
 	expectPresent(testId: string): void;
+	/** Throws if the element has a box: it was built and laid out. A virtual list builds only the rows near its viewport. */
+	expectNotPainted(testId: string): void;
 	/** Throws if an element with this test id is in the tree. */
 	expectAbsent(testId: string): void;
 	/** Writes `<name>-light.png` and `<name>-dark.png`, then restores light. */

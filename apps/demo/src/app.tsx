@@ -4,6 +4,11 @@ import {
 	ColorSchemeProvider,
 	ContextMenuHost,
 	followSystemColorScheme,
+	Sidebar,
+	SidebarFooter,
+	SidebarList,
+	SidebarListItem,
+	SplitView,
 	Text,
 	Toaster,
 	TooltipProvider,
@@ -14,118 +19,141 @@ import { type Demo, demos } from '#src/demos/index.ts';
 
 export const WINDOW_TITLE = 'ghia-swiftui';
 
+/** Height of the strip along the top of the window that drags it: `Toolbar`'s own row height. */
+const DRAG_STRIP_HEIGHT = 52;
+
 const schemeChoices = [
 	{ name: 'system', label: 'System', apply: followSystemColorScheme },
 	{ name: 'light', label: 'Light', apply: () => applyColorScheme(false) },
 	{ name: 'dark', label: 'Dark', apply: () => applyColorScheme(true) },
 ] as const;
 
-export function App(props: { initial?: string }) {
+/** Section names in the order the demos list them first. */
+const sections = [...new Set(demos.map((demo) => demo.group))];
+
+function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
+	const [scheme, setScheme] = createSignal<string>('system');
+	return (
+		<Sidebar
+			testId="nav"
+			actions={<SplitView.SidebarToggle testId="sidebar-toggle" />}
+			footer={
+				<SidebarFooter>
+					<div style={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
+						<For each={schemeChoices}>
+							{(choice) => (
+								<Button
+									testId={`scheme-${choice.name}`}
+									size="small"
+									radius="rounded"
+									variant={scheme() === choice.name ? 'accent' : 'filled'}
+									onClick={() => {
+										setScheme(choice.name);
+										choice.apply();
+									}}
+									style={{ paddingInline: 6, fontSize: 11 }}
+								>
+									{choice.label}
+								</Button>
+							)}
+						</For>
+					</div>
+				</SidebarFooter>
+			}
+		>
+			<SidebarList
+				items={[...demos]}
+				selectedItem={props.selected}
+				onSelectedItemChange={props.onSelect}
+				getItemKey={(demo) => demo.name}
+			>
+				<For each={sections}>
+					{(section) => (
+						<>
+							<div
+								style={{ paddingInline: 8, paddingTop: 12, paddingBottom: 4 }}
+							>
+								<Text variant="smallStrong" color="tertiary">
+									{section}
+								</Text>
+							</div>
+							<For each={demos.filter((demo) => demo.group === section)}>
+								{(demo) => (
+									<SidebarListItem
+										testId={`nav-${demo.name}`}
+										item={demo}
+										title={demo.name}
+									/>
+								)}
+							</For>
+						</>
+					)}
+				</For>
+			</SidebarList>
+		</Sidebar>
+	);
+}
+
+export function App(props: {
+	initial?: string;
+	/**
+	 * Paints an opaque window under the app. A real window is blurred and the
+	 * sidebar's glass samples the desktop; the offscreen test window has no
+	 * desktop, so a capture brings its own.
+	 */
+	windowBackdrop?: boolean;
+}) {
 	const initial = props.initial ?? demos[0]?.name;
 	if (initial === undefined) throw new Error('No demos registered');
-	const [selected, setSelected] = createSignal(initial);
-	const [scheme, setScheme] = createSignal<string>('system');
-	const current = () => {
-		const demo = demos.find((candidate) => candidate.name === selected());
-		if (demo === undefined) throw new Error(`Unknown demo: ${selected()}`);
+	const find = (name: string) => {
+		const demo = demos.find((candidate) => candidate.name === name);
+		if (demo === undefined) throw new Error(`Unknown demo: ${name}`);
 		return demo;
 	};
+	const [selected, setSelected] = createSignal(find(initial));
 	return (
 		<ColorSchemeProvider>
 			<TooltipProvider>
 				<div
 					style={{
-						display: 'flex',
-						flexDirection: 'row',
 						position: 'fixed',
 						top: 0,
 						right: 0,
 						bottom: 0,
 						left: 0,
-						backgroundColor: semanticColors.backgroundSolid,
+						...(props.windowBackdrop === true
+							? { backgroundColor: semanticColors.backgroundSolid }
+							: {}),
 					}}
 				>
+					{/* Painted first so every later sibling, toolbar buttons included, stacks above it and keeps its own click target. */}
 					<div
-						testId="nav"
 						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							width: 200,
-							flexShrink: 0,
-							padding: 8,
-							gap: 2,
-							borderRightWidth: 1,
-							borderStyle: 'solid',
-							borderColor: semanticColors.borderSecondary,
+							position: 'fixed',
+							top: 0,
+							left: 0,
+							right: 0,
+							height: DRAG_STRIP_HEIGHT,
+							appRegion: 'drag',
 						}}
+					/>
+					<SplitView
+						testId="shell"
+						storageKey="ghia-swiftui-demo"
+						style={{ height: '100%' }}
+						sidebar={<DemoNav selected={selected()} onSelect={setSelected} />}
 					>
 						<div
 							style={{
-								display: 'flex',
-								flexDirection: 'column',
-								flexGrow: 1,
-								gap: 2,
-								overflow: 'auto',
+								height: '100%',
+								backgroundColor: semanticColors.backgroundSolid,
 							}}
 						>
-							<For each={demos}>
-								{(demo) => (
-									<div
-										testId={`nav-${demo.name}`}
-										onClick={() => setSelected(demo.name)}
-										style={{
-											padding: 6,
-											borderRadius: 6,
-											cursor: 'default',
-											backgroundColor:
-												selected() === demo.name
-													? semanticColors.surfaceListSelection
-													: 'transparent',
-											hover: {
-												backgroundColor:
-													selected() === demo.name
-														? semanticColors.surfaceListSelection
-														: semanticColors.surfaceListHover,
-											},
-										}}
-									>
-										<Text>{demo.name}</Text>
-									</div>
-								)}
-							</For>
+							<Show when={selected()} keyed>
+								{(demo: Demo) => <demo.component />}
+							</Show>
 						</div>
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'row',
-								gap: 4,
-								paddingTop: 8,
-							}}
-						>
-							<For each={schemeChoices}>
-								{(choice) => (
-									<Button
-										testId={`scheme-${choice.name}`}
-										size="small"
-										radius="rounded"
-										variant={scheme() === choice.name ? 'accent' : 'filled'}
-										onClick={() => {
-											setScheme(choice.name);
-											choice.apply();
-										}}
-										style={{ paddingInline: 6, fontSize: 11 }}
-									>
-										{choice.label}
-									</Button>
-								)}
-							</For>
-						</div>
-					</div>
-					<div style={{ flexGrow: 1, minWidth: 0 }}>
-						<Show when={current()} keyed>
-							{(demo: Demo) => <demo.component />}
-						</Show>
-					</div>
+					</SplitView>
 				</div>
 				<ContextMenuHost />
 				<Toaster />

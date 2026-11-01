@@ -11,7 +11,7 @@
  */
 import { mkdirSync } from 'node:fs';
 import { createTestRoot } from '@ghia/solid/testing';
-import { applyColorScheme } from 'ghia-swiftui';
+import { applyColorScheme, setPanelStorage } from 'ghia-swiftui';
 import { App } from '#src/app.tsx';
 import { demos } from '#src/demos/index.ts';
 import type { Shot } from '#src/demos/shot.ts';
@@ -25,13 +25,28 @@ if (demo === undefined) {
 	process.exit(1);
 }
 
+// A run must not read or write the layout a real window saved.
+const memory = new Map<string, string>();
+setPanelStorage({
+	get: (key) => memory.get(key),
+	set: (key, value) => {
+		memory.set(key, value);
+	},
+});
+
 const outDir = new URL(`../screenshots/${demo.name}/`, import.meta.url)
 	.pathname;
 mkdirSync(outDir, { recursive: true });
 
 const FRAME_MS = 16;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const test = createTestRoot({ width: 1100, height: 900, appearance: 'light' });
+const test = createTestRoot({
+	width: 1100,
+	height: 900,
+	appearance: 'light',
+	// As the real window: `appRegion` applies only to a window with no titlebar of its own.
+	titlebarTransparent: true,
+});
 const renderer = test.renderer;
 
 /** Runs frames for `ms`: each flushes the tree and drains native events so handlers reach JS. */
@@ -137,6 +152,52 @@ const shot: Shot = {
 		renderer.simulateKeystrokes(keystrokes);
 		await settle();
 	},
+	async wheel(testId, deltaY) {
+		pointer = centre(testId);
+		renderer.nativeSimulateScrollWheel(pointer.x, pointer.y, 0, deltaY);
+		await settle();
+	},
+	async reveal(testId) {
+		renderer.scrollIntoView(
+			elementByTestId(testId).id,
+			'nearest',
+			'nearest',
+			'instant',
+		);
+		await settle();
+	},
+	async scrollTo(testId, top) {
+		renderer.scrollTo(elementByTestId(testId).id, 0, top, 'instant');
+		await settle();
+	},
+	async drag(testId, dx, dy) {
+		pointer = centre(testId);
+		renderer.nativeSimulateMouseMove(pointer.x, pointer.y);
+		renderer.nativeSimulateMouseDown(pointer.x, pointer.y);
+		await settle(50);
+		const steps = 6;
+		for (let step = 1; step <= steps; step++) {
+			renderer.nativeSimulateMouseMove(
+				pointer.x + (dx * step) / steps,
+				pointer.y + (dy * step) / steps,
+			);
+			await settle(30);
+		}
+		pointer = { x: pointer.x + dx, y: pointer.y + dy };
+		renderer.nativeSimulateMouseUp(pointer.x, pointer.y);
+		await settle();
+	},
+	async isDragRegion(testId) {
+		renderer.takeSimulatedWindowActions();
+		pointer = centre(testId);
+		renderer.nativeSimulateMouseMove(pointer.x, pointer.y);
+		renderer.nativeSimulateMouseDown(pointer.x, pointer.y);
+		await settle(50);
+		const actions = renderer.takeSimulatedWindowActions();
+		renderer.nativeSimulateMouseUp(pointer.x, pointer.y);
+		await settle(50);
+		return actions.includes('move');
+	},
 	wait: (ms) => settle(ms),
 	expectChecked(testId, checked) {
 		const id = elementByTestId(testId).customProps?.id;
@@ -169,8 +230,32 @@ const shot: Shot = {
 			throw new Error(`${testId} does not hold focus (focused: ${focused})`);
 		}
 	},
+	box(testId) {
+		const bounds = renderer.getElementBounds(elementByTestId(testId).id);
+		if (bounds === null) throw new Error(`no box for ${testId}`);
+		return bounds;
+	},
+	scrollMetrics(testId) {
+		const metrics = renderer.getScrollMetrics(elementByTestId(testId).id);
+		const scrollTop = metrics?.[1];
+		const scrollHeight = metrics?.[3];
+		const clientHeight = metrics?.[5];
+		if (
+			scrollTop === undefined ||
+			scrollHeight === undefined ||
+			clientHeight === undefined
+		) {
+			throw new Error(`${testId} is not a scroller`);
+		}
+		return { scrollTop, scrollHeight, clientHeight };
+	},
 	expectPresent(testId) {
 		elementByTestId(testId);
+	},
+	expectNotPainted(testId) {
+		if (renderer.getElementBounds(elementByTestId(testId).id) !== null) {
+			throw new Error(`${testId} was laid out`);
+		}
 	},
 	expectAbsent(testId) {
 		if (renderer.findByTestId(testId) !== undefined) {
@@ -180,7 +265,7 @@ const shot: Shot = {
 	capture,
 };
 
-test.render(() => <App initial={demo.name} />);
+test.render(() => <App initial={demo.name} windowBackdrop />);
 await settle(500);
 await capture('initial');
 await demo.scenario?.(shot);
