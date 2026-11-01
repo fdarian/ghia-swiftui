@@ -44,7 +44,7 @@ const LAST_COLUMN_SCROLLBAR_BOTTOM_OFFSET = 18;
 const AT_BOTTOM_THRESHOLD_PX = 5;
 const FADE_SIZE = 32;
 /** How far content fades out over the toolbar's bottom edge and ahead of the footer's top edge. */
-const INSET_FADE_SIZE = 16;
+const INSET_FADE_SIZE = 12;
 /** The bar's 3px margin plus its 12px width under the pointer: the track keeps this hit target while the visible bar widens inside it. */
 const TRACK_SIZE = 15;
 const BAR_MARGIN = 3;
