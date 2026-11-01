@@ -23,6 +23,7 @@ import {
 import { RadioGroupDemo, radioGroupScenario } from '#src/demos/radio-group.tsx';
 import { SelectDemo, selectScenario } from '#src/demos/select.tsx';
 import { SeparatorDemo } from '#src/demos/separator.tsx';
+import { SettingsDemo, settingsScenario } from '#src/demos/settings.tsx';
 import {
 	ShortcutRecorderDemo,
 	shortcutRecorderScenario,
@@ -81,6 +82,7 @@ export const demos: readonly Demo[] = [
 		component: ShortcutRecorderDemo,
 		scenario: shortcutRecorderScenario,
 	},
+	{ name: 'settings', component: SettingsDemo, scenario: settingsScenario },
 	{ name: 'select', component: SelectDemo, scenario: selectScenario },
 	{
 		name: 'radio-group',

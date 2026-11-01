@@ -398,6 +398,7 @@ export function SelectContent(props: SelectContentProps) {
 	});
 
 	const placement = createPlacementState('bottom');
+	const [anchorWidth, setAnchorWidth] = createSignal(0);
 	const contentHeight = () =>
 		context.options().length * ROW_HEIGHT + POPUP_PADDING * 2;
 	/** Fixed for the whole open: the selection changing as a pick closes the popup must not move it. */
@@ -443,7 +444,10 @@ export function SelectContent(props: SelectContentProps) {
 				offset={anchor().offset}
 				fit={anchor().aligned ? 'snap' : 'flip'}
 				snapMargin={POPUP_MARGIN}
-				onPlacement={placement.onPlacement}
+				onPlacement={(event) => {
+					placement.onPlacement(event);
+					setAnchorWidth(event.anchorWidth);
+				}}
 				deferred
 				priority={1}
 				style={{
@@ -473,7 +477,10 @@ export function SelectContent(props: SelectContentProps) {
 						flexDirection: 'column',
 						pointerEvents: 'auto',
 						width: 'max-content',
-						minWidth: 'anchor-size(width)',
+						// Shifted left to line the labels up, the popup still reaches the trigger's right edge.
+						minWidth: anchor().aligned
+							? anchorWidth() - (anchor().offset.x + SHADOW_PAD)
+							: 'anchor-size(width)',
 						maxWidth: '100%',
 						maxHeight: maxHeight(),
 					}}
