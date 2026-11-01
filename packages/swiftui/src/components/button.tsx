@@ -1,15 +1,16 @@
 import {
 	type ButtonBehavior,
 	buttonProps,
+	type HostElement,
 	type StyleDesc,
 	useGpuixRequired,
 } from '@ghia/solid';
-import { type JSX, splitProps } from 'solid-js';
+import { type JSX, Show, splitProps } from 'solid-js';
 import { useButtonDefaults } from '#src/components/button-defaults-context.tsx';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
-import { over } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
@@ -40,9 +41,16 @@ export type ButtonSize = keyof typeof sizes;
 export type ButtonRadius = 'full' | 'rounded';
 
 /**
- * `glass` carries the material as its own background, so its hover and press
- * fills are composited over the material tint instead of replacing it.
+ * The fill of `glass`, laid over the glass: its hover and press states are
+ * translucent fills on top of the material, as syne composites them over it.
  */
+function glassFill(): StyleDesc {
+	return {
+		hover: { backgroundColor: semanticColors.surfaceControlSubtle },
+		active: { backgroundColor: semanticColors.surfaceControl },
+	};
+}
+
 function variantStyle(variant: ButtonVariant): StyleDesc {
 	switch (variant) {
 		case 'accent':
@@ -72,19 +80,7 @@ function variantStyle(variant: ButtonVariant): StyleDesc {
 				active: { backgroundColor: semanticColors.surfaceControl },
 			};
 		case 'glass':
-			return {
-				...glass.material(),
-				color: semanticColors.textPrimary,
-				hover: {
-					backgroundColor: over(
-						semanticColors.surfaceControlSubtle,
-						glass.tint,
-					),
-				},
-				active: {
-					backgroundColor: over(semanticColors.surfaceControl, glass.tint),
-				},
-			};
+			return { color: semanticColors.textPrimary };
 		case 'glassAccent':
 			return {
 				backgroundColor: colors.accent,
@@ -130,64 +126,108 @@ export function Button(props: ButtonProps) {
 		['variant', 'size', 'iconOnly', 'radius', 'style', 'children', 'ref'],
 	);
 	const variant = () => own.variant ?? defaults.variant ?? 'filled';
-	const size = () => sizes[own.size ?? defaults.size ?? 'medium'];
+	const isGlass = () => variant() === 'glass';
+	const sizeName = () => own.size ?? defaults.size ?? 'medium';
+	const size = () => sizes[sizeName()];
 	const radius = () => {
 		const radius = own.radius ?? defaults.radius ?? 'full';
 		if (radius === 'full') return styleTokens.radiusPill;
-		return (own.size ?? defaults.size ?? 'medium') === 'small'
+		return sizeName() === 'small'
 			? styleTokens.radius8
 			: styleTokens.radiusControl;
 	};
+	// The glass view is given the radius in px: a pill is half the height.
+	const glassRadius = () =>
+		radius() === styleTokens.radiusPill ? size().height / 2 : radius();
+	const register = (element: HostElement) => {
+		buttonElements.add(element);
+		own.ref?.(element);
+	};
+	const tabIndex = () =>
+		behavior.disabled === true && behavior.focusableWhenDisabled !== true
+			? -1
+			: (behavior.tabIndex ?? 0);
+	const style = (): StyleDesc => ({
+		display: 'inline-flex',
+		flexDirection: 'row',
+		flexShrink: 0,
+		alignItems: 'center',
+		justifyContent: 'center',
+		whiteSpace: 'nowrap',
+		overflow: 'hidden',
+		fontSize: 13,
+		fontWeight: 500,
+		lineHeight: '18px',
+		// The glass view fills the padding box, so a glass button has no border and makes up its width in padding.
+		...(isGlass()
+			? { position: 'relative', borderWidth: 0 }
+			: {
+					borderWidth: 1,
+					borderStyle: 'solid',
+					borderColor: 'transparent',
+				}),
+		cursor: 'default',
+		// A button in a drag region (a toolbar) cuts its own box out of it, as syne's `deep` drag region does.
+		appRegion: 'no-drag',
+		keyboardFocusDim: false,
+		focusVisible: {
+			boxShadow: `0 0 0 1px ${semanticColors.borderPrimary}`,
+		},
+		height: size().height,
+		gap: size().gap,
+		...(own.iconOnly === true
+			? { width: size().height, paddingInline: 0 }
+			: { paddingInline: size().paddingInline + (isGlass() ? 1 : 0) }),
+		borderRadius: radius(),
+		...variantStyle(variant()),
+		...(behavior.disabled === true
+			? { pointerEvents: 'none', opacity: 0.5 }
+			: {}),
+		...own.style,
+	});
+	const content = () => (
+		<IconSizeContext.Provider value={() => size().icon}>
+			{own.children}
+		</IconSizeContext.Provider>
+	);
 	return (
-		<div
-			{...rest}
-			{...buttonProps(behavior, renderer)}
-			ref={(element) => {
-				buttonElements.add(element);
-				own.ref?.(element);
-			}}
-			tabIndex={
-				behavior.disabled === true && behavior.focusableWhenDisabled !== true
-					? -1
-					: (behavior.tabIndex ?? 0)
+		<Show
+			when={isGlass()}
+			fallback={
+				<div
+					{...rest}
+					{...buttonProps(behavior, renderer)}
+					ref={register}
+					tabIndex={tabIndex()}
+					style={style()}
+				>
+					{content()}
+				</div>
 			}
-			style={{
-				display: 'inline-flex',
-				flexDirection: 'row',
-				flexShrink: 0,
-				alignItems: 'center',
-				justifyContent: 'center',
-				whiteSpace: 'nowrap',
-				overflow: 'hidden',
-				fontSize: 13,
-				fontWeight: 500,
-				lineHeight: '18px',
-				borderWidth: 1,
-				borderStyle: 'solid',
-				borderColor: 'transparent',
-				cursor: 'default',
-				// A button in a drag region (a toolbar) cuts its own box out of it, as syne's `deep` drag region does.
-				appRegion: 'no-drag',
-				keyboardFocusDim: false,
-				focusVisible: {
-					boxShadow: `0 0 0 1px ${semanticColors.borderPrimary}`,
-				},
-				height: size().height,
-				gap: size().gap,
-				...(own.iconOnly === true
-					? { width: size().height, paddingInline: 0 }
-					: { paddingInline: size().paddingInline }),
-				borderRadius: radius(),
-				...variantStyle(variant()),
-				...(behavior.disabled === true
-					? { pointerEvents: 'none', opacity: 0.5 }
-					: {}),
-				...own.style,
-			}}
 		>
-			<IconSizeContext.Provider value={() => size().icon}>
-				{own.children}
-			</IconSizeContext.Provider>
-		</div>
+			<NativeGlass
+				{...rest}
+				{...buttonProps(behavior, renderer)}
+				ref={register}
+				tabIndex={tabIndex()}
+				radius={glassRadius()}
+				fallback={glass.material()}
+				style={style()}
+			>
+				<div
+					aria-hidden
+					style={{
+						position: 'absolute',
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0,
+						borderRadius: glassRadius(),
+						...glassFill(),
+					}}
+				/>
+				{content()}
+			</NativeGlass>
+		</Show>
 	);
 }

@@ -19,7 +19,7 @@ import { applyColorScheme, setPanelStorage } from 'ghia-swiftui';
 import { App } from '#src/app.tsx';
 import { demos } from '#src/demos/index.ts';
 import { windowOptions } from '#src/window-options.ts';
-import { captureWindow } from './window-pixels.ts';
+import { captureWindow, countViews } from './window-pixels.ts';
 
 const args = process.argv.slice(2);
 const outFlag = args.indexOf('--out');
@@ -96,6 +96,11 @@ for (const step of steps) {
 			await sleep(500);
 			break;
 		}
+		case 'count':
+			console.log(
+				`NSGlassEffectView in the window: ${countViews('NSGlassEffectView')}`,
+			);
+			break;
 		case 'wheel': {
 			const [testId, delta] = (value ?? '').split(':');
 			if (testId === undefined || delta === undefined) {

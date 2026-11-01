@@ -270,3 +270,40 @@ export function pixel(capture: Capture, x: number, y: number) {
 		4;
 	return [...capture.rgba.subarray(at, at + 3)];
 }
+
+const isKindOfClass = bind<[Pointer, Pointer, Pointer], boolean>(
+	[P, P, P],
+	FFIType.bool,
+);
+
+/** How many views of the class `className` the window holds, nested ones included. */
+export function countViews(className: string): number {
+	const target = requiredClass(className);
+	const visit = (view: Pointer): number => {
+		const subviews = required(
+			send.object(view, selector('subviews')),
+			'subviews',
+		);
+		const count = Number(integer(subviews, selector('count')));
+		let total = isKindOfClass(view, selector('isKindOfClass:'), target) ? 1 : 0;
+		for (let index = 0; index < count; index++) {
+			total += visit(
+				required(
+					objectAt(subviews, selector('objectAtIndex:'), BigInt(index)),
+					'objectAtIndex:',
+				),
+			);
+		}
+		return total;
+	};
+	const content = required(
+		send.object(visibleWindow(), selector('contentView')),
+		'contentView',
+	);
+	// The window's frame view holds the content view; glass lives under it.
+	const frame = required(
+		send.object(content, selector('superview')),
+		'superview',
+	);
+	return visit(frame);
+}

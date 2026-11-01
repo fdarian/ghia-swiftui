@@ -9,9 +9,9 @@ import {
 	splitProps,
 	useContext,
 } from 'solid-js';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import { useScrollAreaContext } from '#src/components/scroll-area-context.ts';
 import { Text } from '#src/components/text.tsx';
-import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { createRevealOnSelect } from '#src/reveal.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
@@ -359,10 +359,25 @@ function ListItem<T>(props: ListItemProps<T>) {
 				...(isSelected() && own.glassSelection !== true
 					? { backgroundColor: semanticColors.surfaceListSelection }
 					: {}),
-				...(glassSelected() ? glass.material() : {}),
+				// A stacking context, so the glass at zIndex -1 sits under the row's content and not under the page.
+				...(glassSelected() ? { position: 'relative', zIndex: 0 } : {}),
 				...own.style,
 			}}
 		>
+			<Show when={glassSelected()}>
+				<NativeGlass
+					aria-hidden
+					radius={styleTokens.radius8}
+					style={{
+						position: 'absolute',
+						zIndex: -1,
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0,
+					}}
+				/>
+			</Show>
 			{own.children}
 		</div>
 	);
