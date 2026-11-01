@@ -18,7 +18,11 @@ export {
 	type CalloutColor,
 	type CalloutProps,
 } from '#src/components/callout.tsx';
-export { CheckboxSpike } from '#src/components/checkbox-spike.tsx';
+export {
+	Checkbox,
+	type CheckboxProps,
+	type CheckedState,
+} from '#src/components/checkbox.tsx';
 export {
 	EmptyState,
 	EmptyStateActions,
