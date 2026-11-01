@@ -11,7 +11,6 @@ import {
 	splitProps,
 } from 'solid-js';
 import { Button, type ButtonProps } from '#src/components/button.tsx';
-import { NativeGlass } from '#src/components/native-glass.tsx';
 import { Panel, PanelGroup } from '#src/components/panel.tsx';
 import { useSidebarContext } from '#src/components/sidebar-context.ts';
 import {
@@ -492,7 +491,7 @@ function SidebarToggle(props: SplitViewToggleProps) {
 	const label = () =>
 		own['aria-label'] ??
 		(split.sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar');
-	// macOS 27: the toggle is always liquid glass at a fixed 36px.
+	// macOS 27: the toggle is always liquid glass at a fixed 36px. A pinned one has its icon drawn by `PinnedIcon`, outside the morphing button.
 	const ToggleButton = () => (
 		<Tooltip>
 			<TooltipTrigger>
@@ -516,22 +515,7 @@ function SidebarToggle(props: SplitViewToggleProps) {
 							: own.style
 					}
 				>
-					<Show when={pinned()} fallback={icon()}>
-						<NativeGlass
-							aria-hidden
-							radius={TOGGLE_SIZE / 2}
-							style={{
-								position: 'absolute',
-								top: 0,
-								right: 0,
-								bottom: 0,
-								left: 0,
-								pointerEvents: 'none',
-								opacity: split.sidebarCollapsed ? 1 : 0,
-								transition: `opacity ${TOGGLE_DURATION_MS}ms ${TOGGLE_EASE_IN}`,
-							}}
-						/>
-					</Show>
+					<Show when={!pinned()}>{icon()}</Show>
 				</Button>
 			</TooltipTrigger>
 			<TooltipContent shortcut={SIDEBAR_SHORTCUT}>

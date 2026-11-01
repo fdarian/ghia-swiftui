@@ -19,7 +19,7 @@ export interface PanelStorage {
 	set(key: string, value: string): void;
 }
 
-/** The one file the default storage writes: `<dir>/panels.json`, a flat `{ key: value }` object. */
+/** The file storage an app can pass to `setPanelStorage`: `<dir>/panels.json`, a flat `{ key: value }` object. */
 export function createFilePanelStorage(options: {
 	/** The directory `~/Library/Application Support/<appName>/` the file lives in. */
 	appName: string;
@@ -72,21 +72,24 @@ export function createFilePanelStorage(options: {
 	};
 }
 
-const DEFAULT_APP_NAME = 'ghia-swiftui';
-
 let storage: PanelStorage | undefined;
 
 /**
- * Replaces where layouts are kept. The default is a file under
- * `~/Library/Application Support/ghia-swiftui/`: an app calls
- * `setPanelStorage(createFilePanelStorage({ appName }))` once, before its first
- * render, to keep its own directory.
+ * Sets where layouts are kept; an app calls it once, before its first render,
+ * usually as `setPanelStorage(createFilePanelStorage({ appName }))`. There is
+ * no default: a library that picked a directory would write into one the app
+ * never named.
  */
 export function setPanelStorage(next: PanelStorage) {
 	storage = next;
 }
 
+/** The storage a `storageKey` persists through. Throws until `setPanelStorage` has been called. */
 export function panelStorage(): PanelStorage {
-	storage ??= createFilePanelStorage({ appName: DEFAULT_APP_NAME });
+	if (storage === undefined) {
+		throw new Error(
+			'A PanelGroup or SplitView has a storageKey but no panel storage is set: call setPanelStorage(createFilePanelStorage({ appName })) before rendering',
+		);
+	}
 	return storage;
 }

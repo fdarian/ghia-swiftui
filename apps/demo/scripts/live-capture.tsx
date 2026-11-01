@@ -13,12 +13,9 @@
  * under the app, so what the glass samples does not depend on the desktop.
  */
 import { mkdirSync } from 'node:fs';
-import { GpuixRenderer, render, useGpuixRequired } from '@ghia/solid';
-import { connectTest, liveRendererAsTest } from '@ghia/solid/automation';
-import { applyColorScheme, setPanelStorage } from 'ghia-swiftui';
-import { App } from '#src/app.tsx';
+import { applyColorScheme } from 'ghia-swiftui';
 import { demos } from '#src/demos/index.ts';
-import { windowOptions } from '#src/window-options.ts';
+import { openLiveWindow, sleep } from './live-window.tsx';
 import { captureWindow, countViews } from './window-pixels.ts';
 
 const args = process.argv.slice(2);
@@ -39,40 +36,7 @@ if (demo === undefined || !demos.some((candidate) => candidate.name === demo)) {
 }
 mkdirSync(outDir, { recursive: true });
 
-const memory = new Map<string, string>();
-setPanelStorage({
-	get: (key) => memory.get(key),
-	set: (key, value) => {
-		memory.set(key, value);
-	},
-});
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-function Probe(props: {
-	onRenderer: (renderer: ReturnType<typeof useGpuixRequired>) => void;
-}) {
-	props.onRenderer(useGpuixRequired());
-	return null;
-}
-
-let renderer: ReturnType<typeof useGpuixRequired> | undefined;
-render(
-	() => (
-		<>
-			<App initial={demo} windowBackdrop={backdrop} />
-			<Probe onRenderer={(value) => (renderer = value)} />
-		</>
-	),
-	windowOptions,
-);
-
-await sleep(2500);
-if (!(renderer instanceof GpuixRenderer)) {
-	throw new Error('The window has no live renderer');
-}
-// The same adapter the automation preload serves: the app drives its own window.
-const app = await connectTest(liveRendererAsTest(renderer));
+const app = await openLiveWindow({ demo, backdrop });
 for (const step of steps) {
 	const [name, value] = step.split('=');
 	switch (name) {

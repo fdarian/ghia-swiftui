@@ -53,6 +53,15 @@ function overlaps(
 
 const settle = (ms: number) =>
 	new Promise((resolve) => setTimeout(resolve, ms));
+/**
+ * Polls until `done` holds. A window that another app covers gets no frames, so
+ * an animation started in it stands still until it is uncovered: a fixed wait
+ * reads that as a failure.
+ */
+async function until(done: () => Promise<boolean>, timeoutMs = 6000) {
+	const end = Date.now() + timeoutMs;
+	while (!(await done()) && Date.now() < end) await settle(100);
+}
 const failures: string[] = [];
 function expect(ok: boolean, what: string) {
 	console.log(`${ok ? 'ok  ' : 'FAIL'} ${what}`);
@@ -96,7 +105,10 @@ try {
 
 	// The toggle collapses the sidebar and the page's toolbar clears the toggle.
 	await first.getByTestId('sidebar-toggle').click();
-	await settle(800);
+	await until(
+		async () => (await first.getByTestId('shell-sidebar').bounds()).width < 2,
+	);
+	await settle(300);
 	const collapsed = await first.getByTestId('shell-sidebar').bounds();
 	const titleAfter = await first.getByText('Tokens').bounds();
 	const toggleAfter = await first.getByTestId('sidebar-toggle').bounds();
@@ -128,7 +140,13 @@ try {
 		'a new window opens with the sidebar collapsed, as it was left',
 	);
 	await second.getByTestId('sidebar-toggle').click();
-	await settle(800);
+	await until(
+		async () =>
+			Math.abs(
+				(await second.getByTestId('shell-sidebar').bounds()).width - savedWidth,
+			) < 2,
+	);
+	await settle(300);
 	const restored = await second.getByTestId('shell-sidebar').bounds();
 	expect(
 		Math.abs(restored.width - savedWidth) < 2,
@@ -137,6 +155,30 @@ try {
 } finally {
 	await second.close();
 	rmSync(home, { recursive: true });
+}
+
+// Real glass: only a capture of the composited window holds it, and only a window that is not covered gets frames.
+const NOT_CHECKABLE = 3;
+for (const mode of ['live', 'fallback']) {
+	let status = NOT_CHECKABLE;
+	for (let attempt = 1; attempt <= 3 && status === NOT_CHECKABLE; attempt++) {
+		const child = Bun.spawnSync({
+			cmd: ['bun', 'scripts/glass-check.tsx', mode, `${outDir}glass-check/`],
+			cwd: new URL('..', import.meta.url).pathname,
+			env: { ...process.env, GPUIX_BACKGROUND: '1' },
+			stdout: 'inherit',
+			stderr: 'pipe',
+		});
+		status = child.exitCode ?? 1;
+		if (status !== 0 && status !== NOT_CHECKABLE) {
+			console.log(child.stderr.toString().slice(-1500));
+		}
+		if (status === NOT_CHECKABLE) await settle(3000);
+	}
+	expect(
+		status === 0,
+		`glass check (${mode}) passed${status === NOT_CHECKABLE ? ': not checkable, the window stayed covered' : ''}`,
+	);
 }
 
 if (failures.length > 0) process.exitCode = 1;

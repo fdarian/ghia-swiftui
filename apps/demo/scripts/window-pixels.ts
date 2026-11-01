@@ -307,3 +307,62 @@ export function countViews(className: string): number {
 	);
 	return visit(frame);
 }
+
+/** A PNG file's pixels, drawn into the same RGBA layout as a window capture. */
+export function loadPng(path: string, scale: number): Capture {
+	const data = required(
+		send.objectWithObject(
+			requiredClass('NSData'),
+			selector('dataWithContentsOfFile:'),
+			required(
+				send.objectWithObject(
+					requiredClass('NSString'),
+					selector('stringWithUTF8String:'),
+					ptr(Buffer.from(`${path}\0`)),
+				),
+				'stringWithUTF8String:',
+			),
+		),
+		`reading ${path}`,
+	);
+	const rep = required(
+		send.objectWithObject(
+			required(
+				send.object(requiredClass('NSBitmapImageRep'), selector('alloc')),
+				'NSBitmapImageRep alloc',
+			),
+			selector('initWithData:'),
+			data,
+		),
+		'initWithData:',
+	);
+	const image = required(send.object(rep, selector('CGImage')), 'CGImage');
+	return { ...toRgba(image), scale };
+}
+
+/** Mean absolute difference per channel between two captures of one size, over a rect in points. */
+export function meanDifference(a: Capture, b: Capture, rect: Rect): number {
+	if (a.width !== b.width || a.height !== b.height) {
+		throw new Error(
+			`Captures differ in size: ${a.width}x${a.height} and ${b.width}x${b.height}`,
+		);
+	}
+	const x0 = Math.round(rect.x * a.scale);
+	const y0 = Math.round(rect.y * a.scale);
+	const x1 = Math.round((rect.x + rect.width) * a.scale);
+	const y1 = Math.round((rect.y + rect.height) * a.scale);
+	let sum = 0;
+	let count = 0;
+	for (let y = y0; y < y1; y++) {
+		for (let x = x0; x < x1; x++) {
+			const at = (y * a.width + x) * 4;
+			for (let channel = 0; channel < 3; channel++) {
+				sum += Math.abs(
+					(a.rgba[at + channel] as number) - (b.rgba[at + channel] as number),
+				);
+				count++;
+			}
+		}
+	}
+	return sum / count;
+}
