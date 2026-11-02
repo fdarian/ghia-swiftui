@@ -14,6 +14,7 @@
 		"check:lint": "biome check",
 		"window-check": "bun scripts/window-check.ts",
 		"live-capture": "bun scripts/live-capture.tsx",
+		"scroll-edge-check": "bun scripts/scroll-edge-check.tsx",
 		"glass-check": "GPUIX_BACKGROUND=1 bun scripts/glass-check.tsx live && bun scripts/glass-check.tsx fallback"
 	},
 	"dependencies": {

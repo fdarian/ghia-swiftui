@@ -99,6 +99,48 @@ try {
 	);
 	await first.screenshot({ path: `${outDir}initial.png` });
 
+	// The search field filters the sidebar as it is typed into, and leaves the open page alone.
+	const search = first.getByTestId('nav-search');
+	const present = async (testId: string) =>
+		(await first.getByTestId(testId).count()) > 0;
+	const type = async (text: string) => {
+		await search.click();
+		await search.press([...text].join(' '));
+		await settle(300);
+	};
+	await type('but');
+	expect(
+		(await present('nav-button')) &&
+			(await present('nav-button-defaults-provider')) &&
+			!(await present('nav-tokens')) &&
+			!(await present('nav-toast')),
+		'typing "but" leaves only the items whose name contains it',
+	);
+	expect(
+		!(await present('nav-empty')) &&
+			(await first.getByTestId('page').getByText('Tokens').count()) > 0,
+		'the open page stays Tokens although the sidebar no longer lists it',
+	);
+	await first.screenshot({ path: `${outDir}search-filtered.png` });
+	await search.press('Escape');
+	await settle(300);
+	expect(
+		(await present('nav-tokens')) && (await present('nav-syne-main-window')),
+		'Escape clears the query and every item is back',
+	);
+	await type('zzz');
+	expect(
+		(await present('nav-empty')) && !(await present('nav-button')),
+		'a query that matches nothing shows "No results" in place of the list',
+	);
+	await first.screenshot({ path: `${outDir}search-empty.png` });
+	await search.press('Escape');
+	await settle(300);
+	expect(
+		(await present('nav-tokens')) && !(await present('nav-empty')),
+		'clearing the query restores the list',
+	);
+
 	// The resize handle between the sidebar and the page.
 	const sidebar = await first.getByTestId('shell-sidebar').bounds();
 	await first.getByTestId('shell-group-handle-0').dragBy(40, 0);
@@ -172,13 +214,27 @@ try {
 	rmSync(home, { recursive: true });
 }
 
-// Real glass: only a capture of the composited window holds it, and only a window that is not covered gets frames.
+// Real glass and the scrolled header: only a capture of the composited window holds them, and only a window that is not covered gets frames.
 const NOT_CHECKABLE = 3;
-for (const mode of ['live', 'fallback']) {
+const pixelChecks = [
+	{
+		name: 'glass check (live)',
+		args: ['scripts/glass-check.tsx', 'live', `${outDir}glass-check/`],
+	},
+	{
+		name: 'glass check (fallback)',
+		args: ['scripts/glass-check.tsx', 'fallback', `${outDir}glass-check/`],
+	},
+	{
+		name: 'scroll edge check',
+		args: ['scripts/scroll-edge-check.tsx', `${outDir}scroll-edge-check/`],
+	},
+];
+for (const check of pixelChecks) {
 	let status = NOT_CHECKABLE;
 	for (let attempt = 1; attempt <= 3 && status === NOT_CHECKABLE; attempt++) {
 		const child = Bun.spawnSync({
-			cmd: ['bun', 'scripts/glass-check.tsx', mode, `${outDir}glass-check/`],
+			cmd: ['bun', ...check.args],
 			cwd: new URL('..', import.meta.url).pathname,
 			env: { ...process.env, GPUIX_BACKGROUND: '1' },
 			stdout: 'inherit',
@@ -192,7 +248,7 @@ for (const mode of ['live', 'fallback']) {
 	}
 	expect(
 		status === 0,
-		`glass check (${mode}) passed${status === NOT_CHECKABLE ? ': not checkable, the window stayed covered' : ''}`,
+		`${check.name} passed${status === NOT_CHECKABLE ? ': not checkable, the window stayed covered' : ''}`,
 	);
 }
 
