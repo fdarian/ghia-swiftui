@@ -33,6 +33,12 @@ import { typography } from '#src/tokens/typography.ts';
 
 /** Matches `Button`'s own `size="small"` icon sizing: an item has no `Button` underneath to inherit it from. */
 const ITEM_ICON_SIZE = 16;
+/** An NSMenu row, as drawn by macOS 26: 24pt tall, rows touching, inset 5pt from the panel's sides and 4pt from its top and bottom. */
+const ROW_HEIGHT = 24;
+const PANEL_PADDING_BLOCK = 4;
+const PANEL_PADDING_INLINE = 5;
+/** Concentric with the panel's 12pt corner, 5pt in. */
+const ROW_RADIUS = 7;
 /** The popup leaves at once, as it appears. */
 const EXIT_MS = 0;
 /** FF focuses the first row two frames after a pointer open, once the popup itself holds focus. */
@@ -311,6 +317,9 @@ export function MenuPopup(props: MenuPopupProps) {
 					style={{
 						flexDirection: 'column',
 						alignItems: 'stretch',
+						gap: 0,
+						paddingBlock: PANEL_PADDING_BLOCK,
+						paddingInline: PANEL_PADDING_INLINE,
 						keyboardFocusDim: false,
 						...own.style,
 					}}
@@ -393,16 +402,16 @@ export function MenuItem(props: MenuItemProps) {
 				width: '100%',
 				flexShrink: 0,
 				alignItems: 'center',
-				gap: 10,
-				paddingInline: 12,
-				paddingBlock: 6,
-				borderRadius: styleTokens.radius8,
+				gap: 8,
+				height: ROW_HEIGHT,
+				paddingInline: 11,
+				borderRadius: ROW_RADIUS,
 				textAlign: 'left',
-				...typography.variants.strong,
+				...typography.variants.regular,
 				whiteSpace: 'nowrap',
 				cursor: own.disabled === true ? 'not-allowed' : 'default',
 				keyboardFocusDim: false,
-				color: litRow.ink(lit(), semanticColors.textSecondary),
+				color: litRow.ink(lit(), semanticColors.textPrimary),
 				backgroundColor: litRow.fill(lit()),
 				...(own.disabled === true ? { opacity: 0.5 } : {}),
 				...own.style,

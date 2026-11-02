@@ -33,14 +33,18 @@ import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 import { typography } from '#src/tokens/typography.ts';
 
-const ROW_HEIGHT = 28;
-const POPUP_PADDING = 4;
+/** An NSMenu row, as drawn by macOS 26: 24pt tall, rows touching, inset 5pt from the panel's sides and 4pt from its top and bottom. */
+const ROW_HEIGHT = 24;
+const POPUP_PADDING_BLOCK = 4;
+const POPUP_PADDING_INLINE = 5;
 const POPUP_MAX_HEIGHT = 300;
 const ROW_PADDING = 8;
-const CHECK_SLOT = 16;
+const CHECK_SLOT = 10;
 const ROW_GAP = 6;
+/** Concentric with the popup's 12pt corner, 5pt in. */
+const ROW_RADIUS = 7;
 /** How far the row's label sits in from the popup's left edge. */
-const LABEL_INSET = POPUP_PADDING + ROW_PADDING + CHECK_SLOT + ROW_GAP;
+const LABEL_INSET = POPUP_PADDING_INLINE + ROW_PADDING + CHECK_SLOT + ROW_GAP;
 /** The popup leaves at once, as it appears. */
 const EXIT_MS = 0;
 /** What the window leaves a popup: its margin and the layer's shadow padding on both ends. */
@@ -125,11 +129,11 @@ export function Select(props: SelectProps) {
 		itemRects: () =>
 			measured()
 				? options().map((_, index) => ({
-						top: POPUP_PADDING + index * ROW_HEIGHT,
+						top: POPUP_PADDING_BLOCK + index * ROW_HEIGHT,
 						height: ROW_HEIGHT,
 					}))
 				: [],
-		scrollPadding: POPUP_PADDING,
+		scrollPadding: POPUP_PADDING_BLOCK,
 	});
 	createEffect(
 		on(root.presence.open, (open) => props.onOpenChange?.(open), {
@@ -447,7 +451,7 @@ export function SelectContent(props: SelectContentProps) {
 	const placement = createPlacementState('bottom');
 	const [anchorWidth, setAnchorWidth] = createSignal(0);
 	const contentHeight = () =>
-		context.options().length * ROW_HEIGHT + POPUP_PADDING * 2;
+		context.options().length * ROW_HEIGHT + POPUP_PADDING_BLOCK * 2;
 	/** Fixed for the whole open: the selection changing as a pick closes the popup must not move it. */
 	const [anchor, setAnchor] = createSignal(unaligned);
 	createComputed(
@@ -468,7 +472,7 @@ export function SelectContent(props: SelectContentProps) {
 						y:
 							-(
 								trigger.height / 2 +
-								POPUP_PADDING +
+								POPUP_PADDING_BLOCK +
 								index * ROW_HEIGHT +
 								ROW_HEIGHT / 2
 							) - SHADOW_PAD,
@@ -550,7 +554,8 @@ export function SelectContent(props: SelectContentProps) {
 								flexDirection: 'column',
 								overflowY: 'scroll',
 								borderRadius: styleTokens.radiusPopover,
-								padding: POPUP_PADDING,
+								paddingBlock: POPUP_PADDING_BLOCK,
+								paddingInline: POPUP_PADDING_INLINE,
 								keyboardFocusDim: false,
 								maxHeight: maxHeight(),
 							}}
@@ -607,7 +612,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 				gap: ROW_GAP,
 				height: ROW_HEIGHT,
 				paddingInline: ROW_PADDING,
-				borderRadius: styleTokens.radius8,
+				borderRadius: ROW_RADIUS,
 				cursor: 'default',
 				keyboardFocusDim: false,
 				backgroundColor: litRow.fill(lit()),
@@ -626,14 +631,14 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 				}}
 			>
 				<Show when={checked()}>
-					<Icon name="check" size={14} strokeWidth={2.5} />
+					<Icon name="check" size={14} strokeWidth={3} />
 				</Show>
 			</div>
 			<text
 				style={{
-					...typography.variants.strong,
+					...typography.variants.regular,
 					whiteSpace: 'nowrap',
-					color: litRow.ink(lit(), semanticColors.textSecondary),
+					color: litRow.ink(lit(), semanticColors.textPrimary),
 				}}
 			>
 				{props.option.label}
