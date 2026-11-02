@@ -64,12 +64,16 @@ export type FloatingGlassStyle = 'regular' | 'clear' | 'tinted';
 
 const [open, setOpen] = createSignal(false);
 const [style, setStyle] = createSignal<FloatingGlassStyle>('regular');
+const [shadow, setShadow] = createSignal(true);
 
 /** Whether the glass panel is on screen. */
 export const floatingGlassOpen = open;
 
 /** The style the panel opens with, and keeps across close and reopen. */
 export const floatingGlassStyle = style;
+
+/** Whether the panel casts a window shadow; kept across close and reopen. */
+export const floatingGlassShadow = shadow;
 
 let panel: Pointer | null = null;
 let glassView: Pointer | null = null;
@@ -88,6 +92,15 @@ export function setFloatingGlassStyle(next: FloatingGlassStyle) {
 	assertMainThread('setFloatingGlassStyle');
 	setStyle(next);
 	if (glassView !== null) applyStyle(glassView);
+}
+
+export function setFloatingGlassShadow(enabled: boolean) {
+	assertMainThread('setFloatingGlassShadow');
+	setShadow(enabled);
+	if (panel === null) return;
+	voidWithBoolean(panel, selector('setHasShadow:'), enabled);
+	// The window server keeps the shadow it already computed until told to redo it.
+	send.void(panel, selector('invalidateShadow'));
 }
 
 function nsString(text: string): Pointer {
@@ -156,7 +169,7 @@ function createPanel(): Pointer {
 	);
 	voidWithBoolean(created, selector('setMovableByWindowBackground:'), true);
 	send.voidWithInteger(created, selector('setLevel:'), FLOATING_WINDOW_LEVEL);
-	voidWithBoolean(created, selector('setHasShadow:'), true);
+	voidWithBoolean(created, selector('setHasShadow:'), shadow());
 	voidWithBoolean(created, selector('setHidesOnDeactivate:'), false);
 	send.voidWithInteger(
 		created,

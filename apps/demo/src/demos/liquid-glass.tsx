@@ -1,5 +1,6 @@
 import {
 	Button,
+	Checkbox,
 	GlassPanel,
 	Icon,
 	Label,
@@ -26,8 +27,10 @@ import {
 	type FloatingGlassStyle,
 	floatingGlassAvailable,
 	floatingGlassOpen,
+	floatingGlassShadow,
 	floatingGlassStyle,
 	openFloatingGlass,
+	setFloatingGlassShadow,
 	setFloatingGlassStyle,
 } from '#src/floating-glass.ts';
 
@@ -256,6 +259,15 @@ export function LiquidGlassDemo() {
 							)}
 						</For>
 					</RadioGroup>
+					<Label>
+						<Checkbox
+							testId="floating-glass-shadow"
+							checked={floatingGlassShadow()}
+							disabled={!floatingGlassAvailable()}
+							onCheckedChange={setFloatingGlassShadow}
+						/>
+						Shadow
+					</Label>
 				</div>
 				<Text variant="small" color="secondary">
 					{floatingGlassAvailable()
