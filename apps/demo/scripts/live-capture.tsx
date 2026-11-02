@@ -12,6 +12,7 @@
  * `system` (the shell's scheme choices), `trace=<name>:<testId>:<x>:<y>:<w>:<h>[:<ms>]` (click `testId` while a worker samples that box, in points from the window's top-left, at the highest rate WindowServer gives, and write every distinct composited frame to `<out>/<name>/` with a `timeline.txt`), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--storage <key>=<json>` starts the window with a saved panel layout (a sidebar at a fractional width: `ghia-swiftui-demo-2={"0":243.37}`). `--backdrop` paints an opaque window
  * under the app, so what the glass samples does not depend on the desktop.
  */
+import './background.ts';
 import { mkdirSync } from 'node:fs';
 import { applyColorScheme } from 'ghia-swiftui';
 import { demos } from '#src/demos/index.ts';

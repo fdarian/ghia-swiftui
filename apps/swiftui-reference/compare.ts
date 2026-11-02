@@ -118,16 +118,10 @@ function compare(
 	scheme: 'light' | 'dark',
 	outDir: string,
 	zoom?: { rect: Rect; factor: number },
-	key: 'none' | 'panel' = 'none',
 ) {
 	const definition = shots[shot];
 	if (definition === undefined) throw new Error(`Unknown shot ${shot}`);
-	const referencePath = captureReference(
-		shot,
-		scheme,
-		key,
-		`${outDir}/reference/`,
-	);
+	const referencePath = captureReference(shot, scheme, `${outDir}/reference/`);
 	const oursPath = captureOurs(shot, scheme, `${outDir}/ours`);
 	const referenceFull = loadPng(referencePath, 1);
 	const oursFull = loadPng(oursPath, 1);
@@ -160,7 +154,6 @@ const take = (flag: string) => {
 const scheme = take('--scheme');
 const outDir = (take('--out') ?? '/tmp/ghia-compare').replace(/\/$/, '');
 const zoomArg = take('--zoom');
-const key = take('--key') === 'panel' ? 'panel' : 'none';
 const [name] = args;
 if (name === undefined) {
 	console.error(
@@ -181,7 +174,7 @@ for (const shot of name === 'all' ? Object.keys(shots) : [name]) {
 	for (const each of scheme === undefined
 		? (['light', 'dark'] as const)
 		: [scheme as 'light' | 'dark']) {
-		console.log(compare(shot, each, outDir, zoom, key));
+		console.log(compare(shot, each, outDir, zoom));
 	}
 }
 process.exit(0);

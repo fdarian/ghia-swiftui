@@ -16,6 +16,7 @@
  * Exit status: 0 passed, 1 a check failed, 3 not checkable (the window was
  * covered by another app, so it got no frames).
  */
+import './background.ts';
 import { mkdirSync } from 'node:fs';
 import { createTestRoot } from '@ghia/solid/testing';
 import {

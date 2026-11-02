@@ -12,7 +12,6 @@ struct Options {
 	var flash = false
 	var focus: String?
 	var scrollInner: CGFloat = 0
-	var key = "none"
 	var hold = false
 	var front = false
 	var dump = false
@@ -47,14 +46,13 @@ func parse() -> Options {
 		case "--flash": options.flash = true
 		case "--focus": options.focus = value(argument)
 		case "--scroll-inner": options.scrollInner = CGFloat(Double(value(argument)) ?? 0)
-		case "--key": options.key = value(argument)
 		case "--hold": options.hold = true
 		case "--front": options.front = true
 		case "--dump": options.dump = true
 		case "--delay": options.delay = Double(value(argument)) ?? 1.8
 		default:
 			guard options.page.isEmpty, Pages.names.contains(argument) else {
-				fatalError("usage: swiftui-reference <\(Pages.names.joined(separator: "|"))> [--scheme light|dark] [--out file.png] [--size WxH] [--scroll pt] [--scroll-inner pt] [--flash] [--focus default|glass] [--click x,y] [--hover x,y] [--flash] [--key none|panel|override] [--front] [--hold] [--dump]")
+				fatalError("usage: swiftui-reference <\(Pages.names.joined(separator: "|"))> [--scheme light|dark] [--out file.png] [--size WxH] [--scroll pt] [--scroll-inner pt] [--flash] [--focus default|glass] [--click x,y] [--hover x,y] [--front] [--hold] [--dump]")
 			}
 			options.page = argument
 		}
@@ -63,27 +61,18 @@ func parse() -> Options {
 	return options
 }
 
-/// A window that reports itself key without the app being active; see AGENTS.md for what this does and does not change.
-final class OverrideWindow: NSWindow {
-	override var isKeyWindow: Bool { true }
-	override var isMainWindow: Bool { true }
-	override var canBecomeKey: Bool { true }
-	override var canBecomeMain: Bool { true }
-	override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
-}
-
-/// Never key: macOS sometimes makes a new window of an accessory app key on its own, which would take keystrokes meant for the user's app.
-final class PlainWindow: NSWindow {
+/// Never key or main: a key window is how an app gets keystrokes, and nothing here may take them from the user's app.
+final class ReferenceWindow: NSWindow {
 	override var canBecomeKey: Bool { false }
 	override var canBecomeMain: Bool { false }
 	override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
 }
 
-/// A non-activating panel can become key while the app stays inactive.
-final class KeyPanel: NSPanel {
-	override var canBecomeKey: Bool { true }
-	override var canBecomeMain: Bool { true }
-	override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
+/// The reference app must never come to the front: every way of asking for it is a no-op.
+final class ReferenceApplication: NSApplication {
+	override func activate(ignoringOtherApps flag: Bool) {}
+	override func activate() {}
+	override func yieldActivation(to application: NSRunningApplication) {}
 }
 
 func allViews(_ view: NSView) -> [NSView] {
@@ -96,18 +85,13 @@ if CommandLine.arguments.contains("--screen") {
 	exit(0)
 }
 let options = parse()
-let application = NSApplication.shared
-application.setActivationPolicy(.accessory)
+let application = ReferenceApplication.shared
+guard application.setActivationPolicy(.accessory) else { fatalError("could not become an accessory app") }
 application.appearance = NSAppearance(named: options.dark ? .darkAqua : .aqua)
 
 let style: NSWindow.StyleMask = [.titled, .fullSizeContentView, .closable, .resizable]
 let rect = NSRect(origin: .zero, size: options.size)
-let window: NSWindow
-switch options.key {
-case "override": window = OverrideWindow(contentRect: rect, styleMask: style, backing: .buffered, defer: false)
-case "panel": window = KeyPanel(contentRect: rect, styleMask: style.union(.nonactivatingPanel), backing: .buffered, defer: false)
-default: window = PlainWindow(contentRect: rect, styleMask: style, backing: .buffered, defer: false)
-}
+let window = ReferenceWindow(contentRect: rect, styleMask: style, backing: .buffered, defer: false)
 window.isReleasedWhenClosed = false
 let windowed = Pages.windowed.contains(options.page)
 if !windowed {
@@ -143,19 +127,6 @@ if options.front || options.click != nil {
 window.orderFrontRegardless()
 if !(options.front || options.click != nil) { window.order(.below, relativeTo: 0) }
 
-switch options.key {
-case "panel": window.makeKey()
-case "override":
-	NotificationCenter.default.post(name: NSWindow.didBecomeKeyNotification, object: window)
-	NotificationCenter.default.post(name: NSWindow.didBecomeMainNotification, object: window)
-default: break
-}
-
-/// Whether the window is in the key state the run asked for: it can turn key on its own (the app is never activated here), and a capture of the wrong state is useless.
-func keyStateMatches() -> Bool {
-	options.key != "none" || !window.isKeyWindow
-}
-
 func report() {
 	let occlusion = window.occlusionState.contains(.visible)
 	FileHandle.standardError.write(Data("window \(window.windowNumber) key=\(window.isKeyWindow) main=\(window.isMainWindow) appActive=\(application.isActive) visible=\(occlusion) scale=\(window.backingScaleFactor)\n".utf8))
@@ -183,7 +154,6 @@ func prepare() {
 		document.scroll(NSPoint(x: 0, y: options.scrollInner))
 		scroller.reflectScrolledClipView(scroller.contentView)
 	}
-	if options.flash { scrollViews().forEach { $0.flashScrollers() } }
 }
 
 let coreGraphics = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_NOW)
@@ -229,10 +199,14 @@ func send(_ type: NSEvent.EventType, at point: CGPoint) {
 }
 
 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { prepare() }
+if options.flash {
+	// Overlay scrollers fade out about a second after they show.
+	DispatchQueue.main.asyncAfter(deadline: .now() + options.delay - 0.3) { scrollViews().forEach { $0.flashScrollers() } }
+}
 DispatchQueue.main.asyncAfter(deadline: .now() + options.delay) {
 	report()
-	if !keyStateMatches() {
-		FileHandle.standardError.write(Data("the window became key by itself; not capturing\n".utf8))
+	if window.isKeyWindow || application.isActive {
+		FileHandle.standardError.write(Data("the app became active by itself; not capturing\n".utf8))
 		exit(3)
 	}
 	if let path = options.out {
@@ -258,4 +232,5 @@ DispatchQueue.main.asyncAfter(deadline: .now() + options.delay) {
 		}
 	}
 }
-application.run()
+// Not `application.run()`: its finishLaunching makes the app frontmost, taking the user's focus. Windows draw and events sent by hand work without it.
+RunLoop.main.run()

@@ -10,6 +10,7 @@
  * The surface capture holds what ghia draws; the traffic lights are native
  * and are not in it. The check is geometry: nothing may sit under the lights.
  */
+import './background.ts';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

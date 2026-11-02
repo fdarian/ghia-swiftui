@@ -4,6 +4,7 @@
  * the same process can click through it and capture it with `window-pixels`.
  * No OS input is posted and no other app is touched.
  */
+import './background.ts';
 import { GpuixRenderer, render, useGpuixRequired } from '@ghia/solid';
 import { connectTest, liveRendererAsTest } from '@ghia/solid/automation';
 import { setPanelStorage } from 'ghia-swiftui';
@@ -27,11 +28,6 @@ export async function openLiveWindow(options: {
 	/** Panel storage entries the window starts with, as a resize drag would have saved them. */
 	storage?: Record<string, string>;
 }) {
-	if (process.env.GPUIX_BACKGROUND !== '1') {
-		throw new Error(
-			'Set GPUIX_BACKGROUND=1: the window must open behind the active app',
-		);
-	}
 	const memory = new Map<string, string>(Object.entries(options.storage ?? {}));
 	setPanelStorage({
 		get: (key) => memory.get(key),

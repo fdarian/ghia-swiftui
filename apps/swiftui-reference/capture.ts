@@ -1,16 +1,13 @@
 /**
  * Captures the reference app's pages as WindowServer composited them.
  *
- *   pnpm --filter ghia-swiftui-reference capture <shot|all> [--scheme light|dark] [--key none|panel]
+ *   pnpm --filter ghia-swiftui-reference capture <shot|all> [--scheme light|dark]
  *
  * Writes `screenshots/<shot>-<scheme>.png`. The app captures its own window
  * (`CGWindowListCreateImage` by window id needs no screen-recording permission
  * for a process's own windows, and another process's pixels are not readable
  * without it), so this script only launches it.
  *
- * `--key none` (default) leaves the window inactive, as the demo's live capture
- * does, so glass tints match. `--key panel` makes it a non-activating panel that
- * becomes key; the demo's window cannot, so the two then differ in tint.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, statSync } from 'node:fs';
@@ -42,11 +39,10 @@ export function screenSize(): { width: number; height: number } {
 	return { width, height };
 }
 
-/** Launches the app for one shot and returns the PNG's path. Retries when the window turned key by itself (exit 3) or a click opened nothing (exit 4). */
+/** Launches the app for one shot and returns the PNG's path. Retries when the app became active by itself (exit 3, nothing captured) or a click opened nothing (exit 4). */
 export function captureReference(
 	shot: string,
 	scheme: Scheme,
-	key: 'none' | 'panel' = 'none',
 	outDir = `${root}screenshots/`,
 ): string {
 	const definition = shots[shot];
@@ -63,8 +59,6 @@ export function captureReference(
 				definition.page,
 				'--scheme',
 				scheme,
-				'--key',
-				key,
 				'--out',
 				out,
 				...(definition.refSize === undefined
@@ -86,7 +80,7 @@ export function captureReference(
 		}
 	}
 	throw new Error(
-		`${shot} ${scheme}: the window kept turning key by itself, or the click kept opening nothing`,
+		`${shot} ${scheme}: the app kept becoming active by itself, or the click kept opening nothing`,
 	);
 }
 
@@ -97,12 +91,10 @@ if (import.meta.main) {
 		return index === -1 ? undefined : args.splice(index, 2)[1];
 	};
 	const scheme = take('--scheme');
-	const key = take('--key') ?? 'none';
-	if (key !== 'none' && key !== 'panel') throw new Error('--key none|panel');
 	const [name] = args;
 	if (name === undefined) {
 		console.error(
-			`usage: capture <${Object.keys(shots).join('|')}|all> [--scheme light|dark] [--key none|panel]`,
+			`usage: capture <${Object.keys(shots).join('|')}|all> [--scheme light|dark]`,
 		);
 		process.exit(1);
 	}
@@ -110,7 +102,7 @@ if (import.meta.main) {
 		scheme === undefined ? ['light', 'dark'] : [scheme as Scheme];
 	for (const shot of name === 'all' ? Object.keys(shots) : [name]) {
 		for (const each of schemes) {
-			console.log(captureReference(shot, each, key));
+			console.log(captureReference(shot, each));
 		}
 	}
 }
