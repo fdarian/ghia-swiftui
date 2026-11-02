@@ -80,6 +80,7 @@ import {
 	TooltipProvider,
 	toast,
 } from 'ghia-swiftui';
+import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors';
 
 setPanelStorage(createFilePanelStorage({ appName: 'my-app' }));
 
@@ -89,6 +90,12 @@ render(
 			<TooltipProvider>
 				<div
 					style={{
+						position: 'fixed',
+						top: 0,
+						right: 0,
+						bottom: 0,
+						left: 0,
+						backgroundColor: semanticColors.backgroundSolid,
 						display: 'flex',
 						flexDirection: 'column',
 						alignItems: 'flex-start',
@@ -111,12 +118,11 @@ render(
 		width: 480,
 		height: 320,
 		titlebarTransparent: true,
-		windowBackground: 'blurred',
 	},
 );
 ```
 
-`bun src/main.tsx` opens it. An app shell is a `SplitView` with a `Sidebar` in its `sidebar` slot: [`apps/demo/src/app.tsx`](apps/demo/src/app.tsx) is one.
+`bun src/main.tsx` opens it. The window is opaque (ghia's default) and ghia paints it black, so the root paints the window colour, as the `div` above does with `backgroundSolid`: a `Sidebar`'s glass samples whatever is painted behind it, and over an unpainted window it reads as a dark grey pane, not the pale frosted sidebar of macOS. An app shell is a `SplitView` with a `Sidebar` in its `sidebar` slot: [`apps/demo/src/app.tsx`](apps/demo/src/app.tsx) is one.
 
 Tokens are plain objects of getters over the colour scheme, imported from their own modules (`import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors'`). The accent is `#138af2` until the app calls `setAccentColor('#rrggbb')`, since ghia cannot read the system accent. `applyColorScheme(true | false)` forces a scheme and `followSystemColorScheme()` returns to the OS.
 

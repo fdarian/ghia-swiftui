@@ -80,6 +80,10 @@ export const send = {
 	object: bind<[Pointer, Pointer], Id>([P, P], P),
 	void: bind<[Pointer, Pointer], void>([P, P], FFIType.void),
 	objectWithObject: bind<[Pointer, Pointer, Id], Id>([P, P, P], P),
+	boolWithObject: bind<[Pointer, Pointer, Id], boolean>(
+		[P, P, P],
+		FFIType.bool,
+	),
 	voidWithObject: bind<[Pointer, Pointer, Id], void>([P, P, P], FFIType.void),
 	voidWithInteger: bind<[Pointer, Pointer, number], void>(
 		[P, P, I],

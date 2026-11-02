@@ -19,19 +19,11 @@ import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { hasNodes } from '#src/resolved.ts';
 import { createRevealOnSelect } from '#src/reveal.ts';
-import { colorScheme } from '#src/tokens/color-scheme.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 
 const SIDEBAR_INSET = 10;
 const ICON_SIZE = 16;
-
-/**
- * syne scales the subdued material up so it samples a uniform patch and lays a
- * 40% black scrim over it in dark mode. NSGlassEffectView has no subdued
- * material, so the scrim becomes the glass's tint.
- */
-const SIDEBAR_SCRIM = '#00000066';
 
 export interface SidebarProps extends HostAttributes {
 	/** Escape hatch: pass a fully custom Toolbar. Overrides `actions`. */
@@ -84,11 +76,11 @@ export function Sidebar(props: SidebarProps) {
 					...own.style,
 				}}
 			>
-				{/* One pixel past the aside, under the panel group's resize handle: the handle is masked and thin, and over a transparent window the desktop shows through it. The aside does not clip, so the content below does. */}
+				{/* Untinted, as Apple asks, in the glass variant a system sidebar uses: `regular` over the same window reads grey, this one pale and frosted. One pixel past the aside, under the panel group's resize handle: the handle is masked and thin and the glass shows through it. The aside does not clip, so the content below does. */}
 				<NativeGlass
 					aria-hidden
 					radius={0}
-					tint={colorScheme() === 'dark' ? SIDEBAR_SCRIM : undefined}
+					variant="sidebar"
 					style={{
 						position: 'absolute',
 						top: 0,

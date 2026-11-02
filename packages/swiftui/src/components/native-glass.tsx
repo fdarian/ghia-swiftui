@@ -14,7 +14,7 @@ import { parse } from '#src/tokens/color-math.ts';
 export interface NativeGlassProps extends HostAttributes {
 	/** A colour laid over the glass; its alpha is the strength. No tint by default. */
 	tint?: string;
-	/** `clear` is the see-through glass of media controls; `regular` the standard one. */
+	/** `clear` is the see-through glass of media controls; `regular` the standard one; `sidebar` the paler, frosted one of a system sidebar (private API, `regular` where missing). */
 	variant?: NativeGlassVariant;
 	/** Corner radius in px, given to the glass view and the box's background. */
 	radius: number;

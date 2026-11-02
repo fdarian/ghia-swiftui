@@ -9,7 +9,7 @@ export interface GlassPanelProps extends HostAttributes {
 	/** A colour laid over the glass; its alpha is the strength. */
 	tint?: string;
 	/** `clear` is the see-through glass of media controls; `regular` (the default) the standard one. */
-	variant?: NativeGlassVariant;
+	variant?: Exclude<NativeGlassVariant, 'sidebar'>;
 	/** Corner radius in px. Defaults to the popover radius. */
 	radius?: number;
 	/** The look while there is no real glass; see `NativeGlass`. */

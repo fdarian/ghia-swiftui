@@ -13,8 +13,10 @@ import {
 const FILL = 18;
 const STYLE_REGULAR = 0;
 const STYLE_CLEAR = 1;
+const VARIANT_SIDEBAR = 17;
 
-export type NativeGlassVariant = 'regular' | 'clear';
+/** `sidebar` is the private glass variant AppKit gives a `NavigationSplitView` sidebar; where this macOS does not have it, it is `regular`. */
+export type NativeGlassVariant = 'regular' | 'clear' | 'sidebar';
 
 export interface NativeGlassOptions {
 	variant: NativeGlassVariant;
@@ -55,12 +57,21 @@ function srgbColor(tint: NativeGlassOptions['tint']): Pointer | null {
 	);
 }
 
+/** `-[NSGlassEffectView set_variant:]` is private: sent only to a view that answers it. */
+function setPrivateVariant(glass: Pointer, variant: number) {
+	const setter = selector('set_variant:');
+	if (!send.boolWithObject(glass, selector('respondsToSelector:'), setter))
+		return;
+	send.voidWithInteger(glass, setter, variant);
+}
+
 function apply(glass: Pointer, options: NativeGlassOptions) {
 	send.voidWithInteger(
 		glass,
 		selector('setStyle:'),
 		options.variant === 'clear' ? STYLE_CLEAR : STYLE_REGULAR,
 	);
+	if (options.variant === 'sidebar') setPrivateVariant(glass, VARIANT_SIDEBAR);
 	send.voidWithDouble(
 		glass,
 		selector('setCornerRadius:'),
