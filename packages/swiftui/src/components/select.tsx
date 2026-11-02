@@ -503,6 +503,7 @@ export function SelectContent(props: SelectContentProps) {
 								display: 'flex',
 								flexDirection: 'column',
 								overflowY: 'scroll',
+								borderRadius: styleTokens.radiusPopover,
 								padding: POPUP_PADDING,
 								keyboardFocusDim: false,
 								maxHeight: maxHeight(),

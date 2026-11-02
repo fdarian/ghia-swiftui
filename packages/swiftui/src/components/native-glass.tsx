@@ -84,7 +84,7 @@ export function NativeGlass(props: NativeGlassProps) {
 				{...rest}
 				style={{
 					borderRadius: own.radius,
-					overflow: 'hidden',
+					overflow: 'visible',
 					...fallback(),
 					...own.style,
 				}}
@@ -117,7 +117,7 @@ export function NativeGlass(props: NativeGlassProps) {
 			}}
 			style={{
 				borderRadius: own.radius,
-				overflow: 'hidden',
+				overflow: 'visible',
 				...(handle() === undefined ? fallback() : {}),
 				...own.style,
 			}}

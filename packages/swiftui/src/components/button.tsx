@@ -154,7 +154,8 @@ export function Button(props: ButtonProps) {
 		alignItems: 'center',
 		justifyContent: 'center',
 		whiteSpace: 'nowrap',
-		overflow: 'hidden',
+		// A glass button keeps overflow visible: clipping would cut the glass's own shadow and edge highlight.
+		...(isGlass() ? {} : { overflow: 'hidden' }),
 		fontSize: 13,
 		fontWeight: 500,
 		lineHeight: '18px',
