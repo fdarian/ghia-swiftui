@@ -10,37 +10,55 @@ import { NativeGlass } from '#src/components/native-glass.tsx';
 import { withAlpha } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
-import { style as styleTokens } from '#src/tokens/style.ts';
 import { typography } from '#src/tokens/typography.ts';
 
+/**
+ * SwiftUI's `TextField` (`.roundedBorder`) on macOS 26, measured from the
+ * reference app: `small` is 23 tall with 11pt type, `medium` and `large` are
+ * both 26 tall with 13pt, since `.controlSize(.large)` does not grow a text
+ * field. The 1px hairline is inside the height; `paddingInline` is measured inside it.
+ */
 const sizes = {
-	small: { height: 28, paddingInline: 8, borderRadius: styleTokens.radius8 },
+	small: {
+		height: 23,
+		paddingInline: 6,
+		borderRadius: 6,
+		fontSize: 11,
+		lineHeight: '14px',
+	},
 	medium: {
-		height: 32,
-		paddingInline: 12,
-		borderRadius: styleTokens.radiusControl,
+		height: 26,
+		paddingInline: 6,
+		borderRadius: 9,
+		fontSize: 13,
+		lineHeight: '18px',
 	},
 	large: {
-		height: 36,
-		paddingInline: 12,
-		borderRadius: styleTokens.radiusControl,
+		height: 26,
+		paddingInline: 6,
+		borderRadius: 9,
+		fontSize: 13,
+		lineHeight: '18px',
 	},
 } as const;
+
+/** The glass variant's pill, measured from Apple Mail's search field: it is not a text field's size. */
+const glassHeights = { small: 28, medium: 32, large: 36 } as const;
 
 export type InputVariant = 'default' | 'filled' | 'glass';
 export type InputSize = keyof typeof sizes;
 
 export interface InputProps extends Omit<HostInputProps, 'style'> {
 	/**
-	 * Bordered transparent fill, subtle filled chrome, or a real-glass pill (a
-	 * search field's) that wiggles and rings in the accent colour on focus.
+	 * A text field's fill and hairline, subtle filled chrome, or a real-glass
+	 * pill (a search field's) that wiggles and rings in the accent colour on focus.
 	 * A glass input's `style` goes on its outer box (width, margin), not on
 	 * the text field inside.
 	 */
 	variant?: InputVariant;
 	/** Glass variant only: content before the text, such as a magnifier `Icon`. */
 	leading?: JSX.Element;
-	/** Control height (28 / 32 / 36px) and corner radius. */
+	/** Control size: a text field is 23 / 26 / 26pt tall with 11 / 13 / 13pt type, as SwiftUI's `.small` / `.regular` / `.large`; the glass pill is 28 / 32 / 36pt. */
 	size?: InputSize;
 	/** Called with the text after every edit; `onChange` carries the same as an event. */
 	onValueChange?: (value: string) => void;
@@ -61,8 +79,8 @@ function variantStyle(variant: Exclude<InputVariant, 'glass'>): StyleDesc {
 	switch (variant) {
 		case 'default':
 			return {
-				borderColor: semanticColors.borderField,
-				backgroundColor: 'transparent',
+				borderColor: semanticColors.borderTextField,
+				backgroundColor: semanticColors.surfaceTextField,
 				focusVisible: { borderColor: colors.fg40 },
 			};
 		case 'filled':
@@ -93,7 +111,7 @@ export function Input(props: InputProps) {
 	const disabled = () => rest.disabled === true || fieldDisabled();
 	const [focused, setFocused] = createSignal(false);
 	const isGlass = () => own.variant === 'glass';
-	const glassRadius = () => sizes[own.size ?? 'medium'].height / 2;
+	const glassRadius = () => glassHeights[own.size ?? 'medium'] / 2;
 	const variant = () => {
 		const chosen = own.variant ?? 'default';
 		return chosen === 'glass' ? undefined : chosen;
@@ -158,7 +176,7 @@ export function Input(props: InputProps) {
 		<Show when={isGlass()} fallback={field()}>
 			<GlassShell
 				radius={glassRadius()}
-				height={sizes[own.size ?? 'medium'].height}
+				height={glassHeights[own.size ?? 'medium']}
 				focused={focused()}
 				disabled={disabled()}
 				leading={own.leading}

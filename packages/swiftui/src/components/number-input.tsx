@@ -10,28 +10,37 @@ import { Icon } from '#src/icons/icon.tsx';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
-import { typography } from '#src/tokens/typography.ts';
 
+/** The box is `Input`'s text field: 23 / 26 / 26pt tall with 11 / 13 / 13pt type, as SwiftUI's `.small` / `.regular` / `.large`. */
 const sizes = {
 	small: {
-		height: 28,
-		borderRadius: styleTokens.radius8,
+		height: 23,
+		borderRadius: 6,
+		fontSize: 11,
+		lineHeight: '14px',
 		fieldPadding: 6,
 		unitPadding: 6,
+		stepperMargin: 3,
 		stepperPadding: 2,
 	},
 	medium: {
-		height: 32,
-		borderRadius: styleTokens.radiusControl,
-		fieldPadding: 12,
-		unitPadding: 8,
+		height: 26,
+		borderRadius: 9,
+		fontSize: 13,
+		lineHeight: '18px',
+		fieldPadding: 6,
+		unitPadding: 6,
+		stepperMargin: 4,
 		stepperPadding: 3,
 	},
 	large: {
-		height: 36,
-		borderRadius: styleTokens.radiusControl,
-		fieldPadding: 12,
-		unitPadding: 8,
+		height: 26,
+		borderRadius: 9,
+		fontSize: 13,
+		lineHeight: '18px',
+		fieldPadding: 6,
+		unitPadding: 6,
+		stepperMargin: 4,
 		stepperPadding: 4,
 	},
 } as const;
@@ -54,9 +63,9 @@ export interface NumberInputProps
 	unit?: JSX.Element;
 	/** Show/hide the stepper arrows. */
 	steppers?: boolean;
-	/** Bordered vs. subtle-filled chrome. */
+	/** A text field's fill and hairline vs. subtle-filled chrome. */
 	variant?: NumberInputVariant;
-	/** Control height (28 / 32 / 36px). */
+	/** Control size: 23 / 26 / 26pt tall with 11 / 13 / 13pt type, as `Input`. */
 	size?: NumberInputSize;
 	min?: number;
 	max?: number;
@@ -74,8 +83,8 @@ function variantStyle(variant: NumberInputVariant): StyleDesc {
 	switch (variant) {
 		case 'default':
 			return {
-				borderColor: semanticColors.borderField,
-				backgroundColor: 'transparent',
+				borderColor: semanticColors.borderTextField,
+				backgroundColor: semanticColors.surfaceTextField,
 				focusWithin: { borderColor: colors.fg40 },
 			};
 		case 'filled':
@@ -198,7 +207,8 @@ export function NumberInput(props: NumberInputProps) {
 					alignSelf: 'stretch',
 					backgroundColor: 'transparent',
 					keyboardFocusDim: false,
-					...typography.variants.regular,
+					fontSize: size().fontSize,
+					lineHeight: size().lineHeight,
 					fontVariantNumeric: 'tabular-nums',
 					color: semanticColors.textPrimary,
 					selectionColor: colors.selection40,
@@ -213,7 +223,7 @@ export function NumberInput(props: NumberInputProps) {
 					style={{
 						pointerEvents: 'none',
 						color: semanticColors.textTertiary,
-						fontSize: typography.variants.regular.fontSize,
+						fontSize: size().fontSize,
 						fontVariantNumeric: 'tabular-nums',
 						userSelect: 'none',
 						paddingLeft: 2,
@@ -230,7 +240,7 @@ export function NumberInput(props: NumberInputProps) {
 						flexDirection: 'column',
 						flexShrink: 0,
 						alignSelf: 'stretch',
-						marginBlock: 4,
+						marginBlock: size().stepperMargin,
 						marginRight: 4,
 						overflow: 'hidden',
 						borderRadius: styleTokens.radiusPill,
