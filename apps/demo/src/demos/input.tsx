@@ -1,4 +1,10 @@
-import { Input, type InputSize, type InputVariant, Text } from 'ghia-swiftui';
+import {
+	Icon,
+	Input,
+	type InputSize,
+	type InputVariant,
+	Text,
+} from 'ghia-swiftui';
 import { createSignal, For } from 'solid-js';
 import { Cell, Page, Row, Section } from '#src/demo-kit.tsx';
 import type { Shot } from '#src/demos/shot.ts';
@@ -68,6 +74,44 @@ export function InputDemo() {
 					</Cell>
 				</Row>
 			</Section>
+			<Section title="Glass">
+				<Row>
+					<Cell label="glass">
+						<Input
+							variant="glass"
+							leading={<Icon name="search" />}
+							placeholder="Search"
+							style={{ width: 240 }}
+						/>
+					</Cell>
+					<Cell label="focused">
+						<Input
+							testId="input-glass-focus"
+							variant="glass"
+							leading={<Icon name="search" />}
+							placeholder="Search"
+							style={{ width: 240 }}
+						/>
+					</Cell>
+					<Cell label="with value">
+						<Input
+							variant="glass"
+							leading={<Icon name="search" />}
+							value="Invoices"
+							style={{ width: 240 }}
+						/>
+					</Cell>
+					<Cell label="disabled">
+						<Input
+							disabled
+							variant="glass"
+							leading={<Icon name="search" />}
+							placeholder="Search"
+							style={{ width: 240 }}
+						/>
+					</Cell>
+				</Row>
+			</Section>
 			<Section title="Typing (controlled)">
 				<Row>
 					<Cell label="type here">
@@ -96,6 +140,10 @@ export async function inputScenario(shot: Shot) {
 	await shot.capture('focus');
 	await shot.focus('input-focus-filled');
 	await shot.capture('focus-filled');
+
+	await shot.focus('input-glass-focus');
+	await shot.wait(500);
+	await shot.capture('focus-glass');
 
 	await shot.focus('input-typing');
 	await shot.keys('h e l l o');
