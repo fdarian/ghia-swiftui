@@ -198,6 +198,25 @@ func send(_ type: NSEvent.EventType, at point: CGPoint) {
 	window.sendEvent(event)
 }
 
+/// Presses on the point. A press that opens a menu blocks in menu tracking, so `captured` runs from a timer in the common run-loop modes; a press that returns with no menu open was not taken (SwiftUI sometimes misses the first one) and is tried again.
+func press(at point: CGPoint, attempt: Int, captured: @escaping () -> Void) {
+	// The pointer has to be over the control before it presses, as a real click's is.
+	send(.mouseMoved, at: point)
+	DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+		let timer = Timer(timeInterval: 2.0, repeats: false) { _ in captured() }
+		RunLoop.main.add(timer, forMode: .common)
+		send(.leftMouseDown, at: point)
+		guard ownWindowIDs().count < 2 else { return }
+		timer.invalidate()
+		send(.leftMouseUp, at: point)
+		guard attempt < 5 else {
+			FileHandle.standardError.write(Data("the click opened nothing\n".utf8))
+			exit(4)
+		}
+		press(at: point, attempt: attempt + 1, captured: captured)
+	}
+}
+
 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { prepare() }
 if options.flash {
 	// Overlay scrollers fade out about a second after they show.
@@ -211,20 +230,9 @@ DispatchQueue.main.asyncAfter(deadline: .now() + options.delay) {
 	}
 	if let path = options.out {
 		if let point = options.click {
-			// The pointer has to be over the control before it presses, as a real click's is.
-			send(.mouseMoved, at: point)
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-				// Menu tracking runs its own loop: the timer has to be in the common modes to fire inside it.
-				let timer = Timer(timeInterval: 2.0, repeats: false) { _ in
-					if ownWindowIDs().count < 2 {
-						FileHandle.standardError.write(Data("the click opened nothing\n".utf8))
-						exit(4)
-					}
-					capture(to: path)
-					exit(0)
-				}
-				RunLoop.main.add(timer, forMode: .common)
-				send(.leftMouseDown, at: point)
+			press(at: point, attempt: 1) {
+				capture(to: path)
+				exit(0)
 			}
 		} else {
 			capture(to: path)
