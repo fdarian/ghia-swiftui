@@ -1,6 +1,7 @@
 import type { InputProps as HostInputProps, StyleDesc } from '@ghia/solid';
 import { splitProps } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
@@ -62,9 +63,11 @@ export function Input(props: InputProps) {
 		'onChange',
 		'style',
 	]);
+	const fieldDisabled = useFieldDisabled();
 	return (
 		<input
 			{...rest}
+			disabled={rest.disabled === true || fieldDisabled()}
 			onChange={(event) => {
 				own.onChange?.(event);
 				own.onValueChange?.(event.value);

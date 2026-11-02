@@ -1,6 +1,7 @@
 import type { StyleDesc } from '@ghia/solid';
 import { createSignal, Show } from 'solid-js';
 import { Button } from '#src/components/button.tsx';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import {
 	Tooltip,
 	TooltipContent,
@@ -183,7 +184,8 @@ export function ShortcutRecorder(props: ShortcutRecorderProps) {
 		createSignal<ModifierState>(NO_MODIFIERS);
 	const [hint, setHint] = createSignal<string>();
 	const size = () => boxSizes[props.size ?? 'medium'];
-	const isDisabled = () => props.disabled === true;
+	const fieldDisabled = useFieldDisabled();
+	const isDisabled = () => props.disabled === true || fieldDisabled();
 
 	const startRecording = () => {
 		if (isDisabled()) return;

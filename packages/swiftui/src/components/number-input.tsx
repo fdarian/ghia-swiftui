@@ -5,6 +5,7 @@ import type {
 } from '@ghia/solid';
 import { createSignal, type JSX, Show, splitProps } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { Icon } from '#src/icons/icon.tsx';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
@@ -112,6 +113,8 @@ export function NumberInput(props: NumberInputProps) {
 	const [uncontrolled, setUncontrolled] = createSignal<number | null>(
 		own.defaultValue ?? null,
 	);
+	const fieldDisabled = useFieldDisabled();
+	const isDisabled = () => own.disabled === true || fieldDisabled();
 	const current = () => (own.value !== undefined ? own.value : uncontrolled());
 	const size = () => sizes[own.size ?? 'medium'];
 	const step = () => own.step ?? 1;
@@ -130,7 +133,7 @@ export function NumberInput(props: NumberInputProps) {
 	};
 
 	const nudge = (direction: 1 | -1) => {
-		if (own.disabled === true) return;
+		if (isDisabled()) return;
 		const base = current() ?? 0;
 		const places = Math.max(decimals(step()), decimals(base));
 		commit(clamp(Number((base + direction * step()).toFixed(places))));
@@ -168,7 +171,7 @@ export function NumberInput(props: NumberInputProps) {
 				min={own.min}
 				max={own.max}
 				step={step()}
-				disabled={own.disabled}
+				disabled={isDisabled()}
 				aria-invalid={own['aria-invalid']}
 				ref={(element) => {
 					input = element;

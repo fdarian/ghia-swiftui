@@ -13,6 +13,7 @@ import {
 	useContext,
 } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { registerLabelControl } from '#src/components/label.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
 import { colors } from '#src/tokens/colors.ts';
@@ -109,7 +110,9 @@ export function RadioGroupItem(props: RadioGroupItemProps) {
 		'style',
 		'ref',
 	]);
-	const isDisabled = () => context.disabled() || own.disabled === true;
+	const fieldDisabled = useFieldDisabled();
+	const isDisabled = () =>
+		context.disabled() || own.disabled === true || fieldDisabled();
 	const row = createRadioRoot(context.group, {
 		index: context.nextIndex(),
 		label: () => own['aria-label'] ?? '',

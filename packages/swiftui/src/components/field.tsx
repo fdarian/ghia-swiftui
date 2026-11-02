@@ -12,6 +12,10 @@ import {
 	splitProps,
 } from 'solid-js';
 import { isButtonElement } from '#src/components/button.tsx';
+import {
+	FieldDisabledContext,
+	useFieldDisabled,
+} from '#src/components/field-disabled-context.ts';
 import { Label, type LabelProps } from '#src/components/label.tsx';
 import { Separator } from '#src/components/separator.tsx';
 import { Text } from '#src/components/text.tsx';
@@ -175,13 +179,26 @@ export interface FieldProps
 }
 
 /**
- * A single form row. When `label` is set, auto-builds the
+ * A single form row. A disabled row dims its label, description and controls
+ * itself, each through `FieldDisabledContext`. When `label` is set, auto-builds the
  * `FieldContent`/`FieldLabel`/`FieldDescription`/`FieldError` stack and
  * right-aligns children as the control slot. Without `label`, children are
  * rendered as-is (primitive mode). With `onClick` the whole row is a button:
  * do not put an interactive child in it.
  */
 export function Field(props: FieldProps) {
+	const parentDisabled = useFieldDisabled();
+	return (
+		<FieldDisabledContext.Provider
+			value={() => props.disabled === true || parentDisabled()}
+		>
+			<FieldRow {...props} />
+		</FieldDisabledContext.Provider>
+	);
+}
+
+// The children resolve in here, below the provider, so they can read it.
+function FieldRow(props: FieldProps) {
 	const renderer = useGpuixRequired();
 	const [behavior, own, rest] = splitProps(
 		props,
@@ -316,7 +333,8 @@ export function Field(props: FieldProps) {
 							},
 						}
 					: {}),
-				...(isDisabled() ? { opacity: 0.5, pointerEvents: 'none' } : {}),
+				// No opacity: a glass control inside would be drawn under its own glass. The label, description and controls dim themselves.
+				...(isDisabled() ? { pointerEvents: 'none' } : {}),
 				...(own['data-invalid'] === true ? { color: colors.red } : {}),
 				...own.style,
 			}}
@@ -353,6 +371,7 @@ export function FieldContent(props: HostAttributes) {
 
 export function FieldLabel(props: LabelProps) {
 	const [own, rest] = splitProps(props, ['style']);
+	const disabled = useFieldDisabled();
 	return (
 		<Label
 			{...rest}
@@ -363,6 +382,7 @@ export function FieldLabel(props: LabelProps) {
 				minWidth: 0,
 				gap: 8,
 				lineHeight: 1.375,
+				...(disabled() ? { opacity: 0.5 } : {}),
 				...own.style,
 			}}
 		/>
@@ -371,6 +391,7 @@ export function FieldLabel(props: LabelProps) {
 
 export function FieldTitle(props: Omit<HostAttributes, 'color'>) {
 	const [own, rest] = splitProps(props, ['style']);
+	const disabled = useFieldDisabled();
 	return (
 		<Text
 			{...rest}
@@ -381,6 +402,7 @@ export function FieldTitle(props: Omit<HostAttributes, 'color'>) {
 				width: 'fit-content',
 				alignItems: 'center',
 				gap: 8,
+				...(disabled() ? { opacity: 0.5 } : {}),
 				...own.style,
 			}}
 		/>
@@ -389,13 +411,18 @@ export function FieldTitle(props: Omit<HostAttributes, 'color'>) {
 
 export function FieldDescription(props: Omit<HostAttributes, 'color'>) {
 	const [own, rest] = splitProps(props, ['style']);
+	const disabled = useFieldDisabled();
 	return (
 		<Text
 			{...rest}
 			as="p"
 			variant="small"
 			color="secondary"
-			style={{ maxWidth: 350, ...own.style }}
+			style={{
+				maxWidth: 350,
+				...(disabled() ? { opacity: 0.5 } : {}),
+				...own.style,
+			}}
 		/>
 	);
 }

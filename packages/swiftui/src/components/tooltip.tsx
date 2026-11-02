@@ -24,7 +24,6 @@ import {
 	useContext,
 } from 'solid-js';
 import { PopupShadow, SHADOW_PAD } from '#src/popup.tsx';
-import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 import { typography } from '#src/tokens/typography.ts';
@@ -259,8 +258,7 @@ export function TooltipContent(props: TooltipContentProps) {
 							outline: `1px solid ${semanticColors.borderSecondary}`,
 							paddingBlock: 4,
 							paddingInline: 8,
-							backgroundColor: colors.bg80,
-							backdropFilter: `blur(${styleTokens.blurPopover}px)`,
+							backgroundColor: semanticColors.surfacePopover,
 							color: semanticColors.textPrimary,
 							...typography.variants.small,
 							whiteSpace: 'nowrap',

@@ -13,6 +13,11 @@ import {
 	Icon,
 	Input,
 	NumberInput,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 	Text,
 } from 'ghia-swiftui';
 import { createSignal } from 'solid-js';
@@ -96,6 +101,50 @@ export function FieldDemo() {
 						</FieldGroup>
 					</FieldSet>
 					<Text testId="field-opens">{`${opens()}`}</Text>
+				</Section>
+				<Section
+					width={400}
+					title="Disabled rows: label, description and controls dim; glass controls included"
+				>
+					<FieldSet>
+						<FieldGroup>
+							<Field
+								testId="field-disabled-glass"
+								label="Glass button"
+								description="Disabled field"
+								disabled
+							>
+								<Button variant="glass" size="small">
+									Edit
+								</Button>
+								<Button variant="glassAccent" size="small">
+									Save
+								</Button>
+							</Field>
+							<Field label="Glass select" disabled>
+								<Select defaultValue="spotify">
+									<SelectTrigger variant="glass" size="small">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="spotify">Spotify</SelectItem>
+									</SelectContent>
+								</Select>
+							</Field>
+							<Field label="Input and checkbox" disabled>
+								<Input size="small" style={{ width: 96 }} value="Ada" />
+								<Checkbox aria-label="Disabled" checked />
+							</Field>
+							<Field label="Enabled, for comparison">
+								<Button variant="glass" size="small">
+									Edit
+								</Button>
+								<Button variant="glassAccent" size="small">
+									Save
+								</Button>
+							</Field>
+						</FieldGroup>
+					</FieldSet>
 				</Section>
 				<Section
 					width={400}

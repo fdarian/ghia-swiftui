@@ -1,4 +1,4 @@
-import { motion } from '@ghia/solid';
+import { type HostElement, motion, type StyleDesc } from '@ghia/solid';
 import {
 	createPlacementState,
 	POPUP_MARGIN,
@@ -11,6 +11,7 @@ import {
 	createSignal,
 	For,
 	type JSX,
+	mergeProps,
 	on,
 	children as resolveChildren,
 	Show,
@@ -19,12 +20,13 @@ import {
 	useContext,
 } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { NativeGlass } from '#src/components/native-glass.tsx';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
 import { PopupShadow, SHADOW_PAD } from '#src/popup.tsx';
-import { over, withAlpha } from '#src/tokens/color-math.ts';
+import { withAlpha } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
@@ -95,6 +97,8 @@ export interface SelectProps {
  * `SelectItem`s). The popup is an in-window glass menu, not a system one.
  */
 export function Select(props: SelectProps) {
+	const fieldDisabled = useFieldDisabled();
+	const disabled = () => props.disabled === true || fieldDisabled();
 	const [options, setOptions] = createSignal<readonly SelectOption[]>([]);
 	const [highlighted, setHighlighted] = createSignal<number | null>(null);
 	const [trigger, setTrigger] = createSignal({ height: 32, labelInset: 13 });
@@ -105,7 +109,7 @@ export function Select(props: SelectProps) {
 		value: () => props.value,
 		defaultValue: props.defaultValue,
 		onValueChange: (next) => props.onValueChange?.(next),
-		disabled: () => props.disabled === true,
+		disabled,
 		required: () => undefined,
 		invalid: () => false,
 		labelledBy: () => undefined,
@@ -135,7 +139,7 @@ export function Select(props: SelectProps) {
 				options,
 				setOptions,
 				root,
-				disabled: () => props.disabled === true,
+				disabled,
 				highlighted,
 				setHighlighted,
 				trigger,
@@ -206,59 +210,63 @@ export function SelectTrigger(props: SelectTriggerProps) {
 		});
 		context.setBleed(variant() === 'transparent' ? 8 : 0);
 	});
-	const hoverFill = () =>
-		variant() === 'glass'
-			? over(semanticColors.surfaceControlSubtle, glass.tint)
-			: semanticColors.surfaceControlSubtle;
-	return (
-		<div
-			{...rest}
-			{...context.root.triggerProps}
-			ref={(element) => {
-				context.root.triggerRef(element);
-				own.ref?.(element);
-			}}
-			formControl={context.disabled() ? 'disabled' : 'enabled'}
-			style={{
-				display: 'flex',
-				flexDirection: 'row',
-				width: 'fit-content',
-				maxWidth: '100%',
-				alignItems: 'center',
-				justifyContent: 'space-between',
-				gap: 8,
-				overflow: 'hidden',
-				whiteSpace: 'nowrap',
-				...typography.variants.regular,
-				color: semanticColors.textPrimary,
-				cursor: 'default',
-				keyboardFocusDim: false,
-				...size(),
-				...(variant() === 'default'
-					? {
-							borderWidth: 1,
-							borderStyle: 'solid',
-							borderColor: semanticColors.borderField,
-							hover: { borderColor: colors.fg40 },
-						}
-					: {}),
-				...(variant() === 'glass' ? glass.material() : {}),
-				...(variant() === 'glass' || variant() === 'transparent'
-					? { hover: { backgroundColor: hoverFill() } }
-					: {}),
-				focusVisible: {
-					outline: `2px solid ${colors.fg20}`,
-					...(variant() === 'default' ? { borderColor: colors.fg40 } : {}),
-				},
-				...(isInvalid(rest['aria-invalid'])
-					? { outline: `1px solid ${colors.red}` }
-					: {}),
-				...(context.disabled()
-					? { pointerEvents: 'none', opacity: 0.5, cursor: 'not-allowed' }
-					: {}),
-				...own.style,
-			}}
-		>
+	const shared = mergeProps(rest, context.root.triggerProps, {
+		ref: (element: HostElement) => {
+			context.root.triggerRef(element);
+			own.ref?.(element);
+		},
+		get formControl() {
+			return context.disabled() ? ('disabled' as const) : ('enabled' as const);
+		},
+	});
+	const [hovered, setHovered] = createSignal(false);
+	const isGlass = () => variant() === 'glass';
+	const style = (): StyleDesc => ({
+		display: 'flex',
+		flexDirection: 'row',
+		width: 'fit-content',
+		maxWidth: '100%',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		gap: 8,
+		// Clipping would cut the glass's own shadow and edge highlight.
+		...(isGlass() ? {} : { overflow: 'hidden' }),
+		whiteSpace: 'nowrap',
+		...typography.variants.regular,
+		color: semanticColors.textPrimary,
+		cursor: 'default',
+		keyboardFocusDim: false,
+		...size(),
+		...(variant() === 'default'
+			? {
+					borderWidth: 1,
+					borderStyle: 'solid',
+					borderColor: semanticColors.borderField,
+					hover: { borderColor: colors.fg40 },
+				}
+			: {}),
+		...(variant() === 'transparent'
+			? { hover: { backgroundColor: semanticColors.surfaceControlSubtle } }
+			: {}),
+		focusVisible: {
+			outline: `2px solid ${colors.fg20}`,
+			...(variant() === 'default' ? { borderColor: colors.fg40 } : {}),
+		},
+		...(isInvalid(rest['aria-invalid'])
+			? { outline: `1px solid ${colors.red}` }
+			: {}),
+		// A glass trigger dims its content instead: opacity on the glass itself would draw the label under the glass.
+		...(context.disabled()
+			? {
+					pointerEvents: 'none',
+					cursor: 'not-allowed',
+					...(isGlass() ? {} : { opacity: 0.5 }),
+				}
+			: {}),
+		...own.style,
+	});
+	const content = () => (
+		<>
 			{own.children}
 			<Show
 				when={variant() === 'transparent'}
@@ -286,7 +294,46 @@ export function SelectTrigger(props: SelectTriggerProps) {
 					<Icon name="chevrons-up-down" size={12} />
 				</div>
 			</Show>
-		</div>
+		</>
+	);
+	return (
+		<Show
+			when={isGlass()}
+			fallback={
+				<div {...shared} style={style()}>
+					{content()}
+				</div>
+			}
+		>
+			<NativeGlass
+				{...shared}
+				radius={size().borderRadius}
+				tint={hovered() ? semanticColors.surfaceControlSubtle : undefined}
+				style={style()}
+				onMouseEnter={(event) => {
+					setHovered(true);
+					rest.onMouseEnter?.(event);
+				}}
+				onMouseLeave={(event) => {
+					setHovered(false);
+					rest.onMouseLeave?.(event);
+				}}
+			>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+						flexGrow: 1,
+						alignItems: 'center',
+						justifyContent: 'space-between',
+						gap: 8,
+						...(context.disabled() ? { opacity: 0.5 } : {}),
+					}}
+				>
+					{content()}
+				</div>
+			</NativeGlass>
+		</Show>
 	);
 }
 

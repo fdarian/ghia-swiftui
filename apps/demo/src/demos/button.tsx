@@ -13,7 +13,12 @@ const variants: readonly ButtonVariant[] = [
 	'glass',
 ];
 const sizes = ['small', 'medium', 'large'] as const;
-const stateVariants = ['filled', 'transparent', 'glass'] as const;
+const stateVariants = [
+	'filled',
+	'transparent',
+	'glass',
+	'glassAccent',
+] as const;
 
 export function ButtonDemo() {
 	const [count, setCount] = createSignal(0);
@@ -135,6 +140,8 @@ export async function buttonScenario(shot: Shot) {
 	await shot.capture('hover-transparent');
 	await shot.hover('state-glass-hover');
 	await shot.capture('hover-glass');
+	await shot.hover('state-glassAccent-hover');
+	await shot.capture('hover-glass-accent');
 	await shot.press('state-filled-pressed');
 	await shot.capture('pressed-filled');
 	await shot.release();

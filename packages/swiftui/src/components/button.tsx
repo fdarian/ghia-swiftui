@@ -5,10 +5,10 @@ import {
 	type StyleDesc,
 	useGpuixRequired,
 } from '@ghia/solid';
-import { type JSX, Show, splitProps } from 'solid-js';
+import { createSignal, type JSX, mergeProps, Show, splitProps } from 'solid-js';
 import { useButtonDefaults } from '#src/components/button-defaults-context.tsx';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { NativeGlass } from '#src/components/native-glass.tsx';
-import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { colors } from '#src/tokens/colors.ts';
@@ -69,25 +69,18 @@ function variantStyle(variant: ButtonVariant): StyleDesc {
 			return {
 				backgroundColor: semanticColors.surfaceControl,
 				color: semanticColors.textPrimary,
-				backdropFilter: 'blur(4px)',
 				active: { backgroundColor: semanticColors.surfaceControlActive },
 			};
 		case 'muted':
 			return {
 				backgroundColor: semanticColors.surfaceControlSubtle,
 				color: semanticColors.textPrimary,
-				backdropFilter: 'blur(4px)',
 				active: { backgroundColor: semanticColors.surfaceControl },
 			};
 		case 'glass':
 			return { color: semanticColors.textPrimary };
 		case 'glassAccent':
-			return {
-				backgroundColor: colors.accent,
-				color: semanticColors.accentContrast,
-				hover: { backgroundColor: semanticColors.accentHover },
-				active: { backgroundColor: semanticColors.accentHover },
-			};
+			return { color: semanticColors.accentContrast };
 		case 'transparent':
 			return {
 				backgroundColor: 'transparent',
@@ -113,7 +106,8 @@ export interface ButtonProps
 export function Button(props: ButtonProps) {
 	const renderer = useGpuixRequired();
 	const defaults = useButtonDefaults();
-	const [behavior, own, rest] = splitProps(
+	const fieldDisabled = useFieldDisabled();
+	const [ownBehavior, own, rest] = splitProps(
 		props,
 		[
 			'disabled',
@@ -125,8 +119,19 @@ export function Button(props: ButtonProps) {
 		],
 		['variant', 'size', 'iconOnly', 'radius', 'style', 'children', 'ref'],
 	);
+	const behavior = mergeProps(ownBehavior, {
+		get disabled() {
+			return ownBehavior.disabled === true || fieldDisabled();
+		},
+	});
 	const variant = () => own.variant ?? defaults.variant ?? 'filled';
-	const isGlass = () => variant() === 'glass';
+	const isGlass = () => variant() === 'glass' || variant() === 'glassAccent';
+	const [hovered, setHovered] = createSignal(false);
+	// A pressed button is a hovered one, so `.glassProminent`'s pressed tint needs no state of its own.
+	const glassTint = () => {
+		if (variant() !== 'glassAccent') return undefined;
+		return hovered() ? semanticColors.accentHover : colors.accent;
+	};
 	const sizeName = () => own.size ?? defaults.size ?? 'medium';
 	const size = () => sizes[sizeName()];
 	const radius = () => {
@@ -215,21 +220,31 @@ export function Button(props: ButtonProps) {
 				ref={register}
 				tabIndex={tabIndex()}
 				radius={glassRadius()}
-				fallback={glass.material()}
+				tint={glassTint()}
 				style={style()}
+				onMouseEnter={(event) => {
+					setHovered(true);
+					rest.onMouseEnter?.(event);
+				}}
+				onMouseLeave={(event) => {
+					setHovered(false);
+					rest.onMouseLeave?.(event);
+				}}
 			>
-				<div
-					aria-hidden
-					style={{
-						position: 'absolute',
-						top: 0,
-						right: 0,
-						bottom: 0,
-						left: 0,
-						borderRadius: glassRadius(),
-						...glassFill(),
-					}}
-				/>
+				<Show when={variant() === 'glass'}>
+					<div
+						aria-hidden
+						style={{
+							position: 'absolute',
+							top: 0,
+							right: 0,
+							bottom: 0,
+							left: 0,
+							borderRadius: glassRadius(),
+							...glassFill(),
+						}}
+					/>
+				</Show>
 				<div
 					style={{
 						display: 'flex',

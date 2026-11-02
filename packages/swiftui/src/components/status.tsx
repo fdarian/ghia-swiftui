@@ -1,6 +1,6 @@
 import { defineKeyframes } from '@ghia/solid';
 import { splitProps } from 'solid-js';
-import { glass } from '#src/glass.ts';
+import { NativeGlass } from '#src/components/native-glass.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { colors } from '#src/tokens/colors.ts';
@@ -12,6 +12,11 @@ defineKeyframes('swiftui-status-pulse', {
 	'50%': { opacity: 0.4 },
 	'100%': { opacity: 1 },
 });
+
+const LINE_HEIGHT = 14;
+const PADDING_BLOCK = 3;
+/** A pill is half its height; the glass view takes the radius in px. */
+const RADIUS = (LINE_HEIGHT + 2 * PADDING_BLOCK) / 2;
 
 export type StatusVariant =
 	| 'neutral'
@@ -49,8 +54,10 @@ export function Status(props: StatusProps) {
 	const [own, rest] = splitProps(props, ['variant', 'style', 'children']);
 	const variant = () => own.variant ?? 'loading';
 	return (
-		<div
+		<NativeGlass
 			{...rest}
+			radius={RADIUS}
+			tint={semanticColors.surfaceControl}
 			style={{
 				display: 'inline-flex',
 				flexDirection: 'row',
@@ -60,17 +67,12 @@ export function Status(props: StatusProps) {
 				justifyContent: 'center',
 				gap: 4,
 				whiteSpace: 'nowrap',
-				overflow: 'hidden',
-				borderRadius: styleTokens.radiusPill,
-				borderWidth: 1,
-				borderStyle: 'solid',
-				borderColor: semanticColors.borderTertiary,
-				...glass.tinted(semanticColors.surfaceControl),
+				borderRadius: RADIUS,
 				fontSize: 11,
 				fontWeight: 500,
-				lineHeight: '14px',
-				paddingInline: 8,
-				paddingBlock: 2,
+				lineHeight: `${LINE_HEIGHT}px`,
+				paddingInline: 9,
+				paddingBlock: PADDING_BLOCK,
 				color: semanticColors.textPrimary,
 				...own.style,
 			}}
@@ -90,6 +92,6 @@ export function Status(props: StatusProps) {
 			<IconSizeContext.Provider value={() => 12}>
 				{own.children}
 			</IconSizeContext.Provider>
-		</div>
+		</NativeGlass>
 	);
 }

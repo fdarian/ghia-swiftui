@@ -2,6 +2,7 @@ import { createCheckboxRoot } from 'base-ui-solid-gpuix/checkbox';
 import { createCheckboxGroup } from 'base-ui-solid-gpuix/checkbox-group';
 import { createSignal, Show, splitProps } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
+import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { registerLabelControl } from '#src/components/label.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
@@ -43,7 +44,8 @@ export function Checkbox(props: CheckboxProps) {
 	);
 	const state = () => own.checked ?? uncontrolled();
 	const isChecked = () => state() !== false;
-	const isDisabled = () => own.disabled === true;
+	const fieldDisabled = useFieldDisabled();
+	const isDisabled = () => own.disabled === true || fieldDisabled();
 
 	// The primitive is a row of a group; a lone checkbox is a group of one.
 	const group = createCheckboxGroup();
