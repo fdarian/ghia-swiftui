@@ -4,7 +4,11 @@
  * AppKit driven through the same bun:ffi layer NativeGlass uses, not GPUI.
  */
 import { FFIType, ptr } from 'bun:ffi';
-import { nativeGlassAvailable } from 'ghia-swiftui/native-glass';
+import {
+	nativeGlassAvailable,
+	setGlassLook,
+	tintFromColor,
+} from 'ghia-swiftui/native-glass';
 import {
 	assertMainThread,
 	bind,
@@ -15,6 +19,7 @@ import {
 	selector,
 	send,
 } from 'ghia-swiftui/objc';
+import { colors } from 'ghia-swiftui/tokens/colors';
 import { createSignal } from 'solid-js';
 
 const P = FFIType.ptr;
@@ -33,7 +38,6 @@ const FLOATING_WINDOW_LEVEL = 3;
 const COLLECTION_CAN_JOIN_ALL_SPACES = 1 << 0;
 // So it also floats over an app in full screen, which canJoinAllSpaces alone does not allow.
 const COLLECTION_FULL_SCREEN_AUXILIARY = 1 << 8;
-const GLASS_STYLE_REGULAR = 0;
 /** NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin: pins a view at the centre. */
 const CENTERED = 1 | 4 | 8 | 32;
 
@@ -56,12 +60,35 @@ const objectAt = bind<[Pointer, Pointer, bigint], Pointer | null>(
 	P,
 );
 
+export type FloatingGlassStyle = 'regular' | 'clear' | 'tinted';
+
 const [open, setOpen] = createSignal(false);
+const [style, setStyle] = createSignal<FloatingGlassStyle>('regular');
 
 /** Whether the glass panel is on screen. */
 export const floatingGlassOpen = open;
 
+/** The style the panel opens with, and keeps across close and reopen. */
+export const floatingGlassStyle = style;
+
 let panel: Pointer | null = null;
+let glassView: Pointer | null = null;
+
+/** Tinted is `glassAccent`'s look: regular glass under the accent colour. */
+function applyStyle(glass: Pointer) {
+	const current = style();
+	setGlassLook(
+		glass,
+		current === 'clear' ? 'clear' : 'regular',
+		tintFromColor(current === 'tinted' ? colors.accent : undefined),
+	);
+}
+
+export function setFloatingGlassStyle(next: FloatingGlassStyle) {
+	assertMainThread('setFloatingGlassStyle');
+	setStyle(next);
+	if (glassView !== null) applyStyle(glassView);
+}
 
 function nsString(text: string): Pointer {
 	return required(
@@ -151,7 +178,7 @@ function createPanel(): Pointer {
 		),
 		'-[NSGlassEffectView initWithFrame:]',
 	);
-	send.voidWithInteger(glass, selector('setStyle:'), GLASS_STYLE_REGULAR);
+	applyStyle(glass);
 	send.voidWithDouble(glass, selector('setCornerRadius:'), CORNER_RADIUS);
 
 	const content = required(
@@ -184,13 +211,20 @@ function createPanel(): Pointer {
 		(WIDTH - (labelFrame[2] as number)) / 2,
 		(HEIGHT - (labelFrame[3] as number)) / 2,
 	);
+	send.voidWithObject(
+		label,
+		selector('setTextColor:'),
+		send.object(requiredClass('NSColor'), selector('labelColor')),
+	);
 	send.voidWithInteger(label, selector('setAutoresizingMask:'), CENTERED);
 	send.voidWithObject(content, selector('addSubview:'), label);
 	send.voidWithObject(glass, selector('setContentView:'), content);
 	send.void(content, selector('release'));
 
 	send.voidWithObject(created, selector('setContentView:'), glass);
+	// The panel retains it as its content view; the pointer lives as long as the panel.
 	send.void(glass, selector('release'));
+	glassView = glass;
 	return created;
 }
 
@@ -235,6 +269,7 @@ function destroyFloatingGlass() {
 	send.void(panel, selector('close'));
 	send.void(panel, selector('release'));
 	panel = null;
+	glassView = null;
 	setOpen(false);
 }
 

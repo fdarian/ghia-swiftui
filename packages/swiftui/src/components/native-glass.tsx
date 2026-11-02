@@ -8,8 +8,8 @@ import {
 	type NativeGlassHandle,
 	type NativeGlassVariant,
 	nativeGlassAvailable,
+	tintFromColor,
 } from '#src/native-glass.ts';
-import { parse } from '#src/tokens/color-math.ts';
 
 export interface NativeGlassProps extends HostAttributes {
 	/** A colour laid over the glass; its alpha is the strength. No tint by default. */
@@ -42,17 +42,6 @@ const hiddenPaint: StyleDesc = {
 	outlineColor: 'transparent',
 	boxShadow: 'none',
 };
-
-function tintComponents(tint: string | undefined) {
-	if (tint === undefined) return { red: 0, green: 0, blue: 0, alpha: 0 };
-	const color = parse(tint);
-	return {
-		red: color.red / 255,
-		green: color.green / 255,
-		blue: color.blue / 255,
-		alpha: color.alpha,
-	};
-}
 
 /**
  * A box whose background is a real `NSGlassEffectView`, which samples what is
@@ -105,7 +94,7 @@ export function NativeGlass(props: NativeGlassProps) {
 		(own.tint === undefined ? glass.material() : glass.tinted(own.tint));
 	const options = () => ({
 		variant: own.variant ?? 'regular',
-		tint: tintComponents(own.tint),
+		tint: tintFromColor(own.tint),
 		cornerRadius: own.radius,
 	});
 	const shadow = () => (

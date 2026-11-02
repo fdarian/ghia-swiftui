@@ -2,8 +2,11 @@ import {
 	Button,
 	GlassPanel,
 	Icon,
+	Label,
 	List,
 	Menu,
+	RadioGroup,
+	RadioGroupItem,
 	Select,
 	SelectContent,
 	SelectItem,
@@ -20,10 +23,27 @@ import { Page, Section } from '#src/demo-kit.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 import {
 	closeFloatingGlass,
+	type FloatingGlassStyle,
 	floatingGlassAvailable,
 	floatingGlassOpen,
+	floatingGlassStyle,
 	openFloatingGlass,
+	setFloatingGlassStyle,
 } from '#src/floating-glass.ts';
+
+const floatingGlassStyles: { value: FloatingGlassStyle; label: string }[] = [
+	{ value: 'regular', label: 'Regular' },
+	{ value: 'clear', label: 'Clear' },
+	{ value: 'tinted', label: 'Tinted' },
+];
+
+function chooseFloatingGlassStyle(value: string) {
+	const chosen = floatingGlassStyles.find((style) => style.value === value);
+	if (chosen === undefined) {
+		throw new Error(`Unknown floating glass style: ${value}`);
+	}
+	setFloatingGlassStyle(chosen.value);
+}
 
 /** High-contrast colour for the glass to sample: wide stripes under big blocks. */
 function Colourful(props: { height: number; children: JSX.Element }) {
@@ -198,7 +218,14 @@ export function LiquidGlassDemo() {
 				</Colourful>
 			</Section>
 			<Section title="Floating glass">
-				<div style={{ display: 'flex', flexDirection: 'row', gap: 12 }}>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+						alignItems: 'center',
+						gap: 24,
+					}}
+				>
 					<Button
 						testId="floating-glass-toggle"
 						variant="filled"
@@ -211,6 +238,24 @@ export function LiquidGlassDemo() {
 							? 'Close floating glass'
 							: 'Open floating glass'}
 					</Button>
+					<RadioGroup
+						testId="floating-glass-style"
+						value={floatingGlassStyle()}
+						onValueChange={chooseFloatingGlassStyle}
+						orientation="horizontal"
+					>
+						<For each={floatingGlassStyles}>
+							{(style) => (
+								<Label>
+									<RadioGroupItem
+										testId={`floating-glass-style-${style.value}`}
+										value={style.value}
+									/>
+									{style.label}
+								</Label>
+							)}
+						</For>
+					</RadioGroup>
 				</div>
 				<Text variant="small" color="secondary">
 					{floatingGlassAvailable()

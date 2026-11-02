@@ -8,6 +8,7 @@ import {
 	selector,
 	send,
 } from '#src/objc.ts';
+import { parse } from '#src/tokens/color-math.ts';
 
 /** `-[NSView setAutoresizingMask:]`: NSViewWidthSizable | NSViewHeightSizable. */
 const FILL = 18;
@@ -42,7 +43,21 @@ function asPointer(address: bigint): Pointer {
 	return Number(address) as unknown as Pointer;
 }
 
-function srgbColor(tint: NativeGlassOptions['tint']): Pointer | null {
+type NativeGlassTint = NativeGlassOptions['tint'];
+
+/** A CSS colour as a tint: its alpha is the strength, and `undefined` is no tint. */
+export function tintFromColor(color: string | undefined): NativeGlassTint {
+	if (color === undefined) return { red: 0, green: 0, blue: 0, alpha: 0 };
+	const parsed = parse(color);
+	return {
+		red: parsed.red / 255,
+		green: parsed.green / 255,
+		blue: parsed.blue / 255,
+		alpha: parsed.alpha,
+	};
+}
+
+function srgbColor(tint: NativeGlassTint): Pointer | null {
 	if (tint.alpha === 0) return null;
 	return required(
 		send.objectWithFourDoubles(
@@ -65,23 +80,35 @@ function setPrivateVariant(glass: Pointer, variant: number) {
 	send.voidWithInteger(glass, setter, variant);
 }
 
-function apply(glass: Pointer, options: NativeGlassOptions) {
+/**
+ * Sets the style and tint of an `NSGlassEffectView` the caller owns, for glass
+ * that is not an `attachNativeGlass` handle. Alpha 0 clears the tint.
+ */
+export function setGlassLook(
+	glass: Pointer,
+	style: 'regular' | 'clear',
+	tint: NativeGlassTint,
+) {
 	send.voidWithInteger(
 		glass,
 		selector('setStyle:'),
-		options.variant === 'clear' ? STYLE_CLEAR : STYLE_REGULAR,
+		style === 'clear' ? STYLE_CLEAR : STYLE_REGULAR,
+	);
+	// A nil colour clears the tint.
+	send.voidWithObject(glass, selector('setTintColor:'), srgbColor(tint));
+}
+
+function apply(glass: Pointer, options: NativeGlassOptions) {
+	setGlassLook(
+		glass,
+		options.variant === 'clear' ? 'clear' : 'regular',
+		options.tint,
 	);
 	if (options.variant === 'sidebar') setPrivateVariant(glass, VARIANT_SIDEBAR);
 	send.voidWithDouble(
 		glass,
 		selector('setCornerRadius:'),
 		options.cornerRadius,
-	);
-	// A nil colour clears the tint.
-	send.voidWithObject(
-		glass,
-		selector('setTintColor:'),
-		srgbColor(options.tint),
 	);
 }
 
