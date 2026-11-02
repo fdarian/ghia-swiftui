@@ -4,3 +4,5 @@ node_modules/
 .turbo/
 dist/
 apps/demo/screenshots/
+apps/swiftui-reference/.build/
+apps/swiftui-reference/screenshots/
