@@ -283,3 +283,20 @@ export const demos: readonly Demo[] = Object.values(groups)
 if (demos.length !== entries.length) {
 	throw new Error('A demo is registered but in no sidebar group');
 }
+
+export interface DemoSection {
+	name: string;
+	demos: Demo[];
+}
+
+/** The sidebar sections in order, each holding the demos whose title contains `query` (case-insensitive); a section with none is dropped. */
+export function filterDemoSections(query: string): DemoSection[] {
+	const needle = query.toLowerCase();
+	return Object.keys(groups).flatMap((name) => {
+		const matching = demos.filter(
+			(demo) =>
+				demo.group === name && demo.title.toLowerCase().includes(needle),
+		);
+		return matching.length === 0 ? [] : [{ name, demos: matching }];
+	});
+}

@@ -1,9 +1,12 @@
 import {
 	applyColorScheme,
 	Button,
+	ButtonDefaultsProvider,
 	ColorSchemeProvider,
 	ContextMenuHost,
 	followSystemColorScheme,
+	Icon,
+	Input,
 	Sidebar,
 	SidebarFooter,
 	SidebarList,
@@ -11,11 +14,13 @@ import {
 	SplitView,
 	Text,
 	Toaster,
+	Toolbar,
+	ToolbarRow,
 	TooltipProvider,
 } from 'ghia-swiftui';
 import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors';
 import { createSignal, For, Show } from 'solid-js';
-import { type Demo, demos } from '#src/demos/index.ts';
+import { type Demo, demos, filterDemoSections } from '#src/demos/index.ts';
 
 export const WINDOW_TITLE = 'ghia-swiftui';
 
@@ -28,15 +33,38 @@ const schemeChoices = [
 	{ name: 'dark', label: 'Dark', apply: () => applyColorScheme(true) },
 ] as const;
 
-/** Section names in the order the demos list them first. */
-const sections = [...new Set(demos.map((demo) => demo.group))];
-
 function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 	const [scheme, setScheme] = createSignal<string>('system');
+	const [query, setQuery] = createSignal('');
+	const sections = () => filterDemoSections(query());
 	return (
 		<Sidebar
 			testId="nav"
-			actions={<SplitView.SidebarToggle testId="sidebar-toggle" />}
+			// Sidebar's default toolbar (a 52px row of actions) plus the search row, so the field stays fixed above the list.
+			toolbar={
+				<Toolbar style={{ paddingTop: 16, paddingBottom: 8 }}>
+					<ToolbarRow style={{ justifyContent: 'flex-end' }}>
+						<ButtonDefaultsProvider value={{ variant: 'glass', size: 'large' }}>
+							<SplitView.SidebarToggle testId="sidebar-toggle" />
+						</ButtonDefaultsProvider>
+					</ToolbarRow>
+					<ToolbarRow>
+						<Input
+							testId="nav-search"
+							variant="glass"
+							leading={<Icon name="search" />}
+							placeholder="Search"
+							value={query()}
+							onValueChange={setQuery}
+							onKeyDown={(event) => {
+								if (event.key === 'Escape') setQuery('');
+							}}
+							// The toolbar is a window drag region; the field opts out of it, as a button does.
+							style={{ appRegion: 'no-drag' }}
+						/>
+					</ToolbarRow>
+				</Toolbar>
+			}
 			footer={
 				<SidebarFooter>
 					<div style={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
@@ -62,22 +90,29 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 			}
 		>
 			<SidebarList
-				items={[...demos]}
+				items={sections().flatMap((section) => section.demos)}
 				selectedItem={props.selected}
 				onSelectedItemChange={props.onSelect}
 				getItemKey={(demo) => demo.name}
+				emptyState={
+					<div style={{ paddingInline: 18, paddingTop: 12 }}>
+						<Text testId="nav-empty" variant="small" color="secondary">
+							No results
+						</Text>
+					</div>
+				}
 			>
-				<For each={sections}>
+				<For each={sections()}>
 					{(section) => (
 						<>
 							<div
 								style={{ paddingInline: 8, paddingTop: 12, paddingBottom: 4 }}
 							>
 								<Text variant="smallStrong" color="tertiary">
-									{section}
+									{section.name}
 								</Text>
 							</div>
-							<For each={demos.filter((demo) => demo.group === section)}>
+							<For each={section.demos}>
 								{(demo) => (
 									<SidebarListItem
 										testId={`nav-${demo.name}`}
