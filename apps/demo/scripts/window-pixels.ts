@@ -103,9 +103,9 @@ const setOrigin = bind<[Pointer, Pointer, number, number], void>(
 
 /**
  * Moves the window's bottom-left corner to a point in screen coordinates
- * (origin bottom-left). A window under other apps' windows gets no frames, so
- * a capture parks it with a strip on the screen's edge showing: the rest of
- * the window may hang off the screen and is still drawn and captured.
+ * (origin bottom-left). Windows open parked already (`park.ts`), so this only
+ * overrides where; keep some of the window on a display, as a covered window
+ * gets no frames.
  */
 export function moveWindow(x: number, y: number) {
 	setOrigin(visibleWindow(), selector('setFrameOrigin:'), x, y);

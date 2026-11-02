@@ -9,7 +9,7 @@
  *
  * Steps run in order: `shot=<name>` writes `<name>.png`, `click=<testId>`,
  * `rightclick=<testId>`, `hover=<testId>`, `wheel=<testId>:<deltaY>`, `bounds=<testId>` (prints the box), `drag=<testId>:<dx>` (a horizontal drag by `dx` points, fractions allowed), `key=<key>` (pressed on the page), `type=<testId>:<text>` (clicks the field, then presses the text key by key), `press=<testId>:<key>`, `text=<testId>` (prints the element's text), `wait=<ms>`, `dark`, `light`,
- * `system` (the shell's scheme choices), `trace=<name>:<testId>:<x>:<y>:<w>:<h>[:<ms>]` (click `testId` while a worker samples that box, in points from the window's top-left, at the highest rate WindowServer gives, and write every distinct composited frame to `<out>/<name>/` with a `timeline.txt`), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--storage <key>=<json>` starts the window with a saved panel layout (a sidebar at a fractional width: `ghia-swiftui-demo-2={"0":243.37}`).
+ * `system` (the shell's scheme choices), `trace=<name>:<testId>:<x>:<y>:<w>:<h>[:<ms>]` (click `testId` while a worker samples that box, in points from the window's top-left, at the highest rate WindowServer gives, and write every distinct composited frame to `<out>/<name>/` with a `timeline.txt`), `move=<x>:<y>` (the window's bottom-left corner in screen points: moves it off where it opened parked, so only for a strip you want elsewhere). `--storage <key>=<json>` starts the window with a saved panel layout (a sidebar at a fractional width: `ghia-swiftui-demo-2={"0":243.37}`).
  */
 import './background.ts';
 import { mkdirSync } from 'node:fs';

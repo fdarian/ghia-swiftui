@@ -9,6 +9,6 @@
 ## Verifying a change
 
 - Every component has a demo with the scenario that shows it working, in light and dark. Run `pnpm screenshot <demo>` and read the PNGs under `screenshots/<demo>/` (gitignored).
-- Anything involving glass, the sidebar or the window frame: `GPUIX_BACKGROUND=1 pnpm live-capture <demo> [steps]` and read the PNG. The demo's window is opaque and `App` paints it, so the glass samples the app and not the desktop. If other windows cover the demo window, park it with `move=<x>:<y>` so a strip stays visible on the screen's edge.
-- `pnpm window-check` (layout, resize, collapse, glass, scroll edge), `pnpm glass-check` and `pnpm --filter ghia-swiftui-demo scroll-edge-check` need an uncovered window; the last takes `move=<x>:<y>` to park it.
+- Anything involving glass, the sidebar or the window frame: `GPUIX_BACKGROUND=1 pnpm live-capture <demo> [steps]` and read the PNG. The demo's window is opaque and `App` paints it, so the glass samples the app and not the desktop. The window opens parked ([Test windows](../../AGENTS.md#test-windows)); a covered strip is "not checkable".
+- `pnpm window-check` (layout, resize, collapse, glass, scroll edge), `pnpm glass-check` and `pnpm --filter ghia-swiftui-demo scroll-edge-check` need the parked strip uncovered (exit 3 "not checkable" otherwise).
 - Committed README images are live captures under the repo's `docs/`.

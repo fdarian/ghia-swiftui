@@ -8,8 +8,7 @@
  *
  *   GPUIX_BACKGROUND=1 bun scripts/scroll-edge-check.tsx [out-dir] [move=<x>:<y>]
  *
- * `move` parks the window with a strip on the screen's edge when other
- * windows cover it. Exit status: 0 passed, 1 a check failed, 3 not checkable
+ * `move` puts the window somewhere other than where it opened parked. Exit status: 0 passed, 1 a check failed, 3 not checkable
  * (the window was covered, so it got no frames).
  */
 import './background.ts';
