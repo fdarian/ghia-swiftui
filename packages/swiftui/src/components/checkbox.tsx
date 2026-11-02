@@ -9,11 +9,15 @@ import { Icon } from '#src/icons/icon.tsx';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 
+/** AppKit's mixed-state mark: a 7 by 2 dash in the 16pt box. */
+const INDETERMINATE_DASH_WIDTH = 7;
+const INDETERMINATE_DASH_HEIGHT = 2;
+
 export type CheckedState = boolean | 'indeterminate';
 
 export interface CheckboxProps
 	extends Omit<HostAttributes, 'children' | 'onChange'> {
-	/** Controlled checked state. `"indeterminate"` shows the checkmark without being fully checked. */
+	/** Controlled checked state. `"indeterminate"` fills the box and draws a dash instead of the checkmark. */
 	checked?: CheckedState;
 	/** Uncontrolled initial state. */
 	defaultChecked?: CheckedState;
@@ -111,8 +115,19 @@ export function Checkbox(props: CheckboxProps) {
 				...own.style,
 			}}
 		>
-			<Show when={isChecked()}>
+			<Show when={state() === true}>
 				<Icon name="check" size={12} strokeWidth={3} />
+			</Show>
+			<Show when={state() === 'indeterminate'}>
+				<div
+					aria-hidden
+					style={{
+						width: INDETERMINATE_DASH_WIDTH,
+						height: INDETERMINATE_DASH_HEIGHT,
+						borderRadius: INDETERMINATE_DASH_HEIGHT / 2,
+						backgroundColor: semanticColors.accentContrast,
+					}}
+				/>
 			</Show>
 		</div>
 	);
