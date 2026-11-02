@@ -39,6 +39,12 @@ export const style = {
 			? `inset 0 0 0 1px ${semanticColors.borderSecondary}, 0 8px 28px rgba(0,0,0,0.48)`
 			: `inset 0 0 0 1px ${semanticColors.borderPrimary}, 0 8px 24px rgba(0,0,0,0.18)`;
 	},
+	/** `shadowPopover` without its inset ring: under real glass the ring shows through as a second edge beside the glass's own. */
+	get shadowGlassPopover() {
+		return colorScheme() === 'dark'
+			? '0 8px 28px rgba(0,0,0,0.48)'
+			: '0 8px 24px rgba(0,0,0,0.18)';
+	},
 	get shadowDialog() {
 		return colorScheme() === 'dark'
 			? '0 32px 64px -8px rgba(0,0,0,0.85), 0 10px 20px -4px rgba(0,0,0,0.4)'

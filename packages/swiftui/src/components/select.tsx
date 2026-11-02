@@ -530,7 +530,7 @@ export function SelectContent(props: SelectContentProps) {
 				>
 					<NativeGlass
 						radius={styleTokens.radiusPopover}
-						shadow={styleTokens.shadowPopover}
+						shadow={styleTokens.shadowGlassPopover}
 						fallback={{
 							...glass.tinted(withAlpha(semanticColors.surfacePopover, 0.7)),
 							outline: `1px solid ${semanticColors.borderSecondary}`,

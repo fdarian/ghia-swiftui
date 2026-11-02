@@ -126,7 +126,7 @@ export function Toast(props: ToastProps) {
 			<div style={{ position: 'relative', display: 'flex' }}>
 				<NativeGlass
 					radius={PILL_RADIUS}
-					shadow={styleTokens.shadowPopover}
+					shadow={styleTokens.shadowGlassPopover}
 					tint={colorScheme() === 'dark' ? undefined : TOAST_LIGHT_TINT}
 					fallback={{
 						...glass.toast(),

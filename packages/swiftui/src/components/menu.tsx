@@ -291,7 +291,7 @@ export function MenuPopup(props: MenuPopupProps) {
 			>
 				<GlassPanel
 					{...rest}
-					shadow={styleTokens.shadowPopover}
+					shadow={styleTokens.shadowGlassPopover}
 					fallback={{
 						...glass.material(),
 						outline: `1px solid ${semanticColors.borderSecondary}`,

@@ -31,7 +31,7 @@ export interface GlassPanelProps extends HostAttributes {
  *
  * No shadow, deliberately: the panel is meant to read as a capsule flush with
  * the surface behind it. A popup that has to separate itself from content
- * underneath adds `style.shadowPopover` itself.
+ * underneath adds `style.shadowGlassPopover` itself.
  */
 export function GlassPanel(props: GlassPanelProps) {
 	const [own, rest] = splitProps(props, [
