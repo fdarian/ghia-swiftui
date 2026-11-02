@@ -270,13 +270,7 @@ function PanelSlot(props: {
 					...(naturalSize() !== undefined && !props.isDragging
 						? { [horizontal() ? 'minWidth' : 'minHeight']: naturalSize() }
 						: {}),
-					opacity: hidden() ? 0 : 1,
 					...(hidden() || props.isDragging ? { pointerEvents: 'none' } : {}),
-					...(props.hasMounted
-						? {
-								transition: `opacity ${PANEL_COLLAPSE_DURATION_MS}ms ${ease()}`,
-							}
-						: {}),
 				}}
 			>
 				{props.entry.element}

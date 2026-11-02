@@ -601,17 +601,17 @@ export function ScrollArea(props: ScrollAreaProps) {
 						{(footer: Accessor<JSX.Element>) => footer()}
 					</Show>
 				</MeasuredContainer>
-				<Show when={own.showScrollToBottomButton}>
+				<Show when={own.showScrollToBottomButton && !atBottom()}>
+					{/* Scale only, and gone at once: an app's `ButtonDefaultsProvider` can make this a glass button, and nothing above glass may fade. */}
 					<motion.div
-						initial={false}
-						animate={atBottom() ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
+						initial={{ scale: 0.8 }}
+						animate={{ scale: 1 }}
 						transition={{ duration: 0.2, ease: 'easeInOut' }}
 						style={{
 							position: 'absolute',
 							right: 13,
 							bottom: footerHeight() + bottomOffset() + topOffset() + 12,
 							zIndex: 20,
-							pointerEvents: atBottom() ? 'none' : 'auto',
 						}}
 					>
 						<Button

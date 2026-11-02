@@ -38,8 +38,8 @@ const CHECK_SLOT = 16;
 const ROW_GAP = 6;
 /** How far the row's label sits in from the popup's left edge. */
 const LABEL_INSET = POPUP_PADDING + ROW_PADDING + CHECK_SLOT + ROW_GAP;
-/** The popup's exit fade, then a buffer for a fade that never completes. */
-const EXIT_MS = 160;
+/** The popup leaves at once: it holds glass, and nothing above glass may fade. */
+const EXIT_MS = 0;
 /** A pick holds the popup open this long so the check is seen land. */
 const PICK_HOLD_MS = 100;
 /** Gap between trigger and popup when no item is aligned over the trigger. */
@@ -454,20 +454,9 @@ export function SelectContent(props: SelectContentProps) {
 				}}
 			>
 				<motion.div
-					initial={{ opacity: 0, scale: 0.97 }}
-					animate={
-						root.presence.open()
-							? { opacity: 1, scale: 1 }
-							: { opacity: 0, scale: 0.97 }
-					}
-					transition={
-						root.presence.open()
-							? { type: 'spring', duration: 0.08, bounce: 0 }
-							: { duration: 0.06 }
-					}
-					onMotionComplete={() => {
-						if (!root.presence.open()) root.presence.release();
-					}}
+					initial={{ scale: 0.97 }}
+					animate={{ scale: 1 }}
+					transition={{ type: 'spring', duration: 0.08, bounce: 0 }}
 					style={{
 						position: 'relative',
 						display: 'flex',

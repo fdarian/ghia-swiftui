@@ -41,6 +41,13 @@ const MAX_WIDTH = 400;
 /** `min(9999px, calc(1.5rem + 0.5lh))` at the 18px line height of `strong`. */
 const PILL_RADIUS = 33;
 
+/**
+ * How far a toast starts and leaves below its resting place: the offset from
+ * the window's edge plus the height of a toast with a description. There is no
+ * opacity above the glass, so the window's edge is what hides it.
+ */
+const TRAVEL = OFFSET + 120;
+
 /** syne's `bg-glass-toast` lays 70% white over the media-controls material in light mode. */
 const TOAST_LIGHT_TINT = '#ffffffb3';
 
@@ -194,9 +201,9 @@ function ToastSlot(props: { id: ToastId }) {
 	return (
 		<motion.div
 			layout
-			initial={{ opacity: 0, y: 24, scale: 0.96 }}
-			animate={{ opacity: 1, y: 0, scale: 1 }}
-			exit={{ opacity: 0, y: 8, scale: 0.96 }}
+			initial={{ y: TRAVEL, scale: 0.96 }}
+			animate={{ y: 0, scale: 1 }}
+			exit={{ y: TRAVEL, scale: 0.96 }}
 			transition={{ type: 'spring', duration: 0.3, bounce: 0 }}
 			onMouseEnter={pauseToasts}
 			onMouseLeave={resumeToasts}

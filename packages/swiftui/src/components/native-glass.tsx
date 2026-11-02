@@ -1,11 +1,5 @@
 import type { StyleDesc } from '@ghia/solid';
-import {
-	createContext,
-	createEffect,
-	createSignal,
-	splitProps,
-	useContext,
-} from 'solid-js';
+import { createEffect, createSignal, splitProps } from 'solid-js';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import {
@@ -17,22 +11,16 @@ import {
 } from '#src/native-glass.ts';
 import { parse } from '#src/tokens/color-math.ts';
 
-/**
- * True below a `NativeGlass`: a `<nativeview>` cannot sit inside another's
- * native view, so glass inside glass keeps its in-window material.
- */
-const NativeGlassContext = createContext(false);
-
 export interface NativeGlassProps extends HostAttributes {
 	/** A colour laid over the glass; its alpha is the strength. No tint by default. */
 	tint?: string;
 	/** `clear` is the see-through glass of media controls; `regular` the standard one. */
 	variant?: NativeGlassVariant;
-	/** Corner radius in px. The element is clipped to it and the glass view is given the same. */
+	/** Corner radius in px, given to the glass view and the box's background. */
 	radius: number;
 	/**
-	 * The look while there is no real glass: macOS before 26, a nested glass, an
-	 * offscreen test window, or the frame before the view is attached. Defaults
+	 * The look while there is no real glass: macOS before 26, an offscreen test
+	 * window, or the frame before the view is attached. Defaults
 	 * to the in-window material (`glass.material()`, or `glass.tinted(tint)`).
 	 */
 	fallback?: StyleDesc;
@@ -52,13 +40,22 @@ function tintComponents(tint: string | undefined) {
 /**
  * A box whose background is a real `NSGlassEffectView`, which samples what is
  * painted beneath it in the window (GPUI's own content included) and refracts
- * it. Children paint above the glass.
+ * it. Children paint above the glass, and a `NativeGlass` among them is a
+ * layer of its own above this one.
  *
- * Glass is only present when this macOS has the class, the window is on a
- * screen and no `NativeGlass` is above this one; otherwise the box wears the
- * `fallback` material, so a surface never renders empty. A failure to create
- * the view throws from `onAttach` (reported like any handler's) and leaves the
- * fallback in place.
+ * Glass is only present when this macOS has the class and the window is on a
+ * screen; otherwise the box wears the `fallback` material, so a surface never
+ * renders empty. A failure to create the view throws from `onAttach` (reported
+ * like any handler's) and leaves the fallback in place.
+ *
+ * No ancestor of a `NativeGlass` (nor the element itself) may have `opacity`,
+ * animated or static: it becomes an effect group that is drawn before the
+ * glass layer, so the children are refracted (blurred text) and the group's
+ * bounds cut the shadow square. Enter and leave with `y` and `scale`; dim a
+ * disabled glass by putting the opacity on its children.
+ *
+ * `overflow` is `visible` so the glass's own shadow and edge highlight are not
+ * masked; pass `overflow: 'hidden'` in `style` to clip children to the shape.
  */
 export function NativeGlass(props: NativeGlassProps) {
 	const [own, rest] = splitProps(props, [
@@ -78,7 +75,7 @@ export function NativeGlass(props: NativeGlassProps) {
 		cornerRadius: own.radius,
 	});
 
-	if (useContext(NativeGlassContext) || !nativeGlassAvailable()) {
+	if (!nativeGlassAvailable()) {
 		return (
 			<div
 				{...rest}
@@ -122,9 +119,7 @@ export function NativeGlass(props: NativeGlassProps) {
 				...own.style,
 			}}
 		>
-			<NativeGlassContext.Provider value={true}>
-				{own.children}
-			</NativeGlassContext.Provider>
+			{own.children}
 		</nativeview>
 	);
 }

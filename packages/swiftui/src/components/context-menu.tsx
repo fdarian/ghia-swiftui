@@ -19,8 +19,8 @@ interface ContextMenuRequest extends ShowContextMenuOptions {
 	resolve: (id: string | null) => void;
 }
 
-/** How long the popup keeps its place after a pick, for its exit fade. */
-const EXIT_MS = 200;
+/** How long the request outlives a pick. The popup leaves at once, so this is only the host's own turn. */
+const EXIT_MS = 0;
 
 let present: ((request: ContextMenuRequest) => void) | undefined;
 

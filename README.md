@@ -140,7 +140,7 @@ What syne has and this does not, and the reverse, is in [`packages/swiftui/DRIFT
 
 ![Glass panels, controls and a list selection over colour stripes](docs/liquid-glass-light.png)
 
-Elsewhere a surface wears an in-window material, a neutral tint over a 24px backdrop blur, so none renders empty. That is what shows on macOS before 26, in a window that is not on screen (so `pnpm screenshot` shows it), and for glass inside glass, since a native view cannot nest.
+Elsewhere a surface wears an in-window material, a neutral tint over a 24px backdrop blur, so none renders empty. That is what shows on macOS before 26, and in a window that is not on screen (so `pnpm screenshot` shows it).
 
 <details>
 <summary>What real glass costs you</summary>

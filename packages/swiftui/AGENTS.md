@@ -17,6 +17,6 @@
 ## Gotchas
 
 - A `backdropFilter` painted over a native view (glass) blurs nothing. Anything that sits over `NativeGlass` and needs a soft edge uses a gradient mask (see the sidebar's `ScrollArea`), not `ProgressiveBlur`.
-- A `<nativeview>` cannot nest: glass inside glass keeps the in-window fallback.
+- No ancestor of a `NativeGlass` may have `opacity`, animated or static: its children would draw under the glass and blur. Glass surfaces enter and leave with `y`/`scale`; see `NativeGlass`.
 - `no-dom` TypeScript lib: DOM types in the program break this source.
 - Native calls that touch AppKit run on Bun's JS thread, which is the app's main thread (`assertMainThread`).

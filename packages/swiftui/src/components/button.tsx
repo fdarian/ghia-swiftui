@@ -181,8 +181,11 @@ export function Button(props: ButtonProps) {
 			: { paddingInline: size().paddingInline + (isGlass() ? 1 : 0) }),
 		borderRadius: radius(),
 		...variantStyle(variant()),
+		// A glass button dims its content instead: opacity on the glass itself would draw the label under the glass.
 		...(behavior.disabled === true
-			? { pointerEvents: 'none', opacity: 0.5 }
+			? isGlass()
+				? { pointerEvents: 'none' }
+				: { pointerEvents: 'none', opacity: 0.5 }
 			: {}),
 		...own.style,
 	});
@@ -227,7 +230,18 @@ export function Button(props: ButtonProps) {
 						...glassFill(),
 					}}
 				/>
-				{content()}
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+						alignItems: 'center',
+						justifyContent: 'center',
+						gap: size().gap,
+						...(behavior.disabled === true ? { opacity: 0.5 } : {}),
+					}}
+				>
+					{content()}
+				</div>
 			</NativeGlass>
 		</Show>
 	);

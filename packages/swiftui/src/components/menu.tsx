@@ -36,8 +36,8 @@ import { typography } from '#src/tokens/typography.ts';
 
 /** Matches `Button`'s own `size="small"` icon sizing: an item has no `Button` underneath to inherit it from. */
 const ITEM_ICON_SIZE = 16;
-/** The popup's exit fade, then a buffer for a fade that never completes. */
-const EXIT_MS = 160;
+/** The popup leaves at once: it holds glass, and nothing above glass may fade. */
+const EXIT_MS = 0;
 /** FF focuses the first row two frames after a pointer open, once the popup itself holds focus. */
 const OPEN_FOCUS_MS = 32;
 
@@ -166,7 +166,7 @@ export function MenuPositioner(props: MenuPositionerProps) {
 		);
 	return (
 		<>
-			{/* A layer only while open: a second Escape during the exit fade belongs to whatever is behind. */}
+			{/* A layer only while open: a second Escape while the popup leaves belongs to whatever is behind. */}
 			<Show when={root.presence.open()}>
 				<DismissableLayer onEscapeKeyDown={() => root.setOpen(false)} />
 			</Show>
@@ -283,20 +283,9 @@ export function MenuPopup(props: MenuPopupProps) {
 			}}
 		>
 			<motion.div
-				initial={{ opacity: 0, scale: 0.97 }}
-				animate={
-					root.presence.open()
-						? { opacity: 1, scale: 1 }
-						: { opacity: 0, scale: 0.97 }
-				}
-				transition={
-					root.presence.open()
-						? { type: 'spring', duration: 0.08, bounce: 0 }
-						: { duration: 0.06 }
-				}
-				onMotionComplete={() => {
-					if (!root.presence.open()) root.presence.release();
-				}}
+				initial={{ scale: 0.97 }}
+				animate={{ scale: 1 }}
+				transition={{ type: 'spring', duration: 0.08, bounce: 0 }}
 				style={{
 					position: 'relative',
 					display: 'flex',

@@ -21,8 +21,8 @@ export interface GlassPanelProps extends HostAttributes {
  * edge from the controls inside it.
  *
  * On macOS 26 and later the material is a real `NSGlassEffectView`; elsewhere
- * (and in an offscreen test window, and for glass inside another glass) it is
- * a tint over a backdrop blur. See `NativeGlass`.
+ * (and in an offscreen test window) it is a tint over a backdrop blur. See
+ * `NativeGlass`.
  *
  * No shadow, deliberately: the panel is meant to read as a capsule flush with
  * the surface behind it. A popup that has to separate itself from content
