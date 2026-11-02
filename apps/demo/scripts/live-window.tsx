@@ -23,8 +23,6 @@ function Probe(props: {
 
 export async function openLiveWindow(options: {
 	demo: string;
-	/** Paints an opaque window under the app, so what the glass samples does not depend on the desktop. */
-	backdrop: boolean;
 	/** Panel storage entries the window starts with, as a resize drag would have saved them. */
 	storage?: Record<string, string>;
 }) {
@@ -39,7 +37,7 @@ export async function openLiveWindow(options: {
 	render(
 		() => (
 			<>
-				<App initial={options.demo} windowBackdrop={options.backdrop} />
+				<App initial={options.demo} />
 				<Probe onRenderer={(value) => (renderer = value)} />
 			</>
 		),

@@ -265,7 +265,7 @@ const shot: Shot = {
 	capture,
 };
 
-test.render(() => <App initial={demo.name} windowBackdrop />);
+test.render(() => <App initial={demo.name} />);
 await settle(500);
 await capture('initial');
 await demo.scenario?.(shot);

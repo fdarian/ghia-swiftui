@@ -11,8 +11,8 @@
  * the demo's side its own rect when the same control sits elsewhere.
  *
  * The demo is captured by `apps/demo/scripts/live-capture.tsx` (real window,
- * `--backdrop`, `GPUIX_BACKGROUND=1`), parked with a strip on the screen's
- * edge so another app's window does not cover it.
+ * `GPUIX_BACKGROUND=1`), parked with a strip on the screen's edge so another
+ * app's window does not cover it.
  */
 import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -44,7 +44,6 @@ function captureOurs(shot: string, scheme: string, outDir: string): string {
 		[
 			'scripts/live-capture.tsx',
 			definition.demo,
-			'--backdrop',
 			'--out',
 			outDir,
 			`move=${screen.width - 60}:300`,

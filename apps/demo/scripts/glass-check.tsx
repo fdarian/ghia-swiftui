@@ -5,7 +5,7 @@
  *   GPUIX_BACKGROUND=1 bun scripts/glass-check.tsx live [out-dir]
  *   bun scripts/glass-check.tsx fallback
  *
- * `live` opens the liquid-glass demo over an opaque backdrop and checks that
+ * `live` opens the liquid-glass demo in an opaque window and checks that
  * NSGlassEffectViews exist, that the window as WindowServer composited it differs
  * from the Metal frame over a glass panel and not beside it (the glass is
  * above the GPUI layer), that the panel shows the stripes painted beneath it
@@ -56,7 +56,7 @@ const GLASS_DIFFERENCE = 6;
 const CONTROL_DIFFERENCE = 1;
 
 async function live() {
-	const app = await openLiveWindow({ demo: 'liquid-glass', backdrop: true });
+	const app = await openLiveWindow({ demo: 'liquid-glass' });
 	const metalPath = `${outDir}metal.png`;
 
 	const initial = countViews(GLASS);
@@ -109,7 +109,7 @@ async function live() {
 		`the panel's top edge carries the colours beneath it (spread ${spread.toFixed(0)} between four columns, y ${y.toFixed(0)})`,
 	);
 
-	// The shell's sidebar is glass over the opaque backdrop: it is light in light and dark in dark.
+	// The shell's sidebar is glass over the opaque window: it is light in light and dark in dark.
 	const sidebar = await app.getByTestId('nav').bounds();
 	const cell = {
 		...sidebar,

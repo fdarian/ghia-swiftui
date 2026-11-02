@@ -94,15 +94,7 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 	);
 }
 
-export function App(props: {
-	initial?: string;
-	/**
-	 * Paints an opaque window under the app. A real window is blurred and the
-	 * sidebar's glass samples the desktop; the offscreen test window has no
-	 * desktop, so a capture brings its own.
-	 */
-	windowBackdrop?: boolean;
-}) {
+export function App(props: { initial?: string }) {
 	const initial = props.initial ?? demos[0]?.name;
 	if (initial === undefined) throw new Error('No demos registered');
 	const find = (name: string) => {
@@ -121,9 +113,8 @@ export function App(props: {
 						right: 0,
 						bottom: 0,
 						left: 0,
-						...(props.windowBackdrop === true
-							? { backgroundColor: semanticColors.backgroundSolid }
-							: {}),
+						// An opaque window is black: this is its colour, and what the sidebar's glass samples.
+						backgroundColor: semanticColors.backgroundSolid,
 					}}
 				>
 					{/* Painted first so every later sibling, toolbar buttons included, stacks above it and keeps its own click target. */}

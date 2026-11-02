@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The demo's `--backdrop` window colour (`semanticColors.backgroundSolid`): opaque, so glass samples the same thing on both sides.
+/// The demo's window colour (`semanticColors.backgroundSolid`): opaque, so glass samples the same thing on both sides.
 func backdropColor(dark: Bool) -> Color {
 	dark ? Color(red: 0, green: 0, blue: 0) : Color(red: 1, green: 1, blue: 1)
 }

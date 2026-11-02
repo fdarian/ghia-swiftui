@@ -7,7 +7,7 @@ export const windowOptions = {
 	minWidth: 640,
 	minHeight: 400,
 	titlebarTransparent: true,
-	windowBackground: 'blurred',
+	windowBackground: 'opaque',
 	trafficLightX: 20,
 	trafficLightY: 20,
 	focus: process.env.GPUIX_BACKGROUND !== '1',
