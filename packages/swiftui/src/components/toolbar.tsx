@@ -307,8 +307,8 @@ export interface ToolbarTitleProps extends Omit<HostAttributes, 'color'> {}
 
 /**
  * Title for the current view: the active filename, selected item, or section
- * name, never the app name. Native (Tahoe) unified-toolbar titles render at
- * 15px medium, a size the `Text` scale does not have.
+ * name, never the app name. SwiftUI's `navigationTitle` on macOS 26 is 13px
+ * bold on a 15px line, with the 11px subtitle on a 13px line under it.
  */
 export function ToolbarTitle(props: ToolbarTitleProps) {
 	const [own, rest] = splitProps(props, ['style', 'children']);
@@ -317,7 +317,12 @@ export function ToolbarTitle(props: ToolbarTitleProps) {
 			{...rest}
 			as="h2"
 			variant="strong"
-			style={{ ...clippedLine, fontSize: 15, fontWeight: 500, ...own.style }}
+			style={{
+				...clippedLine,
+				fontWeight: 700,
+				lineHeight: '15px',
+				...own.style,
+			}}
 		>
 			{own.children}
 		</Text>
@@ -333,8 +338,9 @@ export function ToolbarDescription(props: ToolbarDescriptionProps) {
 		<Text
 			{...rest}
 			as="p"
+			variant="small"
 			color="secondary"
-			style={{ ...clippedLine, ...own.style }}
+			style={{ ...clippedLine, lineHeight: '13px', ...own.style }}
 		>
 			{own.children}
 		</Text>
