@@ -1,7 +1,7 @@
 /**
  * Captures this process's own window as WindowServer composited it, native
  * subviews (NSGlassEffectView) included. `captureScreenshot` is only the Metal
- * frame. Same route as gpuix's nativeview e2e: `CGWindowListCreateImage` on
+ * frame. Same route as ghia's nativeview e2e: `CGWindowListCreateImage` on
  * the app's own window id needs no screen-recording permission, and nothing
  * outside the process is touched. Run it in the app's process, on the main
  * thread (Bun's JS thread is the app's).

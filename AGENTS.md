@@ -6,6 +6,11 @@ SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.11.0, Bun runti
 - [`apps/demo/`](apps/demo/AGENTS.md) — private native-window showcase of every component, plus the capture and check scripts.
 - [`README.md`](README.md) — install and setup for a consumer; the only copy of that, keep it true when setup changes.
 
+## Principles
+
+- Match SwiftUI as closely as possible. Where SwiftUI draws glass, use real `NativeGlass`, never a tint plus blur. Where syne and SwiftUI disagree, SwiftUI wins. In-window emulation only where macOS has no element to use, and then it is recorded in `DRIFT.md`.
+- No ancestor of a `NativeGlass` has `opacity`, animated or static: the group it forms is drawn before the glass layer, so the glass refracts its own content and its shadow is cut square. Enter and leave with `y` and `scale`; dim a disabled glass control's content.
+
 ## Commands
 
 - `pnpm check` — `tsc` and `biome check` in both workspaces (turbo). Must pass before a commit. `pnpm format` fixes style.
@@ -13,7 +18,7 @@ SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.11.0, Bun runti
 
 ## Gotchas
 
-- `base-ui-solid-gpuix` (headless primitives, a git dependency pinned to a SHA) imports ghia as `@gpuix/solid`. `pnpm-workspace.yaml` aliases that name to `@ghia/solid` (`overrides`) and adds `@ghia/solid` to the package's dependencies (`packageExtensions`). Do not edit that repo or `gpuix` from here.
+- `base-ui-solid-gpuix` (headless primitives, a git dependency pinned to a SHA) imports ghia as `@gpuix/solid`. `pnpm-workspace.yaml` aliases that name to `@ghia/solid` (`overrides`) and adds `@ghia/solid` to the package's dependencies (`packageExtensions`). Do not edit that repo, or the ghia fork it runs on (`~/code/fdarian/ghia`), from here.
 - Exactly one runtime instance of `solid-js` and `@ghia/solid` may exist: a second gives a second reactive graph and fails silently. `pnpm --filter ghia-swiftui-demo check:single-instance` verifies it; run it after touching dependencies.
 - A bunfig must list `ghia-swiftui/preload` after `@ghia/solid/preload` (both `preload` and `[test] preload`): base-ui ships TSX source that the ghia preload skips.
 - Windows open only with `GPUIX_BACKGROUND=1`, behind the active app, and scripts must never post OS input outside their own process. A window another app covers gets no frames, so animations stand still and pixel captures wait or report "not checkable".
