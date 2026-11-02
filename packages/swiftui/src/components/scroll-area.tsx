@@ -51,7 +51,7 @@ const BAR_MARGIN = 3;
 const BAR_WIDTH = 8;
 const BAR_HOVER_WIDTH = 12;
 /** How long a bar stays fully visible once nothing holds it, then how long it takes to fade out (a macOS overlay scroller's, and ghia's own). */
-const BAR_IDLE_MS = 1000;
+const BAR_IDLE_MS = 500;
 const BAR_FADE_MS = 200;
 
 export interface ScrollAreaControl {
