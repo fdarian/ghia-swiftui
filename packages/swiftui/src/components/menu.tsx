@@ -25,6 +25,7 @@ import {
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { anchoredShift, SHADOW_PAD } from '#src/popup.tsx';
+import { litRow } from '#src/tokens/lit-row.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 import { typography } from '#src/tokens/typography.ts';
@@ -397,12 +398,8 @@ export function MenuItem(props: MenuItemProps) {
 				whiteSpace: 'nowrap',
 				cursor: own.disabled === true ? 'not-allowed' : 'default',
 				keyboardFocusDim: false,
-				color: lit()
-					? semanticColors.textPrimary
-					: semanticColors.textSecondary,
-				backgroundColor: lit()
-					? semanticColors.surfaceControlSubtle
-					: 'transparent',
+				color: litRow.ink(lit(), semanticColors.textSecondary),
+				backgroundColor: litRow.fill(lit()),
 				...(own.disabled === true ? { opacity: 0.5 } : {}),
 				...own.style,
 			}}

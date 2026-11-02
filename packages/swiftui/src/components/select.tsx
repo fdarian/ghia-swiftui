@@ -28,6 +28,7 @@ import { Icon } from '#src/icons/icon.tsx';
 import { SHADOW_PAD } from '#src/popup.tsx';
 import { withAlpha } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
+import { litRow } from '#src/tokens/lit-row.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 import { typography } from '#src/tokens/typography.ts';
@@ -609,7 +610,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 				borderRadius: styleTokens.radius8,
 				cursor: 'default',
 				keyboardFocusDim: false,
-				backgroundColor: lit() ? colors.accent : 'transparent',
+				backgroundColor: litRow.fill(lit()),
 				...(props.option.disabled ? { opacity: 0.5 } : {}),
 			}}
 		>
@@ -621,9 +622,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 					justifyContent: 'center',
 					width: CHECK_SLOT,
 					height: CHECK_SLOT,
-					color: lit()
-						? semanticColors.accentContrast
-						: semanticColors.textPrimary,
+					color: litRow.ink(lit(), semanticColors.textPrimary),
 				}}
 			>
 				<Show when={checked()}>
@@ -634,9 +633,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 				style={{
 					...typography.variants.strong,
 					whiteSpace: 'nowrap',
-					color: lit()
-						? semanticColors.accentContrast
-						: semanticColors.textSecondary,
+					color: litRow.ink(lit(), semanticColors.textSecondary),
 				}}
 			>
 				{props.option.label}
