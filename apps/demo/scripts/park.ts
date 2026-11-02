@@ -5,6 +5,7 @@ import {
 	type Id,
 	native,
 	type Pointer,
+	readRect,
 	required,
 	requiredClass,
 	selector,
@@ -62,9 +63,33 @@ function value(dictionary: Pointer, name: string): Pointer | null {
 }
 
 /**
+ * The display holding the mouse pointer. Only reads the position, no input.
+ * `NSEvent.mouseLocation` is in AppKit's space (origin at the primary
+ * display's bottom-left, y up); `Display.bounds` has y down.
+ */
+function pointerDisplay(displays: Display[]): Display {
+	const location = readRect(requiredClass('NSEvent'), 'mouseLocation');
+	const x = location[0] as number;
+	const y = screen.getPrimaryDisplay().bounds.height - (location[1] as number);
+	const found = displays.find(
+		(display) =>
+			x >= display.bounds.x &&
+			x < display.bounds.x + display.bounds.width &&
+			y >= display.bounds.y &&
+			y < display.bounds.y + display.bounds.height,
+	);
+	if (found === undefined) {
+		throw new Error(`the mouse pointer (${x}, ${y}) is on no display`);
+	}
+	return found;
+}
+
+/**
  * The display the user is working on: the one holding the frontmost window of
- * the frontmost app. `NSScreen.mainScreen` is not that, for a process that is
- * not active: it answers with its own idea of main, wherever the user is.
+ * the frontmost app, or, when that app has no window (Finder with none open),
+ * the one holding the mouse pointer. `NSScreen.mainScreen` is not that, for a
+ * process that is not active: it answers with its own idea of main, wherever
+ * the user is.
  */
 function userDisplay(displays: Display[]): Display {
 	const workspace = required(
@@ -128,9 +153,7 @@ function userDisplay(displays: Display[]): Display {
 		}
 		if (best !== undefined) return best;
 	}
-	throw new Error(
-		`cannot tell which display the user is on: the frontmost app (pid ${pid}) has no window on any display`,
-	);
+	return pointerDisplay(displays);
 }
 
 /**

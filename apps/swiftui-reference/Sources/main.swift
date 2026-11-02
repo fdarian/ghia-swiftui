@@ -126,7 +126,7 @@ func overlap(_ a: NSRect, _ b: NSRect) -> CGFloat {
 	return intersection.isNull ? 0 : intersection.width * intersection.height
 }
 
-/// The screen the user is working on: the one holding the frontmost window of the frontmost app. `NSScreen.main` is not that for an app that is not active: it answers with its own idea of main, wherever the user is.
+/// The screen the user is working on: the one holding the frontmost window of the frontmost app, or, when that app has no window (Finder with none open), the one holding the mouse pointer (read only, no input). `NSScreen.main` is not that for an app that is not active: it answers with its own idea of main, wherever the user is.
 func userScreen() -> NSScreen {
 	guard let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier else { fatalError("no frontmost app") }
 	let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
@@ -137,7 +137,9 @@ func userScreen() -> NSScreen {
 		let box = NSRect(x: bounds["X"]!, y: primaryHeight - bounds["Y"]! - bounds["Height"]!, width: bounds["Width"]!, height: bounds["Height"]!)
 		if let screen = NSScreen.screens.max(by: { overlap(box, $0.frame) < overlap(box, $1.frame) }), overlap(box, screen.frame) > 0 { return screen }
 	}
-	fatalError("cannot tell which display the user is on: the frontmost app (pid \(pid)) has no window on any display")
+	let pointer = NSEvent.mouseLocation
+	guard let screen = NSScreen.screens.first(where: { $0.frame.contains(pointer) }) else { fatalError("the mouse pointer \(pointer) is on no display") }
+	return screen
 }
 
 /// Where a window of `size` is parked: a `parkStrip` edge of it on a screen that is not the user's, unless there is only one. Of the strips on that screen's four edges the one with the least of the window on any screen wins, so the rest hangs off where no screen is.
