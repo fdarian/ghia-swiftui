@@ -22,6 +22,7 @@ import {
 	GlassPanel,
 	type GlassPanelProps,
 } from '#src/components/glass-panel.tsx';
+import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { anchoredShift, SHADOW_PAD } from '#src/popup.tsx';
@@ -291,6 +292,10 @@ export function MenuPopup(props: MenuPopupProps) {
 				<GlassPanel
 					{...rest}
 					shadow={styleTokens.shadowPopover}
+					fallback={{
+						...glass.material(),
+						outline: `1px solid ${semanticColors.borderSecondary}`,
+					}}
 					{...panelProps}
 					ref={(element: HostElement) => {
 						list.setPanel(element);
@@ -306,7 +311,6 @@ export function MenuPopup(props: MenuPopupProps) {
 					style={{
 						flexDirection: 'column',
 						alignItems: 'stretch',
-						outline: `1px solid ${semanticColors.borderSecondary}`,
 						keyboardFocusDim: false,
 						...own.style,
 					}}

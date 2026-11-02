@@ -1,3 +1,4 @@
+import type { StyleDesc } from '@ghia/solid';
 import { splitProps } from 'solid-js';
 import { NativeGlass } from '#src/components/native-glass.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
@@ -11,6 +12,8 @@ export interface GlassPanelProps extends HostAttributes {
 	variant?: NativeGlassVariant;
 	/** Corner radius in px. Defaults to the popover radius. */
 	radius?: number;
+	/** The look while there is no real glass; see `NativeGlass`. */
+	fallback?: StyleDesc;
 	/** A `box-shadow` on an element under the glass; see `NativeGlass`. A panel has none by default. */
 	shadow?: string;
 }

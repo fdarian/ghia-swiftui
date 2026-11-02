@@ -531,13 +531,13 @@ export function SelectContent(props: SelectContentProps) {
 					<NativeGlass
 						radius={styleTokens.radiusPopover}
 						shadow={styleTokens.shadowPopover}
-						fallback={glass.tinted(
-							withAlpha(semanticColors.surfacePopover, 0.7),
-						)}
+						fallback={{
+							...glass.tinted(withAlpha(semanticColors.surfacePopover, 0.7)),
+							outline: `1px solid ${semanticColors.borderSecondary}`,
+						}}
 						style={{
 							display: 'flex',
 							flexDirection: 'column',
-							outline: `1px solid ${semanticColors.borderSecondary}`,
 							maxHeight: maxHeight(),
 						}}
 					>

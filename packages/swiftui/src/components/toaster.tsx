@@ -128,7 +128,10 @@ export function Toast(props: ToastProps) {
 					radius={PILL_RADIUS}
 					shadow={styleTokens.shadowPopover}
 					tint={colorScheme() === 'dark' ? undefined : TOAST_LIGHT_TINT}
-					fallback={glass.toast()}
+					fallback={{
+						...glass.toast(),
+						outline: `1px solid ${semanticColors.borderSecondary}`,
+					}}
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
@@ -137,7 +140,6 @@ export function Toast(props: ToastProps) {
 						gap: 10,
 						paddingInline: 16,
 						paddingBlock: 12,
-						outline: `1px solid ${semanticColors.borderSecondary}`,
 					}}
 				>
 					<Show when={props.type}>
