@@ -4,16 +4,19 @@ SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.11.0, Bun runti
 
 - [`packages/swiftui/`](packages/swiftui/AGENTS.md) — the library, `ghia-swiftui`, consumed as TS source (no build step).
 - [`apps/demo/`](apps/demo/AGENTS.md) — private native-window showcase of every component, plus the capture and check scripts.
+- [`apps/swiftui-reference/`](apps/swiftui-reference/AGENTS.md) — private minimal SwiftUI macOS app that shows the system's real control for each demo page, and the scripts that put it beside ours.
 - [`README.md`](README.md) — install and setup for a consumer; the only copy of that, keep it true when setup changes.
 
 ## Principles
 
 - Match SwiftUI as closely as possible. Where SwiftUI draws glass, use real `NativeGlass`, never a tint plus blur. Where syne and SwiftUI disagree, SwiftUI wins. In-window emulation only where macOS has no element to use, and then it is recorded in `DRIFT.md`.
+- The SwiftUI reference is the target. Before tuning a component's look, capture it beside ours with `pnpm compare <shot>` (list in `apps/swiftui-reference/shots.ts`) and read the PNG; `--zoom x:y:w:h@N` enlarges a region of both sides to read radius, edge, padding and colour. Tune against that image, not against memory or a screen recording.
 - No ancestor of a `NativeGlass` has `opacity`, animated or static: the group it forms is drawn before the glass layer, so the glass refracts its own content and its shadow is cut square. Enter and leave with `y` and `scale`; dim a disabled glass control's content.
 
 ## Commands
 
 - `pnpm check` — `tsc` and `biome check` in both workspaces (turbo). Must pass before a commit. `pnpm format` fixes style.
+- `pnpm compare <shot|all> [--scheme light|dark] [--key panel]` — reference | ours PNG into `/tmp/ghia-compare/`; `pnpm reference <shot|all>` captures the reference alone.
 - `pnpm start`, `pnpm screenshot <demo>`, `pnpm live-capture <demo> [step...]`, `pnpm glass-check`, `pnpm window-check` — forwarded to the demo.
 
 ## Gotchas

@@ -42,7 +42,7 @@ export function screenSize(): { width: number; height: number } {
 	return { width, height };
 }
 
-/** Launches the app for one shot and returns the PNG's path. Retries when the window turned key by itself (exit 3). */
+/** Launches the app for one shot and returns the PNG's path. Retries when the window turned key by itself (exit 3) or a click opened nothing (exit 4). */
 export function captureReference(
 	shot: string,
 	scheme: Scheme,
@@ -81,11 +81,13 @@ export function captureReference(
 			process.stderr.write(result.stderr.replace(/windows .*\n/, ''));
 			return out;
 		}
-		if (result.status !== 3) {
+		if (result.status !== 3 && result.status !== 4) {
 			throw new Error(`${shot} ${scheme}: ${result.stderr}`);
 		}
 	}
-	throw new Error(`${shot} ${scheme}: the window kept turning key by itself`);
+	throw new Error(
+		`${shot} ${scheme}: the window kept turning key by itself, or the click kept opening nothing`,
+	);
 }
 
 if (import.meta.main) {

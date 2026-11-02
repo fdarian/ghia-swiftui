@@ -80,7 +80,7 @@ export const shots: Record<string, Shot> = {
 		ours: { x: 225, y: 100, width: 711, height: 120 },
 		ref: { x: 0, y: 0, width: 711, height: 120 },
 	},
-	tooltip: { page: 'tooltip', refArgs: ['--hover', '46,80'], demo: 'tooltip' },
+	tooltip: { page: 'tooltip', demo: 'tooltip' },
 	checkbox: { page: 'checkbox', demo: 'checkbox' },
 	radio: { page: 'radio', demo: 'radio-group' },
 	list: { page: 'list', demo: 'list' },

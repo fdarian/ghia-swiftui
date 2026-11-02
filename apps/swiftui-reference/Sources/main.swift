@@ -72,8 +72,10 @@ final class OverrideWindow: NSWindow {
 	override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
 }
 
+/// Never key: macOS sometimes makes a new window of an accessory app key on its own, which would take keystrokes meant for the user's app.
 final class PlainWindow: NSWindow {
-	override var canBecomeKey: Bool { true }
+	override var canBecomeKey: Bool { false }
+	override var canBecomeMain: Bool { false }
 	override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
 }
 
@@ -235,13 +237,21 @@ DispatchQueue.main.asyncAfter(deadline: .now() + options.delay) {
 	}
 	if let path = options.out {
 		if let point = options.click {
-			// Menu tracking runs its own loop: the timer has to be in the common modes to fire inside it.
-			let timer = Timer(timeInterval: 1.2, repeats: false) { _ in
-				capture(to: path)
-				exit(0)
+			// The pointer has to be over the control before it presses, as a real click's is.
+			send(.mouseMoved, at: point)
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+				// Menu tracking runs its own loop: the timer has to be in the common modes to fire inside it.
+				let timer = Timer(timeInterval: 2.0, repeats: false) { _ in
+					if ownWindowIDs().count < 2 {
+						FileHandle.standardError.write(Data("the click opened nothing\n".utf8))
+						exit(4)
+					}
+					capture(to: path)
+					exit(0)
+				}
+				RunLoop.main.add(timer, forMode: .common)
+				send(.leftMouseDown, at: point)
 			}
-			RunLoop.main.add(timer, forMode: .common)
-			send(.leftMouseDown, at: point)
 		} else {
 			capture(to: path)
 			if !options.hold { exit(0) }
