@@ -16,7 +16,15 @@ import type { HostAttributes } from '#src/host-props.ts';
 import { contains } from '#src/host-tree.ts';
 import { createRevealOnSelect } from '#src/reveal.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
-import { style as styleTokens } from '#src/tokens/style.ts';
+
+/** A SwiftUI `List` row on macOS 26: 40pt tall, the selection 10pt in from the list's edge at an 8pt radius, the content 6pt inside it. */
+const LIST_INSET = 10;
+const ROW_HEIGHT = 40;
+const ROW_PADDING_START = 6;
+const ROW_PADDING_END = 8;
+const ROW_RADIUS = 8;
+/** The separator starts at the text's left edge and ends as far from the right one: 16pt from each side of the list. */
+const SEPARATOR_INSET = ROW_PADDING_START;
 
 /**
  * A native macOS-style vertical list with optional single selection and
@@ -214,8 +222,8 @@ function ListRoot<T>(props: ListRootProps<T>) {
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
-					paddingInline: 8,
-					paddingBlock: 8,
+					paddingInline: LIST_INSET,
+					paddingBlock: LIST_INSET,
 					keyboardFocusDim: false,
 					...own.style,
 				}}
@@ -310,6 +318,21 @@ function ListItem<T>(props: ListItemProps<T>) {
 		position: itemIndex,
 	});
 
+	/** A rule under the row, as SwiftUI draws between rows, unless the row or the next one is the selection (its fill is the divider there). */
+	const separated = () => {
+		if (own.glassSelection === true || isSelected()) return false;
+		const index = itemIndex();
+		const items = list.items();
+		const next = items[index + 1];
+		if (index === -1 || next === undefined) return false;
+		const selected = list.selectedItem();
+		const nextSelected =
+			list.isSelectionEnabled() &&
+			selected !== null &&
+			selected !== undefined &&
+			list.getItemKey()(selected) === list.getItemKey()(next);
+		return !nextSelected;
+	};
 	const glassSelected = () => own.glassSelection === true && isSelected();
 	return (
 		<div
@@ -336,9 +359,12 @@ function ListItem<T>(props: ListItemProps<T>) {
 				alignItems: 'center',
 				justifyContent: 'space-between',
 				gap: 16,
-				borderRadius: styleTokens.radius8,
-				paddingInline: 8,
-				paddingBlock: 10,
+				position: 'relative',
+				minHeight: ROW_HEIGHT,
+				borderRadius: ROW_RADIUS,
+				paddingLeft: ROW_PADDING_START,
+				paddingRight: ROW_PADDING_END,
+				paddingBlock: 3,
 				textAlign: 'left',
 				...(own.glassSelection === true
 					? // The material's border on macOS 27 is reserved on every row, selected or not, so selecting does not nudge the content by its width.
@@ -352,14 +378,14 @@ function ListItem<T>(props: ListItemProps<T>) {
 					? { backgroundColor: semanticColors.surfaceListSelection }
 					: {}),
 				// A stacking context, so the glass at zIndex -1 sits under the row's content and not under the page.
-				...(glassSelected() ? { position: 'relative', zIndex: 0 } : {}),
+				...(glassSelected() ? { zIndex: 0 } : {}),
 				...own.style,
 			}}
 		>
 			<Show when={glassSelected()}>
 				<NativeGlass
 					aria-hidden
-					radius={styleTokens.radius8}
+					radius={ROW_RADIUS}
 					style={{
 						position: 'absolute',
 						zIndex: -1,
@@ -371,6 +397,19 @@ function ListItem<T>(props: ListItemProps<T>) {
 				/>
 			</Show>
 			{own.children}
+			<Show when={separated()}>
+				<div
+					aria-hidden
+					style={{
+						position: 'absolute',
+						left: SEPARATOR_INSET,
+						right: SEPARATOR_INSET,
+						bottom: 0,
+						height: 1,
+						backgroundColor: semanticColors.borderSeparator,
+					}}
+				/>
+			</Show>
 		</div>
 	);
 }
@@ -385,7 +424,7 @@ function ListItemContent(props: ListItemContentProps) {
 			style={{
 				display: 'flex',
 				flexDirection: 'column',
-				gap: 4,
+				gap: 2,
 				flexGrow: 1,
 				flexShrink: 1,
 				flexBasis: 0,
@@ -403,7 +442,7 @@ export interface ListItemTitleProps extends Omit<HostAttributes, 'color'> {}
 function ListItemTitle(props: ListItemTitleProps) {
 	const [own, rest] = splitProps(props, ['style', 'children']);
 	return (
-		<Text {...rest} as="h2" variant="strong" truncate style={own.style}>
+		<Text {...rest} as="h2" variant="regular" truncate style={own.style}>
 			{own.children}
 		</Text>
 	);
@@ -418,12 +457,12 @@ function ListItemDescription(props: ListItemDescriptionProps) {
 		<Text
 			{...rest}
 			as="p"
+			variant="small"
 			color="secondary"
 			style={{
 				overflow: 'hidden',
 				lineClamp: 2,
 				minWidth: '50%',
-				lineHeight: '15.6px',
 				...own.style,
 			}}
 		>
@@ -447,8 +486,7 @@ function ListItemAccessory(props: ListItemAccessoryProps) {
 				gap: 4,
 				flexShrink: 0,
 				color: semanticColors.textTertiary,
-				fontSize: 13,
-				fontWeight: 500,
+				fontSize: 11,
 				...own.style,
 			}}
 		>
