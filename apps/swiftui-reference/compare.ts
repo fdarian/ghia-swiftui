@@ -2,7 +2,7 @@
  * Side by side: the reference app's page on the left, the demo's on the right,
  * same scale, same backdrop, both windows inactive.
  *
- *   pnpm compare <shot|all> [--scheme light|dark] [--out dir] [--zoom x:y:w:h@N [--zoom-ours x:y:w:h]]
+ *   pnpm compare <shot|all> [--scheme light|dark] [--out dir] [--zoom x:y:w:h@N [--zoom-ours x:y:w:h]] [--allow-front]
  *
  * Writes `<out>/<shot>-<scheme>.png` (`/tmp/ghia-compare` by default), plus the
  * two halves under `<out>/reference/` and `<out>/ours/`. `--zoom` crops both
@@ -11,8 +11,10 @@
  * the demo's side its own rect when the same control sits elsewhere.
  *
  * The demo is captured by `apps/demo/scripts/live-capture.tsx` (real window,
- * `GPUIX_BACKGROUND=1`), parked with a strip on the screen's edge so another
- * app's window does not cover it.
+ * `GPUIX_BACKGROUND=1`), which opens already parked: a strip of it on the edge
+ * of a display the user is not working on. `all` skips the shots that need a
+ * real menu (`front` in `shots.ts`); `--allow-front` runs those by name, only
+ * when the user asked for it: the window covers their work for seconds.
  */
 import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -21,10 +23,11 @@ import {
 	loadPng,
 	writeRgbaPng,
 } from '../demo/scripts/window-pixels.ts';
-import { captureReference, screenSize } from './capture.ts';
+import { captureReference } from './capture.ts';
 import {
 	DEMO_PAGE,
 	DEMO_SIZE,
+	parkedShots,
 	REFERENCE_SIZE,
 	type Rect,
 	shots,
@@ -36,7 +39,6 @@ const GAP = 10;
 function captureOurs(shot: string, scheme: string, outDir: string): string {
 	const definition = shots[shot];
 	if (definition === undefined) throw new Error(`Unknown shot ${shot}`);
-	const screen = screenSize();
 	mkdirSync(outDir, { recursive: true });
 	const name = `${shot}-${scheme}`;
 	const result = spawnSync(
@@ -46,7 +48,6 @@ function captureOurs(shot: string, scheme: string, outDir: string): string {
 			definition.demo,
 			'--out',
 			outDir,
-			`move=${screen.width - 60}:300`,
 			scheme,
 			...(definition.steps ?? []),
 			`shot=${name}`,
@@ -118,10 +119,16 @@ function compare(
 	scheme: 'light' | 'dark',
 	outDir: string,
 	zoom?: { rect: Rect; oursRect?: Rect; factor: number },
+	allowFront = false,
 ) {
 	const definition = shots[shot];
 	if (definition === undefined) throw new Error(`Unknown shot ${shot}`);
-	const referencePath = captureReference(shot, scheme, `${outDir}/reference/`);
+	const referencePath = captureReference(
+		shot,
+		scheme,
+		`${outDir}/reference/`,
+		allowFront,
+	);
 	const oursPath = captureOurs(shot, scheme, `${outDir}/ours`);
 	const referenceFull = loadPng(referencePath, 1);
 	const oursFull = loadPng(oursPath, 1);
@@ -156,12 +163,14 @@ const take = (flag: string) => {
 };
 const scheme = take('--scheme');
 const outDir = (take('--out') ?? '/tmp/ghia-compare').replace(/\/$/, '');
+const allowFront = args.includes('--allow-front');
+if (allowFront) args.splice(args.indexOf('--allow-front'), 1);
 const zoomArg = take('--zoom');
 const oursZoomArg = take('--zoom-ours');
 const [name] = args;
 if (name === undefined) {
 	console.error(
-		`usage: pnpm compare <${Object.keys(shots).join('|')}|all> [--scheme light|dark] [--out dir] [--zoom x:y:w:h@N [--zoom-ours x:y:w:h]]`,
+		`usage: pnpm compare <${Object.keys(shots).join('|')}|all> [--scheme light|dark] [--out dir] [--zoom x:y:w:h@N [--zoom-ours x:y:w:h]] [--allow-front]`,
 	);
 	process.exit(1);
 }
@@ -182,11 +191,11 @@ if (zoomArg !== undefined) {
 		factor: Number(factor),
 	};
 }
-for (const shot of name === 'all' ? Object.keys(shots) : [name]) {
+for (const shot of name === 'all' ? parkedShots : [name]) {
 	for (const each of scheme === undefined
 		? (['light', 'dark'] as const)
 		: [scheme as 'light' | 'dark']) {
-		console.log(compare(shot, each, outDir, zoom));
+		console.log(compare(shot, each, outDir, zoom, allowFront));
 	}
 }
 process.exit(0);

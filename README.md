@@ -169,7 +169,7 @@ pnpm glass-check                # real glass present, by window pixels and the v
 pnpm window-check               # layout against the traffic lights, resize, collapse, glass
 ```
 
-`live-capture`, `glass-check` and `window-check` open windows behind the active app and read their own pixels; they post no input and touch no other app. A window another app covers is given no frames, so they wait for it to be uncovered. `live-capture` also takes steps (`shot=`, `click=`, `wheel=`, `dark`, `light`, `move=`; see its header).
+`live-capture`, `glass-check` and `window-check` open windows parked, with a thin strip on a display you are not working on, and read their own pixels; they post no input and touch no other app. A window another app covers is given no frames, so they report "not checkable". `live-capture` also takes steps (`shot=`, `click=`, `wheel=`, `dark`, `light`, `move=`; see its header).
 
 `pnpm check` at the root runs the type and lint checks.
 

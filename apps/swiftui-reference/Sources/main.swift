@@ -14,6 +14,7 @@ struct Options {
 	var scrollInner: CGFloat = 0
 	var hold = false
 	var front = false
+	var allowFront = false
 	var dump = false
 	var delay = 1.8
 }
@@ -48,16 +49,21 @@ func parse() -> Options {
 		case "--scroll-inner": options.scrollInner = CGFloat(Double(value(argument)) ?? 0)
 		case "--hold": options.hold = true
 		case "--front": options.front = true
+		case "--allow-front": options.allowFront = true
 		case "--dump": options.dump = true
 		case "--delay": options.delay = Double(value(argument)) ?? 1.8
 		default:
 			guard options.page.isEmpty, Pages.names.contains(argument) else {
-				fatalError("usage: swiftui-reference <\(Pages.names.joined(separator: "|"))> [--scheme light|dark] [--out file.png] [--size WxH] [--scroll pt] [--scroll-inner pt] [--flash] [--focus default|glass] [--click x,y] [--hover x,y] [--front] [--hold] [--dump]")
+				fatalError("usage: swiftui-reference <\(Pages.names.joined(separator: "|"))> [--scheme light|dark] [--out file.png] [--size WxH] [--scroll pt] [--scroll-inner pt] [--flash] [--focus default|glass] [--click x,y] [--hover x,y] [--front] [--allow-front] [--hold] [--dump]")
 			}
 			options.page = argument
 		}
 	}
 	guard !options.page.isEmpty else { fatalError("page name required") }
+	if (options.front || options.click != nil) && !options.allowFront {
+		FileHandle.standardError.write(Data("--front and --click put the window, and the menu a click opens, in front of everything for seconds: this covers the user's work. Run it only when the user asked for it, with --allow-front.\n".utf8))
+		exit(2)
+	}
 	return options
 }
 
@@ -79,11 +85,6 @@ func allViews(_ view: NSView) -> [NSView] {
 	[view] + view.subviews.flatMap(allViews)
 }
 
-if CommandLine.arguments.contains("--screen") {
-	let frame = (NSScreen.main ?? NSScreen.screens[0]).frame
-	print(Int(frame.width), Int(frame.height))
-	exit(0)
-}
 let options = parse()
 let application = ReferenceApplication.shared
 guard application.setActivationPolicy(.accessory) else { fatalError("could not become an accessory app") }
@@ -117,12 +118,59 @@ if windowed { controller.sceneBridgingOptions = .all }
 window.contentViewController = controller
 window.setContentSize(options.size)
 
-let screen = NSScreen.main ?? NSScreen.screens[0]
+/// How much of a parked window shows: a covered window gets no frames, so some pixels stay on a display, and the part off every display still draws.
+let parkStrip: CGFloat = 8
+
+func overlap(_ a: NSRect, _ b: NSRect) -> CGFloat {
+	let intersection = a.intersection(b)
+	return intersection.isNull ? 0 : intersection.width * intersection.height
+}
+
+/// The screen the user is working on: the one holding the frontmost window of the frontmost app. `NSScreen.main` is not that for an app that is not active: it answers with its own idea of main, wherever the user is.
+func userScreen() -> NSScreen {
+	guard let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier else { fatalError("no frontmost app") }
+	let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
+	let primaryHeight = NSScreen.screens[0].frame.height
+	for info in windows where info[kCGWindowOwnerPID as String] as? Int32 == pid && info[kCGWindowLayer as String] as? Int == 0 {
+		guard let bounds = info[kCGWindowBounds as String] as? [String: CGFloat] else { continue }
+		// CGWindow bounds have their origin at the primary display's top-left, y down; AppKit's at its bottom-left, y up.
+		let box = NSRect(x: bounds["X"]!, y: primaryHeight - bounds["Y"]! - bounds["Height"]!, width: bounds["Width"]!, height: bounds["Height"]!)
+		if let screen = NSScreen.screens.max(by: { overlap(box, $0.frame) < overlap(box, $1.frame) }), overlap(box, screen.frame) > 0 { return screen }
+	}
+	fatalError("cannot tell which display the user is on: the frontmost app (pid \(pid)) has no window on any display")
+}
+
+/// Where a window of `size` is parked: a `parkStrip` edge of it on a screen that is not the user's, unless there is only one. Of the strips on that screen's four edges the one with the least of the window on any screen wins, so the rest hangs off where no screen is.
+func parkedOrigin(size: CGSize) -> NSPoint {
+	let user = userScreen()
+	let targets = NSScreen.screens.count == 1 ? NSScreen.screens : NSScreen.screens.filter { $0 != user }
+	var best: (origin: NSPoint, cost: CGFloat)?
+	for target in targets {
+		let area = target.frame
+		let alongX = max(area.minX, min(area.minX + 120, area.maxX - size.width))
+		let alongY = min(area.maxY, max(area.maxY - 120, area.minY + size.height)) - size.height
+		let candidates = [
+			NSPoint(x: area.maxX - parkStrip, y: alongY),
+			NSPoint(x: area.minX + parkStrip - size.width, y: alongY),
+			NSPoint(x: alongX, y: area.minY + parkStrip - size.height),
+			NSPoint(x: alongX, y: area.maxY - parkStrip),
+		]
+		for origin in candidates {
+			let box = NSRect(origin: origin, size: size)
+			if NSScreen.screens.count > 1 && overlap(box, user.frame) > 0 { continue }
+			let cost = NSScreen.screens.reduce(0) { $0 + overlap(box, $1.frame) }
+			if best == nil || cost < best!.cost { best = (origin, cost) }
+		}
+	}
+	guard let best else { fatalError("no edge of any display leaves the user's display clear") }
+	return best.origin
+}
+
 if options.front || options.click != nil {
+	let screen = userScreen()
 	window.setFrameOrigin(NSPoint(x: screen.frame.minX + 120, y: screen.frame.maxY - options.size.height - 120))
 } else {
-	// A covered window gets no frames: park it behind everything with a strip on the screen's edge showing.
-	window.setFrameOrigin(NSPoint(x: screen.frame.maxX - 60, y: screen.frame.maxY - options.size.height - 120))
+	window.setFrameOrigin(parkedOrigin(size: window.frame.size))
 }
 window.orderFrontRegardless()
 if !(options.front || options.click != nil) { window.order(.below, relativeTo: 0) }

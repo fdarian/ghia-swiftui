@@ -14,6 +14,8 @@ export interface Shot {
 	page: string;
 	/** Extra reference app flags: how the page is put in the state to compare. */
 	refArgs?: string[];
+	/** The state is a real menu, which needs the window in front of everything for seconds: `all` skips it, and it runs only by name with `--allow-front`, when the user asked for it. */
+	front?: true;
 	/** The demo the shot is compared with (`pnpm live-capture <demo>`). */
 	demo: string;
 	/** `live-capture` steps that put the demo in the same state. */
@@ -50,6 +52,7 @@ export const shots: Record<string, Shot> = {
 	'select-open': {
 		page: 'select',
 		refArgs: ['--click', '236,148'],
+		front: true,
 		demo: 'select',
 		steps: ['click=select-default-medium'],
 	},
@@ -57,6 +60,7 @@ export const shots: Record<string, Shot> = {
 	'menu-open': {
 		page: 'menu',
 		refArgs: ['--click', '71,80'],
+		front: true,
 		demo: 'menu',
 		steps: ['click=menu-trigger'],
 	},
@@ -107,3 +111,8 @@ export const shots: Record<string, Shot> = {
 	liquid: { page: 'liquid', demo: 'liquid-glass' },
 	status: { page: 'status', demo: 'status' },
 };
+
+/** What `all` runs: the shots that can be captured with the window parked. */
+export const parkedShots = Object.keys(shots).filter(
+	(name) => shots[name]?.front !== true,
+);
