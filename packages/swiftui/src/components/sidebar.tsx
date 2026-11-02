@@ -1,8 +1,11 @@
-import type { HostElement, KeyEvent } from '@ghia/solid';
-import { buttonProps, useGpuixRequired } from '@ghia/solid';
+import type { DomEvent, HostElement, KeyEvent } from '@ghia/solid';
+import { buttonProps, document, useGpuixRequired } from '@ghia/solid';
 import {
 	createContext,
+	createSignal,
 	type JSX,
+	onCleanup,
+	onMount,
 	children as resolveChildren,
 	Show,
 	splitProps,
@@ -16,14 +19,19 @@ import { SidebarContext } from '#src/components/sidebar-context.ts';
 import { Text } from '#src/components/text.tsx';
 import { Toolbar, ToolbarRow } from '#src/components/toolbar.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
+import { contains } from '#src/host-tree.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
 import { hasNodes } from '#src/resolved.ts';
 import { createRevealOnSelect } from '#src/reveal.ts';
+import { litRow } from '#src/tokens/lit-row.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
-import { style as styleTokens } from '#src/tokens/style.ts';
 
 const SIDEBAR_INSET = 10;
-const ICON_SIZE = 16;
+/** A SwiftUI sidebar row: 32pt tall, the selection 10pt in from each side with an 8pt radius, the icon 17pt and the label 8pt after it. */
+const ICON_SIZE = 17;
+const ROW_PADDING_INLINE = 11;
+const ROW_RADIUS = 8;
+const SELECTED_WEIGHT = 600;
 
 export interface SidebarProps extends HostAttributes {
 	/** Escape hatch: pass a fully custom Toolbar. Overrides `actions`. */
@@ -116,6 +124,9 @@ interface SidebarListContextValue<T> {
 	onItemSelect: () => ((item: T) => void) | undefined;
 	getItemKey: () => (item: T) => string;
 	isSelectionEnabled: () => boolean;
+	/** False while focus is on something outside the list: the selection then draws grey, as AppKit's unemphasized one. */
+	emphasized: () => boolean;
+	focusList: () => void;
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: the context is generic-agnostic; items narrow it with their own T
@@ -137,9 +148,31 @@ export function SidebarList<T>(props: SidebarListProps<T>) {
 		'onSelectedItemChange',
 		'getItemKey',
 		'emptyState',
+		'ref',
 		'style',
 		'children',
 	]);
+	let list: HostElement | undefined;
+	const [focusOutside, setFocusOutside] = createSignal(false);
+	onMount(() => {
+		const active = document.activeElement;
+		setFocusOutside(
+			active !== null && list !== undefined && !contains(list, active),
+		);
+		// Focus on nothing at all (a press on bare window) leaves the selection emphasized.
+		const onFocusIn = (event: DomEvent) => {
+			setFocusOutside(list !== undefined && !contains(list, event.target));
+		};
+		const onFocusOut = (event: DomEvent) => {
+			if (event.relatedTarget === null) setFocusOutside(false);
+		};
+		document.addEventListener('focusin', onFocusIn);
+		document.addEventListener('focusout', onFocusOut);
+		onCleanup(() => {
+			document.removeEventListener('focusin', onFocusIn);
+			document.removeEventListener('focusout', onFocusOut);
+		});
+	});
 	const isSelectionEnabled = () =>
 		own.selectedItem !== undefined && own.onSelectedItemChange !== undefined;
 
@@ -202,10 +235,16 @@ export function SidebarList<T>(props: SidebarListProps<T>) {
 						return getItemKey === undefined ? () => '' : getItemKey;
 					},
 					isSelectionEnabled,
+					emphasized: () => !focusOutside(),
+					focusList: () => list?.focus({ preventScroll: true }),
 				}}
 			>
 				<div
 					{...rest}
+					ref={(element: HostElement) => {
+						list = element;
+						own.ref?.(element);
+					}}
 					role={isSelectionEnabled() ? 'listbox' : undefined}
 					tabIndex={isSelectionEnabled() ? 0 : undefined}
 					onKeyDown={isSelectionEnabled() ? handleKeyDown : undefined}
@@ -269,6 +308,8 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 	const subtitle = resolveChildren(() => own.subtitle);
 	const accessory = resolveChildren(() => own.accessory);
 	const has = hasNodes;
+	const selectedWeight = () =>
+		isSelected() === true ? { fontWeight: SELECTED_WEIGHT } : {};
 	const usePropsMode = () => has(title);
 
 	const isContextManaged = () =>
@@ -289,6 +330,9 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 		row: () => row,
 		selected: () => isContextManaged() && isSelected() === true,
 	});
+
+	/** The accent fill under white ink; a selection with focus elsewhere is the grey one. */
+	const lit = () => isSelected() === true && (context?.emphasized() ?? true);
 
 	const activate = () => {
 		if (own.disabled === true) return;
@@ -323,6 +367,8 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 			onMouseDown={(event) => {
 				if (event.button !== 0) return;
 				event.preventDefault();
+				// The press keeps focus where it was, so a selection made from a search field has to bring the list's focus itself.
+				if (isContextManaged()) context?.focusList();
 				activate();
 			}}
 			style={{
@@ -333,18 +379,22 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 				width: '100%',
 				minWidth: 0,
 				minHeight: 32,
-				paddingInline: 8,
+				paddingInline: ROW_PADDING_INLINE,
 				paddingBlock: 4,
-				borderRadius: styleTokens.radius8,
+				borderRadius: ROW_RADIUS,
 				textAlign: 'left',
-				color: semanticColors.textPrimary,
+				color: litRow.ink(lit(), semanticColors.textPrimary),
 				cursor: 'default',
 				keyboardFocusDim: false,
 				focusVisible: {
 					boxShadow: `0 0 0 1px ${semanticColors.borderPrimary}`,
 				},
 				...(isSelected() === true
-					? { backgroundColor: semanticColors.surfaceListSelection }
+					? {
+							backgroundColor: lit()
+								? litRow.fill(true)
+								: semanticColors.surfaceListSelection,
+						}
 					: {}),
 				...(own.disabled === true
 					? { pointerEvents: 'none', opacity: 0.5 }
@@ -375,7 +425,11 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 							variant="regular"
 							color="inherit"
 							truncate
-							style={{ minWidth: 0, flexGrow: 1 }}
+							style={{
+								minWidth: 0,
+								flexGrow: 1,
+								...selectedWeight(),
+							}}
 						>
 							{title()}
 						</Text>
@@ -390,13 +444,20 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 							gap: 1,
 						}}
 					>
-						<Text variant="regular" color="inherit" truncate>
+						<Text
+							variant="regular"
+							color="inherit"
+							truncate
+							style={selectedWeight()}
+						>
 							{title()}
 						</Text>
 						<Text
 							variant="small"
 							truncate
-							style={{ color: semanticColors.textTertiary }}
+							style={{
+								color: litRow.inkSecondary(lit(), semanticColors.textTertiary),
+							}}
 						>
 							{subtitle()}
 						</Text>
@@ -417,7 +478,7 @@ export function SidebarListItem<T>(props: SidebarListItemProps<T>) {
 								flexDirection: 'row',
 								alignItems: 'center',
 								gap: 4,
-								color: semanticColors.textTertiary,
+								color: litRow.inkSecondary(lit(), semanticColors.textTertiary),
 								fontSize: 11,
 							}}
 						>

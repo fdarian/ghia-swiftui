@@ -13,6 +13,7 @@ import { NativeGlass } from '#src/components/native-glass.tsx';
 import { useScrollAreaContext } from '#src/components/scroll-area-context.ts';
 import { Text } from '#src/components/text.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
+import { contains } from '#src/host-tree.ts';
 import { createRevealOnSelect } from '#src/reveal.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
@@ -68,15 +69,6 @@ export interface ListRootProps<T>
 	onNavigationKeyDown?: (event: KeyEvent) => void;
 	/** Receives the imperative handle once mounted. */
 	ref?: (list: ListRef) => void;
-}
-
-function contains(root: HostElement, node: object | null): boolean {
-	let current: object | null | undefined = node;
-	while (current !== null && current !== undefined) {
-		if (current === root) return true;
-		current = (current as { parent?: object | null }).parent;
-	}
-	return false;
 }
 
 /** The last 4px of the list: when it comes within `endThreshold` of the scroller's bottom, `onEndReached` runs. */
