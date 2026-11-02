@@ -24,11 +24,14 @@ export type SemanticColorName =
 	| 'surfaceListHover'
 	| 'surfaceListSelection'
 	| 'surfaceInput'
+	| 'surfaceBordered'
+	| 'surfaceTextField'
 	| 'borderPrimary'
 	| 'borderSecondary'
 	| 'borderTertiary'
 	| 'borderSeparator'
 	| 'borderField'
+	| 'borderTextField'
 	| 'windowBg'
 	| 'windowBgSecondary'
 	| 'panelBackground'
@@ -76,12 +79,19 @@ export const semanticColors = defineTokens<SemanticColorName, string>({
 	surfaceListHover: () => colors.selection5,
 	surfaceListSelection: () => colors.selection10,
 	surfaceInput: () => colors.fg5,
+	/** What AppKit fills a bordered control with (`.bordered` buttons, `Picker`): 236 on white, 19 on black. */
+	surfaceBordered: () => withAlpha(colors.fg, 0.075),
+	/** A `TextField`'s fill: the control background, white in light and a faint lift in dark. */
+	surfaceTextField: () => (dark() ? withAlpha(colors.fg, 0.075) : '#ffffff'),
 
 	borderPrimary: () => colors.fg20,
 	borderSecondary: () => colors.fg10,
 	borderTertiary: () => colors.fg5,
 	borderSeparator: () => colors.fg10,
 	borderField: () => colors.fg20,
+	/** A `TextField`'s hairline, drawn over its fill: 235 on white, and in dark darker than the fill, 12 against 19. */
+	borderTextField: () =>
+		dark() ? withAlpha(colors.bg, 0.37) : withAlpha(colors.fg, 0.078),
 
 	windowBg: () => colors.bg40,
 	windowBgSecondary: () => colors.bgSecondary40,

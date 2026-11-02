@@ -173,19 +173,54 @@ export function Select(props: SelectProps) {
 	);
 }
 
+/**
+ * SwiftUI's `.controlSize` on a `Picker` on macOS 26, measured from the
+ * reference app, the same boxes as `Button`'s: `small`/`medium`/`large` are
+ * `.small`/`.regular`/`.large`. `chevron` is the up/down glyph's svg size and
+ * stroke, `chevronInset` the gap from its ink to the trigger's right edge, and
+ * `gap` the space between the widest label and the glyph, fitted to the
+ * reference's trigger widths.
+ */
 const triggerSizes = {
-	small: { height: 28, paddingInline: 8, borderRadius: styleTokens.radius8 },
+	small: {
+		height: 20,
+		paddingInline: 10,
+		borderRadius: 5,
+		fontSize: 11,
+		lineHeight: 14,
+		gap: 12.5,
+		chevron: { size: 12, strokeWidth: 2.2 },
+		chevronInset: 8.5,
+	},
 	medium: {
-		height: 32,
+		height: 24,
 		paddingInline: 12,
-		borderRadius: styleTokens.radiusControl,
+		borderRadius: 6,
+		fontSize: 13,
+		lineHeight: 16,
+		gap: 15,
+		chevron: { size: 14, strokeWidth: 2.5 },
+		chevronInset: 10,
 	},
 	large: {
-		height: 36,
-		paddingInline: 12,
-		borderRadius: styleTokens.radiusControl,
+		height: 28,
+		paddingInline: 14,
+		borderRadius: 14,
+		fontSize: 13,
+		lineHeight: 16,
+		gap: 18,
+		chevron: { size: 17, strokeWidth: 2.8 },
+		chevronInset: 10.5,
 	},
 } as const;
+
+/** A transparent trigger's label sits this close to its round chevron button, as before the retune: SwiftUI draws no distinct one to measure. */
+const TRANSPARENT_GAP = 8;
+
+/** The chevron pair's ink width: its path spans 10 of the svg's 24 units, plus the stroke. */
+function inkWidth(size: (typeof triggerSizes)[keyof typeof triggerSizes]) {
+	return ((10 + size.chevron.strokeWidth) * size.chevron.size) / 24;
+}
 
 export type SelectTriggerVariant = 'default' | 'transparent' | 'glass';
 export type SelectTriggerSize = keyof typeof triggerSizes;
@@ -193,7 +228,7 @@ export type SelectTriggerSize = keyof typeof triggerSizes;
 export interface SelectTriggerProps extends HostAttributes {
 	/** Visual style. */
 	variant?: SelectTriggerVariant;
-	/** Trigger height (28 / 32 / 36px). */
+	/** Control size: 20 / 24 / 28pt tall, as SwiftUI's `.small` / `.regular` / `.large`. */
 	size?: SelectTriggerSize;
 }
 
@@ -209,11 +244,10 @@ export function SelectTrigger(props: SelectTriggerProps) {
 	]);
 	const variant = () => own.variant ?? 'default';
 	const size = () => triggerSizes[own.size ?? 'medium'];
-	const bordered = () => variant() === 'default';
 	createComputed(() => {
 		context.setTrigger({
 			height: size().height,
-			labelInset: size().paddingInline + (bordered() ? 1 : 0),
+			labelInset: size().paddingInline,
 		});
 		context.setBleed(variant() === 'transparent' ? 8 : 0);
 	});
@@ -235,30 +269,26 @@ export function SelectTrigger(props: SelectTriggerProps) {
 		maxWidth: '100%',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		gap: 8,
+		gap: variant() === 'transparent' ? TRANSPARENT_GAP : size().gap,
 		// Clipping would cut the glass's own shadow and edge highlight.
 		...(isGlass() ? {} : { overflow: 'hidden' }),
 		whiteSpace: 'nowrap',
-		...typography.variants.regular,
+		fontSize: size().fontSize,
+		fontWeight: 400,
+		lineHeight: `${size().lineHeight}px`,
 		color: semanticColors.textPrimary,
 		cursor: 'default',
 		keyboardFocusDim: false,
-		...size(),
+		height: size().height,
+		paddingInline: size().paddingInline,
+		borderRadius: size().borderRadius,
 		...(variant() === 'default'
-			? {
-					borderWidth: 1,
-					borderStyle: 'solid',
-					borderColor: semanticColors.borderField,
-					hover: { borderColor: colors.fg40 },
-				}
+			? { backgroundColor: semanticColors.surfaceBordered }
 			: {}),
 		...(variant() === 'transparent'
 			? { hover: { backgroundColor: semanticColors.surfaceControlSubtle } }
 			: {}),
-		focusVisible: {
-			outline: `2px solid ${colors.fg20}`,
-			...(variant() === 'default' ? { borderColor: colors.fg40 } : {}),
-		},
+		focusVisible: { outline: `2px solid ${colors.fg20}` },
 		...(isInvalid(rest['aria-invalid'])
 			? { outline: `1px solid ${colors.red}` }
 			: {}),
@@ -272,6 +302,11 @@ export function SelectTrigger(props: SelectTriggerProps) {
 			: {}),
 		...own.style,
 	});
+	// The glyph's ink sits in the middle of its svg box: pull the box out so the ink is `chevronInset` from the edge.
+	const chevronMargin = () =>
+		size().chevronInset -
+		size().paddingInline -
+		(size().chevron.size - inkWidth(size())) / 2;
 	const content = () => (
 		<>
 			{own.children}
@@ -280,8 +315,12 @@ export function SelectTrigger(props: SelectTriggerProps) {
 				fallback={
 					<Icon
 						name="chevrons-up-down"
-						size={16}
-						style={{ color: semanticColors.textQuaternary }}
+						size={size().chevron.size}
+						strokeWidth={size().chevron.strokeWidth}
+						style={{
+							color: semanticColors.textPrimary,
+							marginRight: chevronMargin(),
+						}}
 					/>
 				}
 			>
@@ -333,7 +372,7 @@ export function SelectTrigger(props: SelectTriggerProps) {
 						flexGrow: 1,
 						alignItems: 'center',
 						justifyContent: 'space-between',
-						gap: 8,
+						gap: size().gap,
 						...(context.disabled() ? { opacity: 0.5 } : {}),
 					}}
 				>
@@ -348,28 +387,42 @@ export interface SelectValueProps extends Omit<HostAttributes, 'children'> {
 	placeholder?: string;
 }
 
-/** The selected item's label, or the placeholder. */
+/**
+ * The selected item's label, or the placeholder. Like a SwiftUI `Picker`, the
+ * trigger is as wide as its widest label, so it does not resize with the value.
+ */
 export function SelectValue(props: SelectValueProps) {
 	const context = useSelectContext();
 	const [own, rest] = splitProps(props, ['placeholder', 'style']);
 	const selected = () =>
 		context.options().find((option) => option.value === context.root.value());
+	const labels = () => [
+		...(own.placeholder === undefined ? [] : [own.placeholder]),
+		...context.options().map((option) => option.label),
+	];
 	return (
-		<text
-			{...rest}
-			style={{
-				minWidth: 0,
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-				whiteSpace: 'nowrap',
-				...(selected() === undefined
-					? { color: semanticColors.textPlaceholder }
-					: {}),
-				...own.style,
-			}}
-		>
-			{selected() === undefined ? own.placeholder : selected()?.label}
-		</text>
+		<div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+			<text
+				{...rest}
+				style={{
+					minWidth: 0,
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					whiteSpace: 'nowrap',
+					...(selected() === undefined
+						? { color: semanticColors.textPlaceholder }
+						: {}),
+					...own.style,
+				}}
+			>
+				{selected() === undefined ? own.placeholder : selected()?.label}
+			</text>
+			<div aria-hidden style={{ height: 0, overflow: 'hidden' }}>
+				<For each={labels()}>
+					{(label) => <text style={{ whiteSpace: 'nowrap' }}>{label}</text>}
+				</For>
+			</div>
+		</div>
 	);
 }
 
