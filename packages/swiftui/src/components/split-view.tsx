@@ -498,7 +498,7 @@ function SidebarToggle(props: SplitViewToggleProps) {
 				<Button
 					{...rest}
 					variant="glass"
-					size="large"
+					size="toolbar"
 					iconOnly={own.iconOnly ?? true}
 					aria-label={label()}
 					aria-pressed={!split.sidebarCollapsed}
@@ -561,7 +561,7 @@ function InspectorToggle(props: SplitViewToggleProps) {
 	createRenderEffect(() => onCleanup(split.registerInspectorToggle()));
 	const variant = () =>
 		own.variant ?? (inSidebar && !pinned() ? 'transparent' : 'glass');
-	const size = () => own.size ?? (inSidebar && !pinned() ? 'small' : 'large');
+	const size = () => own.size ?? (inSidebar && !pinned() ? 'small' : 'toolbar');
 	const label = () =>
 		own['aria-label'] ??
 		(split.inspectorCollapsed ? 'Show inspector' : 'Hide inspector');
@@ -579,11 +579,17 @@ function InspectorToggle(props: SplitViewToggleProps) {
 					style={
 						pinned()
 							? { position: 'relative', pointerEvents: 'auto', ...own.style }
-							: own.style
+							: // A `transparent` button is its bare icon: a sidebar row's toggle keeps its 28px target.
+								{
+									...(variant() === 'transparent'
+										? { width: 28, height: 28 }
+										: {}),
+									...own.style,
+								}
 					}
 				>
 					{own.children ?? (
-						<Icon name="panel-right" size={size() === 'large' ? 18 : 16} />
+						<Icon name="panel-right" size={size() === 'toolbar' ? 18 : 16} />
 					)}
 				</Button>
 			</TooltipTrigger>

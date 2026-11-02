@@ -70,7 +70,7 @@ export interface ScrollAreaProps extends Omit<HostAttributes, 'children'> {
 	/** Describes the active view (filename, selected item, section), not the app name. */
 	title?: JSX.Element;
 	subtitle?: JSX.Element;
-	/** Action buttons, auto-styled with content-area defaults (`variant="glass" size="large"`). */
+	/** Action buttons, auto-styled as toolbar items (`variant="glass" size="toolbar"`). */
 	actions?: JSX.Element;
 	/** Leading-edge chrome before the title (e.g. a back button), auto-styled like `actions`. */
 	leading?: JSX.Element;
@@ -222,7 +222,7 @@ function BuiltToolbar(props: {
 	leading?: JSX.Element;
 }) {
 	return (
-		<ButtonDefaultsProvider value={{ variant: 'glass', size: 'large' }}>
+		<ButtonDefaultsProvider value={{ variant: 'glass', size: 'toolbar' }}>
 			<BuiltToolbarContent {...props} />
 		</ButtonDefaultsProvider>
 	);
@@ -639,7 +639,7 @@ export function ScrollArea(props: ScrollAreaProps) {
 									: `${rest.testId}-scroll-to-bottom`
 							}
 							onClick={scrollToBottom}
-							size="small"
+							size="large"
 							iconOnly
 							aria-label="Scroll to bottom"
 						>

@@ -195,8 +195,9 @@ function CalloutClose(props: CalloutCloseProps) {
 			variant="transparent"
 			aria-label={own['aria-label'] ?? own.label ?? 'Dismiss'}
 			style={{
-				marginBlock: -4,
-				marginRight: -4,
+				// A `transparent` button is its bare icon: the close keeps a 20px target.
+				width: 20,
+				height: 20,
 				alignSelf: 'center',
 				...own.style,
 			}}

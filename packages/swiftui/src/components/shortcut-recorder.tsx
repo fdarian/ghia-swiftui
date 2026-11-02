@@ -320,6 +320,8 @@ export function ShortcutRecorder(props: ShortcutRecorderProps) {
 							disabled={isDisabled()}
 							onClick={() => props.onValueChange(null)}
 							aria-label="Clear shortcut"
+							// A `transparent` button is its bare icon: the clear keeps a 24px target.
+							style={{ width: 24, height: 24 }}
 						>
 							<Icon name="x" />
 						</Button>

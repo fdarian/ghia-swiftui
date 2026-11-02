@@ -31,10 +31,60 @@ export function isButtonElement(node: unknown): boolean {
 	return typeof node === 'object' && node !== null && buttonElements.has(node);
 }
 
+/**
+ * SwiftUI's `.controlSize` on macOS 26, measured from the reference app:
+ * `small`/`medium`/`large` are `.small`/`.regular`/`.large`. `lineHeight` is the
+ * label's own height, the whole of a `transparent` (`.borderless`) button;
+ * `iconOnlyWidth` the width of a `.bordered`/`.glass` button around one glyph;
+ * `rounded` the corner radius of its rounded rectangle, `shape` the one it has
+ * unless `radius` says otherwise. `toolbar` is not a control size: it is the
+ * platter macOS draws behind a toolbar item, 36 tall whatever the control size.
+ */
 const sizes = {
-	small: { height: 28, paddingInline: 8, gap: 6, icon: 16 },
-	medium: { height: 32, paddingInline: 12, gap: 6, icon: 18 },
-	large: { height: 36, paddingInline: 12, gap: 6, icon: 20 },
+	small: {
+		height: 20,
+		lineHeight: 14,
+		paddingInline: 10,
+		iconOnlyWidth: 33,
+		gap: 8,
+		icon: 12,
+		fontSize: 11,
+		rounded: 5,
+		shape: 'rounded',
+	},
+	medium: {
+		height: 24,
+		lineHeight: 16,
+		paddingInline: 12,
+		iconOnlyWidth: 39,
+		gap: 9,
+		icon: 14,
+		fontSize: 13,
+		rounded: 6,
+		shape: 'rounded',
+	},
+	large: {
+		height: 28,
+		lineHeight: 16,
+		paddingInline: 14,
+		iconOnlyWidth: 43,
+		gap: 9,
+		icon: 14,
+		fontSize: 13,
+		rounded: 7,
+		shape: 'full',
+	},
+	toolbar: {
+		height: 36,
+		lineHeight: 18,
+		paddingInline: 12,
+		iconOnlyWidth: 36,
+		gap: 6,
+		icon: 20,
+		fontSize: 13,
+		rounded: styleTokens.radiusControl,
+		shape: 'full',
+	},
 } as const;
 
 export type ButtonSize = keyof typeof sizes;
@@ -85,7 +135,7 @@ function variantStyle(variant: ButtonVariant): StyleDesc {
 			return {
 				backgroundColor: 'transparent',
 				color: semanticColors.textPrimary,
-				hover: { backgroundColor: semanticColors.surfaceControlSubtle },
+				active: { opacity: 0.55 },
 			};
 	}
 }
@@ -95,9 +145,9 @@ export interface ButtonProps
 		ButtonBehavior {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
-	/** Square button sized for a single icon, with no text padding. */
+	/** Sized for a single icon, with no text padding: a SwiftUI icon-only button is wider than tall, except `transparent`, which is the bare icon. */
 	iconOnly?: boolean;
-	/** `full` = pill (default); `rounded` = control radius (softer corners on `small`). */
+	/** Overrides the shape of the size: `full` = capsule, `rounded` = the size's rounded rectangle. Default: rounded on `small` and `medium`, capsule on `large`, as SwiftUI draws them. */
 	radius?: ButtonRadius;
 	children?: JSX.Element;
 }
@@ -134,16 +184,17 @@ export function Button(props: ButtonProps) {
 	};
 	const sizeName = () => own.size ?? defaults.size ?? 'medium';
 	const size = () => sizes[sizeName()];
+	// A `transparent` button has no chrome: its box is the label.
+	const bare = () => variant() === 'transparent';
+	const height = () => (bare() ? size().lineHeight : size().height);
+	const width = () => (bare() ? size().icon : size().iconOnlyWidth);
 	const radius = () => {
-		const radius = own.radius ?? defaults.radius ?? 'full';
-		if (radius === 'full') return styleTokens.radiusPill;
-		return sizeName() === 'small'
-			? styleTokens.radius8
-			: styleTokens.radiusControl;
+		const shape = own.radius ?? defaults.radius ?? size().shape;
+		return shape === 'full' ? styleTokens.radiusPill : size().rounded;
 	};
 	// The glass view is given the radius in px: a pill is half the height.
 	const glassRadius = () =>
-		radius() === styleTokens.radiusPill ? size().height / 2 : radius();
+		radius() === styleTokens.radiusPill ? height() / 2 : radius();
 	const register = (element: HostElement) => {
 		buttonElements.add(element);
 		own.ref?.(element);
@@ -161,17 +212,12 @@ export function Button(props: ButtonProps) {
 		whiteSpace: 'nowrap',
 		// A glass button keeps overflow visible: clipping would cut the glass's own shadow and edge highlight.
 		...(isGlass() ? {} : { overflow: 'hidden' }),
-		fontSize: 13,
-		fontWeight: 500,
-		lineHeight: '18px',
-		// The glass view fills the padding box, so a glass button has no border and makes up its width in padding.
-		...(isGlass()
-			? { position: 'relative', borderWidth: 0 }
-			: {
-					borderWidth: 1,
-					borderStyle: 'solid',
-					borderColor: 'transparent',
-				}),
+		fontSize: size().fontSize,
+		fontWeight: 400,
+		lineHeight: `${size().lineHeight}px`,
+		borderWidth: 0,
+		// The glass view fills the padding box.
+		...(isGlass() ? { position: 'relative' } : {}),
 		cursor: 'default',
 		// A button in a drag region (a toolbar) cuts its own box out of it, as syne's `deep` drag region does.
 		appRegion: 'no-drag',
@@ -179,11 +225,11 @@ export function Button(props: ButtonProps) {
 		focusVisible: {
 			boxShadow: `0 0 0 1px ${semanticColors.borderPrimary}`,
 		},
-		height: size().height,
+		height: height(),
 		gap: size().gap,
 		...(own.iconOnly === true
-			? { width: size().height, paddingInline: 0 }
-			: { paddingInline: size().paddingInline + (isGlass() ? 1 : 0) }),
+			? { width: width(), paddingInline: 0 }
+			: { paddingInline: bare() ? 0 : size().paddingInline }),
 		borderRadius: radius(),
 		...variantStyle(variant()),
 		// A glass button dims its content instead: opacity on the glass itself would draw the label under the glass.

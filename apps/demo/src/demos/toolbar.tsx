@@ -104,7 +104,7 @@ export function ToolbarDemo() {
 							<ToolbarDescription>3 unread messages</ToolbarDescription>
 						</ToolbarContent>
 						<ToolbarActions>
-							<Button testId="toolbar-button" variant="glass" size="large">
+							<Button testId="toolbar-button" variant="glass" size="toolbar">
 								<Icon name="plus" />
 								Compose
 							</Button>

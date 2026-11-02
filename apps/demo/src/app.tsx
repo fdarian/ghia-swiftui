@@ -44,7 +44,9 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 			toolbar={
 				<Toolbar style={{ paddingTop: 16, paddingBottom: 8 }}>
 					<ToolbarRow style={{ justifyContent: 'flex-end' }}>
-						<ButtonDefaultsProvider value={{ variant: 'glass', size: 'large' }}>
+						<ButtonDefaultsProvider
+							value={{ variant: 'glass', size: 'toolbar' }}
+						>
 							<SplitView.SidebarToggle testId="sidebar-toggle" />
 						</ButtonDefaultsProvider>
 					</ToolbarRow>

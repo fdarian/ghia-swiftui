@@ -30,7 +30,7 @@ export interface SidebarProps extends HostAttributes {
 	toolbar?: JSX.Element;
 	footer?: JSX.Element;
 	scrollEnabled?: boolean;
-	/** Action buttons for the sidebar toolbar. Auto-styled with `variant="glass" size="large"`. */
+	/** Action buttons for the sidebar toolbar. Auto-styled with `variant="glass" size="toolbar"`. */
 	actions?: JSX.Element;
 }
 
@@ -39,7 +39,7 @@ function DefaultToolbar(props: { actions?: JSX.Element }) {
 	return (
 		<Toolbar style={{ paddingTop: 16 }}>
 			<ToolbarRow style={{ justifyContent: 'flex-end' }}>
-				<ButtonDefaultsProvider value={{ variant: 'glass', size: 'large' }}>
+				<ButtonDefaultsProvider value={{ variant: 'glass', size: 'toolbar' }}>
 					{props.actions}
 				</ButtonDefaultsProvider>
 			</ToolbarRow>

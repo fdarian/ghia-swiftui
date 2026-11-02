@@ -1,5 +1,5 @@
 import { Button, type ButtonVariant, Icon, Text } from 'ghia-swiftui';
-import { createSignal, For } from 'solid-js';
+import { createSignal, For, type JSX } from 'solid-js';
 import { Cell, Page, Row, Section } from '#src/demo-kit.tsx';
 import type { Shot } from '#src/demos/shot.ts';
 
@@ -13,12 +13,40 @@ const variants: readonly ButtonVariant[] = [
 	'glass',
 ];
 const sizes = ['small', 'medium', 'large'] as const;
+const iconVariants: readonly ButtonVariant[] = [
+	'accent',
+	'glassAccent',
+	'filled',
+	'transparent',
+	'glass',
+];
+const radii = ['rounded', 'full'] as const;
 const stateVariants = [
 	'filled',
 	'transparent',
 	'glass',
 	'glassAccent',
 ] as const;
+
+function StyleRow(props: { label: string; children: JSX.Element }) {
+	return (
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'row',
+				alignItems: 'center',
+				gap: 16,
+			}}
+		>
+			<div style={{ width: 90 }}>
+				<Text variant="small" color="tertiary">
+					{props.label}
+				</Text>
+			</div>
+			{props.children}
+		</div>
+	);
+}
 
 export function ButtonDemo() {
 	const [count, setCount] = createSignal(0);
@@ -28,19 +56,7 @@ export function ButtonDemo() {
 				<div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 					<For each={variants}>
 						{(variant) => (
-							<div
-								style={{
-									display: 'flex',
-									flexDirection: 'row',
-									alignItems: 'center',
-									gap: 16,
-								}}
-							>
-								<div style={{ width: 90 }}>
-									<Text variant="small" color="tertiary">
-										{variant}
-									</Text>
-								</div>
+							<StyleRow label={variant}>
 								<For each={sizes}>
 									{(size) => (
 										<Button
@@ -53,7 +69,7 @@ export function ButtonDemo() {
 										</Button>
 									)}
 								</For>
-							</div>
+							</StyleRow>
 						)}
 					</For>
 				</div>
@@ -77,21 +93,44 @@ export function ButtonDemo() {
 					</For>
 				</Row>
 			</Section>
-			<Section title="Radius">
-				<Row>
-					<For each={sizes}>
-						{(size) => (
-							<Cell label={`rounded ${size}`}>
-								<Button radius="rounded" size={size}>
-									Rounded
-								</Button>
-							</Cell>
+			<Section title="Icon only by style">
+				<div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+					<For each={iconVariants}>
+						{(variant) => (
+							<StyleRow label={variant}>
+								<For each={sizes}>
+									{(size) => (
+										<Button
+											iconOnly
+											variant={variant}
+											size={size}
+											aria-label="Delete"
+										>
+											<Icon name="trash" />
+										</Button>
+									)}
+								</For>
+							</StyleRow>
 						)}
 					</For>
-					<Cell label="full (default)">
-						<Button>Full</Button>
-					</Cell>
-				</Row>
+				</div>
+			</Section>
+			<Section title="Radius">
+				<div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+					<For each={radii}>
+						{(radius) => (
+							<StyleRow label={radius}>
+								<For each={sizes}>
+									{(size) => (
+										<Button radius={radius} size={size}>
+											{size}
+										</Button>
+									)}
+								</For>
+							</StyleRow>
+						)}
+					</For>
+				</div>
 			</Section>
 			<Section title="State">
 				<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

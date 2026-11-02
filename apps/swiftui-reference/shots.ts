@@ -34,11 +34,17 @@ export const DEMO_PAGE: Rect = { x: 201, y: 0, width: 759, height: 640 };
 
 export const shots: Record<string, Shot> = {
 	button: { page: 'button', demo: 'button' },
+	'button-icons': {
+		page: 'button',
+		refArgs: ['--scroll', '400'],
+		demo: 'button',
+		steps: ['wheel=page:400'],
+	},
 	'button-state': {
 		page: 'button',
-		refArgs: ['--scroll', '560'],
+		refArgs: ['--scroll', '800'],
 		demo: 'button',
-		steps: ['wheel=page:560'],
+		steps: ['wheel=page:800'],
 	},
 	select: { page: 'select', demo: 'select' },
 	'select-open': {

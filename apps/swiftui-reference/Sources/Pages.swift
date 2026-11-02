@@ -30,6 +30,46 @@ private struct StyleRow<S: PrimitiveButtonStyle>: View {
 	}
 }
 
+private struct IconRow<S: PrimitiveButtonStyle>: View {
+	let label: String
+	let style: S
+
+	var body: some View {
+		HStack(spacing: 16) {
+			Text(label)
+				.font(.system(size: 11))
+				.foregroundStyle(.tertiary)
+				.frame(width: 90, alignment: .leading)
+			ForEach(sizes, id: \.0) { size in
+				Button { } label: { Image(systemName: "trash") }
+					.controlSize(size.1)
+					.accessibilityLabel("Delete")
+			}
+		}
+		.buttonStyle(style)
+	}
+}
+
+private struct ShapeRow: View {
+	let label: String
+	let shape: ButtonBorderShape
+
+	var body: some View {
+		HStack(spacing: 16) {
+			Text(label)
+				.font(.system(size: 11))
+				.foregroundStyle(.tertiary)
+				.frame(width: 90, alignment: .leading)
+			ForEach(sizes, id: \.0) { size in
+				Button(size.0) {}
+					.controlSize(size.1)
+			}
+		}
+		.buttonStyle(.bordered)
+		.buttonBorderShape(shape)
+	}
+}
+
 struct ButtonPage: View {
 	var body: some View {
 		DemoPage(title: "Button") {
@@ -39,6 +79,7 @@ struct ButtonPage: View {
 					StyleRow(label: "destructive", style: .borderedProminent, note: ".borderedProminent, .tint(.red)", tint: .red)
 					StyleRow(label: "glassAccent", style: .glassProminent, note: ".glassProminent")
 					StyleRow(label: "filled", style: .bordered, note: ".bordered")
+					StyleRow(label: "muted", style: .bordered, note: ".bordered")
 					StyleRow(label: "transparent", style: .borderless, note: ".borderless")
 					StyleRow(label: "glass", style: .glass, note: ".glass")
 				}
@@ -59,19 +100,19 @@ struct ButtonPage: View {
 					}
 				}
 			}
+			DemoSection(title: "Icon only by style") {
+				VStack(alignment: .leading, spacing: 16) {
+					IconRow(label: "accent", style: .borderedProminent)
+					IconRow(label: "glassAccent", style: .glassProminent)
+					IconRow(label: "filled", style: .bordered)
+					IconRow(label: "transparent", style: .borderless)
+					IconRow(label: "glass", style: .glass)
+				}
+			}
 			DemoSection(title: "Radius") {
-				HStack(alignment: .top, spacing: 16) {
-					ForEach(sizes, id: \.0) { size in
-						Cell(label: "rounded \(size.0)") {
-							Button("Rounded") {}
-								.buttonStyle(.bordered)
-								.buttonBorderShape(.roundedRectangle)
-								.controlSize(size.1)
-						}
-					}
-					Cell(label: "full (default)") {
-						Button("Full") {}.buttonStyle(.bordered)
-					}
+				VStack(alignment: .leading, spacing: 16) {
+					ShapeRow(label: "rounded", shape: .roundedRectangle)
+					ShapeRow(label: "full", shape: .capsule)
 				}
 			}
 			DemoSection(title: "State") {
