@@ -9,12 +9,13 @@
  *
  * Steps run in order: `shot=<name>` writes `<name>.png`, `click=<testId>`,
  * `rightclick=<testId>`, `hover=<testId>`, `wheel=<testId>:<deltaY>`, `bounds=<testId>` (prints the box), `drag=<testId>:<dx>` (a horizontal drag by `dx` points, fractions allowed), `key=<key>`, `wait=<ms>`, `dark`, `light`,
- * `system` (the shell's scheme choices), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--storage <key>=<json>` starts the window with a saved panel layout (a sidebar at a fractional width: `ghia-swiftui-demo-2={"0":243.37}`). `--backdrop` paints an opaque window
+ * `system` (the shell's scheme choices), `trace=<name>:<testId>:<x>:<y>:<w>:<h>[:<ms>]` (click `testId` while a worker samples that box, in points from the window's top-left, at the highest rate WindowServer gives, and write every distinct composited frame to `<out>/<name>/` with a `timeline.txt`), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--storage <key>=<json>` starts the window with a saved panel layout (a sidebar at a fractional width: `ghia-swiftui-demo-2={"0":243.37}`). `--backdrop` paints an opaque window
  * under the app, so what the glass samples does not depend on the desktop.
  */
 import { mkdirSync } from 'node:fs';
 import { applyColorScheme } from 'ghia-swiftui';
 import { demos } from '#src/demos/index.ts';
+import { traceAction } from './frame-trace.ts';
 import { openLiveWindow, sleep } from './live-window.tsx';
 import { captureWindow, countViews, moveWindow } from './window-pixels.ts';
 
@@ -80,6 +81,26 @@ for (const step of steps) {
 			}
 			moveWindow(Number(x), Number(y));
 			await sleep(600);
+			break;
+		}
+		case 'trace': {
+			const [name, testId, x, y, width, height, duration] = (value ?? '').split(
+				':',
+			);
+			if ([name, testId, x, y, width, height].includes(undefined)) {
+				throw new Error('trace needs <name>:<testId>:<x>:<y>:<w>:<h>');
+			}
+			await traceAction({
+				dir: `${outDir}${name}`,
+				crop: {
+					x: Number(x),
+					y: Number(y),
+					width: Number(width),
+					height: Number(height),
+				},
+				durationMs: Number(duration ?? 1500),
+				action: () => app.getByTestId(testId as string).click(),
+			});
 			break;
 		}
 		case 'count':

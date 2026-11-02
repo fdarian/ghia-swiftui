@@ -73,6 +73,12 @@ const releaseContext = native<[Pointer], void>(
 	[P],
 	VOID,
 );
+const imageFromContext = native<[Pointer], Id>(
+	COREGRAPHICS,
+	'CGBitmapContextCreateImage',
+	[P],
+	P,
+);
 
 const bool = bind<[Pointer, Pointer], boolean>([P, P], FFIType.bool);
 const integer = bind<[Pointer, Pointer], bigint>([P, P], FFIType.i64);
@@ -103,6 +109,11 @@ const setOrigin = bind<[Pointer, Pointer, number, number], void>(
  */
 export function moveWindow(x: number, y: number) {
 	setOrigin(visibleWindow(), selector('setFrameOrigin:'), x, y);
+}
+
+/** The window number of the app's visible window: `sampleWindow` takes it, so another thread can capture it. */
+export function visibleWindowNumber(): number {
+	return Number(integer(visibleWindow(), selector('windowNumber')));
 }
 
 function visibleWindow(): Pointer {
@@ -185,10 +196,15 @@ function toPng(image: Pointer, path: string) {
 	}
 }
 
-/** The window's pixels, drawn into a known RGBA layout. */
-function toRgba(image: Pointer) {
-	const width = Number(imageWidth(image));
-	const height = Number(imageHeight(image));
+/** The window's pixels, drawn into a known RGBA layout; only `crop` (device pixels) when given. */
+function toRgba(
+	image: Pointer,
+	crop?: { x: number; y: number; width: number; height: number },
+) {
+	const fullWidth = Number(imageWidth(image));
+	const fullHeight = Number(imageHeight(image));
+	const width = crop?.width ?? fullWidth;
+	const height = crop?.height ?? fullHeight;
 	const rgba = new Uint8Array(width * height * 4);
 	const space = required(createColorSpace(), 'CGColorSpaceCreateDeviceRGB');
 	const context = createBitmapContext(
@@ -201,16 +217,93 @@ function toRgba(image: Pointer) {
 		1 /* kCGImageAlphaPremultipliedLast */,
 	);
 	releaseColorSpace(space);
+	// CoreGraphics' origin is the bottom-left corner.
 	drawImage(
 		required(context, 'CGBitmapContextCreate'),
-		0,
-		0,
-		width,
-		height,
+		-(crop?.x ?? 0),
+		-(fullHeight - (crop?.y ?? 0) - height),
+		fullWidth,
+		fullHeight,
 		image,
 	);
 	releaseContext(required(context, 'CGBitmapContextCreate'));
 	return { width, height, rgba };
+}
+
+/**
+ * One frame of the window with number `windowNumber`, cropped to `crop` in
+ * points. Safe off the main thread: the high-rate sampler calls it from a worker.
+ */
+export function sampleWindow(
+	windowNumber: number,
+	crop: Rect,
+	scale: number,
+): Capture {
+	const image = createWindowImage(
+		Number.POSITIVE_INFINITY,
+		Number.POSITIVE_INFINITY,
+		0,
+		0,
+		8,
+		windowNumber,
+		1 | 8,
+	);
+	if (image === null) {
+		throw new Error(
+			`CGWindowListCreateImage returned null for ${windowNumber}`,
+		);
+	}
+	try {
+		return {
+			...toRgba(image, {
+				x: Math.round(crop.x * scale),
+				y: Math.round(crop.y * scale),
+				width: Math.round(crop.width * scale),
+				height: Math.round(crop.height * scale),
+			}),
+			scale,
+		};
+	} finally {
+		releaseImage(image);
+	}
+}
+
+/** The backing scale of the app's visible window. */
+export function windowScale(): number {
+	return double(visibleWindow(), selector('backingScaleFactor'));
+}
+
+/** Writes RGBA pixels (`width` by `height`) to `path` as a PNG. */
+export function writeRgbaPng(
+	rgba: Uint8Array,
+	width: number,
+	height: number,
+	path: string,
+) {
+	const space = required(createColorSpace(), 'CGColorSpaceCreateDeviceRGB');
+	const context = required(
+		createBitmapContext(
+			rgba,
+			BigInt(width),
+			BigInt(height),
+			8n,
+			BigInt(width * 4),
+			space,
+			1,
+		),
+		'CGBitmapContextCreate',
+	);
+	releaseColorSpace(space);
+	const image = required(
+		imageFromContext(context),
+		'CGBitmapContextCreateImage',
+	);
+	try {
+		toPng(image, path);
+	} finally {
+		releaseImage(image);
+		releaseContext(context);
+	}
 }
 
 /** Writes the window to `path` as a PNG, and returns its pixels. */
