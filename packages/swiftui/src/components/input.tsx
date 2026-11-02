@@ -116,7 +116,7 @@ export function Input(props: InputProps) {
 			}}
 			// `textMuted` is the native colour of a disabled field's text; the opacity below already dims it.
 			theme={{
-				caret: semanticColors.textPrimary,
+				caret: isGlass() ? colors.accent : semanticColors.textPrimary,
 				textMuted: semanticColors.textPrimary,
 				...rest.theme,
 			}}
