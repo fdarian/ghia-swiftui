@@ -60,7 +60,7 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 								if (event.key === 'Escape') setQuery('');
 							}}
 							// The toolbar is a window drag region; the field opts out of it, as a button does.
-							style={{ appRegion: 'no-drag' }}
+							style={{ width: '100%', minWidth: 0, appRegion: 'no-drag' }}
 						/>
 					</ToolbarRow>
 				</Toolbar>
@@ -90,6 +90,7 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 			}
 		>
 			<SidebarList
+				testId="nav-items"
 				items={sections().flatMap((section) => section.demos)}
 				selectedItem={props.selected}
 				onSelectedItemChange={props.onSelect}

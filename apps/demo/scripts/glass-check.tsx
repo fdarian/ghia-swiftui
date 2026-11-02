@@ -156,7 +156,7 @@ async function live() {
 	await app.getByTestId('nav-tokens').click();
 	const seen = new Set<number>();
 	for (let step = 0; step < demos.length; step++) {
-		await app.getByTestId('nav').press('ArrowDown');
+		await app.getByTestId('nav-items').press('ArrowDown');
 		await sleep(250);
 		seen.add(countViews(GLASS));
 	}
