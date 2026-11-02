@@ -18,6 +18,12 @@ import { colors } from 'ghia-swiftui/tokens/colors';
 import { createSignal, For, type JSX } from 'solid-js';
 import { Page, Section } from '#src/demo-kit.tsx';
 import type { Shot } from '#src/demos/shot.ts';
+import {
+	closeFloatingGlass,
+	floatingGlassAvailable,
+	floatingGlassOpen,
+	openFloatingGlass,
+} from '#src/floating-glass.ts';
 
 /** High-contrast colour for the glass to sample: wide stripes under big blocks. */
 function Colourful(props: { height: number; children: JSX.Element }) {
@@ -190,6 +196,27 @@ export function LiquidGlassDemo() {
 						<Text style={{ color: '#ffffff' }}>Right-click me</Text>
 					</div>
 				</Colourful>
+			</Section>
+			<Section title="Floating glass">
+				<div style={{ display: 'flex', flexDirection: 'row', gap: 12 }}>
+					<Button
+						testId="floating-glass-toggle"
+						variant="filled"
+						disabled={!floatingGlassAvailable()}
+						onClick={() =>
+							floatingGlassOpen() ? closeFloatingGlass() : openFloatingGlass()
+						}
+					>
+						{floatingGlassOpen()
+							? 'Close floating glass'
+							: 'Open floating glass'}
+					</Button>
+				</div>
+				<Text variant="small" color="secondary">
+					{floatingGlassAvailable()
+						? 'A real glass panel you can drag over any app; it stays when you switch demo pages.'
+						: 'Needs macOS 26 and a real window: the offscreen screenshot window has no native glass.'}
+				</Text>
 			</Section>
 		</Page>
 	);
