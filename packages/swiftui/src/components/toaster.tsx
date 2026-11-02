@@ -12,7 +12,6 @@ import { NativeGlass } from '#src/components/native-glass.tsx';
 import { Text } from '#src/components/text.tsx';
 import { glass } from '#src/glass.ts';
 import { Icon, type IconName } from '#src/icons/icon.tsx';
-import { PopupShadow } from '#src/popup.tsx';
 import {
 	dismissToast,
 	pauseToasts,
@@ -125,9 +124,9 @@ export function Toast(props: ToastProps) {
 				<Icon name="x" size={12} />
 			</div>
 			<div style={{ position: 'relative', display: 'flex' }}>
-				<PopupShadow radius={PILL_RADIUS} />
 				<NativeGlass
 					radius={PILL_RADIUS}
+					shadow={styleTokens.shadowPopover}
 					tint={colorScheme() === 'dark' ? undefined : TOAST_LIGHT_TINT}
 					fallback={glass.toast()}
 					style={{

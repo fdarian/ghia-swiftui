@@ -1,9 +1,4 @@
-import {
-	DismissableLayer,
-	type HostElement,
-	type KeyEvent,
-	motion,
-} from '@ghia/solid';
+import { DismissableLayer, type HostElement, type KeyEvent } from '@ghia/solid';
 import {
 	createPlacementState,
 	POPUP_MARGIN,
@@ -29,14 +24,14 @@ import {
 } from '#src/components/glass-panel.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
-import { anchoredShift, PopupShadow, SHADOW_PAD } from '#src/popup.tsx';
+import { anchoredShift, SHADOW_PAD } from '#src/popup.tsx';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 import { style as styleTokens } from '#src/tokens/style.ts';
 import { typography } from '#src/tokens/typography.ts';
 
 /** Matches `Button`'s own `size="small"` icon sizing: an item has no `Button` underneath to inherit it from. */
 const ITEM_ICON_SIZE = 16;
-/** The popup leaves at once: it holds glass, and nothing above glass may fade. */
+/** The popup leaves at once, as it appears. */
 const EXIT_MS = 0;
 /** FF focuses the first row two frames after a pointer open, once the popup itself holds focus. */
 const OPEN_FOCUS_MS = 32;
@@ -231,7 +226,7 @@ export interface MenuPopupProps extends Omit<GlassPanelProps, 'onKeyDown'> {
 	highlightOnOpen?: boolean;
 }
 
-/** The menu surface: a `GlassPanel` that owns the keyboard, the highlight and the open and close motion. */
+/** The menu surface: a `GlassPanel` that owns the keyboard and the highlight. It appears and leaves at once, with no motion. */
 export function MenuPopup(props: MenuPopupProps) {
 	const root = useMenuScope();
 	const [own, rest] = splitProps(props, [
@@ -282,10 +277,7 @@ export function MenuPopup(props: MenuPopupProps) {
 				nextIndex: () => rowCount++,
 			}}
 		>
-			<motion.div
-				initial={{ scale: 0.97 }}
-				animate={{ scale: 1 }}
-				transition={{ type: 'spring', duration: 0.08, bounce: 0 }}
+			<div
 				style={{
 					position: 'relative',
 					display: 'flex',
@@ -295,9 +287,9 @@ export function MenuPopup(props: MenuPopupProps) {
 					maxWidth: '100%',
 				}}
 			>
-				<PopupShadow />
 				<GlassPanel
 					{...rest}
+					shadow={styleTokens.shadowPopover}
 					{...panelProps}
 					ref={(element: HostElement) => {
 						list.setPanel(element);
@@ -320,7 +312,7 @@ export function MenuPopup(props: MenuPopupProps) {
 				>
 					{own.children}
 				</GlassPanel>
-			</motion.div>
+			</div>
 		</MenuListContext.Provider>
 	);
 }

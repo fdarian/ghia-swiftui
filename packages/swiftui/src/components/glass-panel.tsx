@@ -11,6 +11,8 @@ export interface GlassPanelProps extends HostAttributes {
 	variant?: NativeGlassVariant;
 	/** Corner radius in px. Defaults to the popover radius. */
 	radius?: number;
+	/** A `box-shadow` on an element under the glass; see `NativeGlass`. A panel has none by default. */
+	shadow?: string;
 }
 
 /**

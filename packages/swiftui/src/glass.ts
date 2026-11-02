@@ -6,10 +6,10 @@ import { style } from '#src/tokens/style.ts';
 
 /**
  * The in-window glass look, which `NativeGlass` wears wherever there is no real
- * glass: macOS before 26, a window that is not on a screen (the offscreen test
- * root), and the frame before the view attaches. syne's own fallback for a
- * window without `-apple-visual-effect`: a neutral tint over a 24px backdrop
- * blur. Read inside JSX props or effects, like every token.
+ * glass: macOS before 26 or a window that is not on a screen (the offscreen
+ * test root). syne's own fallback for a window without `-apple-visual-effect`:
+ * a neutral tint over a 24px backdrop blur. Read inside JSX props or effects,
+ * like every token.
  */
 export const glass = {
 	get tint() {

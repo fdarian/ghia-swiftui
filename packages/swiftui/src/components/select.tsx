@@ -1,4 +1,4 @@
-import { type HostElement, motion, type StyleDesc } from '@ghia/solid';
+import type { HostElement, StyleDesc } from '@ghia/solid';
 import {
 	createPlacementState,
 	POPUP_MARGIN,
@@ -25,7 +25,7 @@ import { NativeGlass } from '#src/components/native-glass.tsx';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
-import { PopupShadow, SHADOW_PAD } from '#src/popup.tsx';
+import { SHADOW_PAD } from '#src/popup.tsx';
 import { withAlpha } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
@@ -40,8 +40,10 @@ const CHECK_SLOT = 16;
 const ROW_GAP = 6;
 /** How far the row's label sits in from the popup's left edge. */
 const LABEL_INSET = POPUP_PADDING + ROW_PADDING + CHECK_SLOT + ROW_GAP;
-/** The popup leaves at once: it holds glass, and nothing above glass may fade. */
+/** The popup leaves at once, as it appears. */
 const EXIT_MS = 0;
+/** What the window leaves a popup: its margin and the layer's shadow padding on both ends. */
+const ALIGNED_MAX_HEIGHT = `calc(100vh - ${(POPUP_MARGIN + SHADOW_PAD) * 2}px)`;
 /** A pick holds the popup open this long so the check is seen land. */
 const PICK_HOLD_MS = 100;
 /** Gap between trigger and popup when no item is aligned over the trigger. */
@@ -474,7 +476,17 @@ export function SelectContent(props: SelectContentProps) {
 			});
 		}),
 	);
-	const maxHeight = () => placement.maxHeight(POPUP_MAX_HEIGHT);
+	/**
+	 * `onPlacement` reports the room on one side of the trigger, measured to
+	 * the layer's edge, which holds the shadow's padding on both sides. An
+	 * aligned popup reaches above the trigger too and the layer slides to stay
+	 * inside the window (its list is never over `POPUP_MAX_HEIGHT`), so the
+	 * room below the trigger says nothing about it: the window is its limit.
+	 */
+	const maxHeight = () =>
+		anchor().aligned
+			? ALIGNED_MAX_HEIGHT
+			: placement.maxHeight(POPUP_MAX_HEIGHT + SHADOW_PAD * 2) - SHADOW_PAD * 2;
 	createEffect(() => {
 		if (!root.presence.mounted()) context.setMeasured(false);
 	});
@@ -500,10 +512,7 @@ export function SelectContent(props: SelectContentProps) {
 					pointerEvents: 'none',
 				}}
 			>
-				<motion.div
-					initial={{ scale: 0.97 }}
-					animate={{ scale: 1 }}
-					transition={{ type: 'spring', duration: 0.08, bounce: 0 }}
+				<div
 					style={{
 						position: 'relative',
 						display: 'flex',
@@ -518,9 +527,9 @@ export function SelectContent(props: SelectContentProps) {
 						maxHeight: maxHeight(),
 					}}
 				>
-					<PopupShadow />
 					<NativeGlass
 						radius={styleTokens.radiusPopover}
+						shadow={styleTokens.shadowPopover}
 						fallback={glass.tinted(
 							withAlpha(semanticColors.surfacePopover, 0.7),
 						)}
@@ -552,7 +561,7 @@ export function SelectContent(props: SelectContentProps) {
 							</For>
 						</div>
 					</NativeGlass>
-				</motion.div>
+				</div>
 			</anchored>
 		</Show>
 	);
@@ -600,9 +609,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 				borderRadius: styleTokens.radius8,
 				cursor: 'default',
 				keyboardFocusDim: false,
-				backgroundColor: lit()
-					? semanticColors.surfaceControlSubtle
-					: 'transparent',
+				backgroundColor: lit() ? colors.accent : 'transparent',
 				...(props.option.disabled ? { opacity: 0.5 } : {}),
 			}}
 		>
@@ -614,7 +621,9 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 					justifyContent: 'center',
 					width: CHECK_SLOT,
 					height: CHECK_SLOT,
-					color: semanticColors.textPrimary,
+					color: lit()
+						? semanticColors.accentContrast
+						: semanticColors.textPrimary,
 				}}
 			>
 				<Show when={checked()}>
@@ -626,7 +635,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 					...typography.variants.strong,
 					whiteSpace: 'nowrap',
 					color: lit()
-						? semanticColors.textPrimary
+						? semanticColors.accentContrast
 						: semanticColors.textSecondary,
 				}}
 			>
