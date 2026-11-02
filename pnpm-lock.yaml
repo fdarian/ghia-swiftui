@@ -204,6 +204,22 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  apps/swiftui-reference:
+    dependencies:
+      ghia-swiftui:
+        specifier: workspace:*
+        version: link:../../packages/swiftui
+    devDependencies:
+      '@total-typescript/tsconfig':
+        specifier: 1.0.4
+        version: 1.0.4
+      '@types/bun':
+        specifier: 1.4.4
+        version: 1.4.4
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
   packages/swiftui:
     dependencies:
       '@babel/core':

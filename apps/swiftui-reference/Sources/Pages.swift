@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Which field the page focuses once it appears (`--focus`), so one run shows one focused field.
+nonisolated(unsafe) var requestedFocus: String?
+
 private let sizes: [(String, ControlSize)] = [("small", .small), ("medium", .regular), ("large", .large)]
 
 // MARK: button
@@ -94,7 +97,7 @@ struct ButtonPage: View {
 
 private let sources = ["Apple Music", "Spotify", "Tidal", "YouTube Music"]
 
-private struct SourcePicker: View {
+struct SourcePicker: View {
 	@State private var value = "Spotify"
 	var body: some View {
 		Picker("", selection: $value) {
@@ -234,7 +237,7 @@ private struct FieldCell: View {
 				.disabled(disabled)
 				.focused($focused)
 				.onAppear {
-					if focusID != nil { DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { focused = true } }
+					if focusID != nil && focusID == requestedFocus { DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { focused = true } }
 				}
 		}
 	}
@@ -257,11 +260,11 @@ private struct GlassField: View {
 			}
 			.padding(.horizontal, 10)
 			.padding(.vertical, 6)
-			.frame(width: 240)
+			.frame(width: 200)
 			.glassEffect(.regular.interactive(), in: .capsule)
 			.disabled(disabled)
 			.onAppear {
-				if focus { DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { focused = true } }
+				if focus && requestedFocus == "glass" { DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { focused = true } }
 			}
 		}
 	}
@@ -280,7 +283,7 @@ struct InputPage: View {
 			DemoSection(title: "State") {
 				HStack(alignment: .top, spacing: 16) {
 					FieldCell(label: "with value", text: "Hello, world")
-					FieldCell(label: "focused (default)", focusID: "a")
+					FieldCell(label: "focused (default)", focusID: "default")
 					FieldCell(label: "disabled", text: "Read only", disabled: true)
 				}
 			}
@@ -558,7 +561,7 @@ struct ListPage: View {
 struct ScrollbarPage: View {
 	var body: some View {
 		DemoPage(title: "ScrollArea") {
-			DemoSection(title: "Chat") {
+			DemoSection(title: "Toolbar from title, subtitle and actions; a footer") {
 				ScrollView {
 					VStack(spacing: 0) {
 						ForEach(1...14, id: \.self) { index in
@@ -572,7 +575,7 @@ struct ScrollbarPage: View {
 						}
 					}
 				}
-				.frame(height: 260)
+				.frame(height: 280)
 				.clipShape(RoundedRectangle(cornerRadius: 12))
 				.overlay(RoundedRectangle(cornerRadius: 12).stroke(.quaternary))
 			}
@@ -608,13 +611,45 @@ private struct StatusPill: View {
 	}
 }
 
+/// The glass-panel demo's `Backdrop`: `repeating-linear-gradient(45deg, #ff6b6b 0 14px, #ffd93d 14px 28px, #4dabf7 28px 42px, #51cf66 42px 56px)`.
+private struct DiagonalStripes: View {
+	private let colors = [
+		Color(red: 1, green: 0.42, blue: 0.42),
+		Color(red: 1, green: 0.851, blue: 0.239),
+		Color(red: 0.302, green: 0.671, blue: 0.969),
+		Color(red: 0.318, green: 0.812, blue: 0.4),
+	]
+
+	var body: some View {
+		Canvas { context, size in
+			let length = (size.width + size.height) * sin(.pi / 4)
+			context.translateBy(x: size.width / 2, y: size.height / 2)
+			context.rotate(by: .radians(-.pi / 4))
+			let count = Int(ceil(length / 14)) + 1
+			for index in 0..<count {
+				let x = -length / 2 + CGFloat(index) * 14
+				context.fill(Path(CGRect(x: x, y: -length, width: 14, height: length * 2)), with: .color(colors[index % 4]))
+			}
+		}
+	}
+}
+
+private struct GlassBackdrop<Content: View>: View {
+	@ViewBuilder var content: Content
+	var body: some View {
+		ZStack { DiagonalStripes(); content }
+			.frame(width: 420, height: 150)
+			.clipShape(RoundedRectangle(cornerRadius: 12))
+	}
+}
+
 struct GlassPage: View {
 	var body: some View {
 		DemoPage(title: "GlassPanel") {
 			DemoSection(title: "Floating over content") {
-				HStack(alignment: .top, spacing: 16) {
+				VStack(alignment: .leading, spacing: 16) {
 					Cell(label: "action bar of glass buttons") {
-						diagonalBlock {
+						GlassBackdrop {
 							GlassEffectContainer {
 								HStack(spacing: 8) {
 									Button { } label: { Image(systemName: "star") }.buttonStyle(.glass)
@@ -628,35 +663,60 @@ struct GlassPage: View {
 							}
 						}
 					}
+					Cell(label: "with a status pill and text") {
+						GlassBackdrop {
+							HStack(spacing: 10) {
+								StatusPill(name: "success", symbol: "circle.fill", color: .green, text: "Connected")
+								Text("3 files changed").font(.system(size: 13, weight: .semibold))
+							}
+							.padding(10)
+							.glassEffect(.regular, in: .capsule)
+						}
+					}
+				}
+			}
+			DemoSection(title: "On the page background (no content to blur)") {
+				GlassEffectContainer {
+					HStack(spacing: 4) {
+						Button("Back") {}.buttonStyle(.glass)
+						Button("Forward") {}.buttonStyle(.glass)
+					}
+					.padding(4)
+					.glassEffect(.regular, in: .capsule)
+				}
+				.fixedSize()
+			}
+		}
+	}
+}
+
+struct LiquidPage: View {
+	var body: some View {
+		DemoPage(title: "Liquid glass") {
+			DemoSection(title: "GlassPanel: regular, clear, tinted") {
+				StripeBlock(height: 160) {
+					Text("Regular").font(.system(size: 13, weight: .semibold)).padding(16).glassEffect(.regular, in: .rect(cornerRadius: 16))
+					Text("Clear").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(16).glassEffect(.clear, in: .rect(cornerRadius: 16))
+					Text("Tinted").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(16).glassEffect(.regular.tint(.accentColor.opacity(0.5)), in: .rect(cornerRadius: 16))
+				}
+			}
+			DemoSection(title: "Glass controls over colour") {
+				StripeBlock(height: 120) {
+					Button("Glass") {}.buttonStyle(.glass)
+					Button { } label: { Image(systemName: "star") }.buttonStyle(.glass).controlSize(.large)
+					Button("Glass accent") {}.buttonStyle(.glassProminent)
+					StatusPill(name: "success", symbol: "circle.fill", color: .green, text: "Connected")
+					SourcePicker().buttonStyle(.glass)
 				}
 			}
 			DemoSection(title: "Tints") {
 				StripeBlock(height: 120) {
-					Text("Regular").font(.system(size: 13, weight: .semibold)).padding(16).glassEffect(.regular, in: .rect(cornerRadius: 16))
-					Text("Clear").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(16).glassEffect(.clear, in: .rect(cornerRadius: 16))
-					Text("Tinted").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(16).glassEffect(.regular.tint(.accentColor.opacity(0.5)), in: .rect(cornerRadius: 16))
+					Text("Red").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(16).glassEffect(.regular.tint(.red.opacity(0.5)), in: .rect(cornerRadius: 16))
 					Text("Green").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).padding(16).glassEffect(.regular.tint(.green.opacity(0.5)), in: .rect(cornerRadius: 16))
-				}
-			}
-			DemoSection(title: "Status over content (glass material)") {
-				StripeBlock(height: 70, spacing: 12) {
-					ForEach(statusVariants, id: \.0) { StatusPill(name: $0.0, symbol: $0.1, color: $0.2) }
-				}
-			}
-			DemoSection(title: "Glass controls over colour") {
-				StripeBlock(height: 100) {
-					Button("Glass") {}.buttonStyle(.glass)
-					Button { } label: { Image(systemName: "star") }.buttonStyle(.glass).controlSize(.large)
-					Button("Glass accent") {}.buttonStyle(.glassProminent)
+					Text("Interactive").font(.system(size: 13, weight: .semibold)).padding(16).glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))
 				}
 			}
 		}
-	}
-
-	private func diagonalBlock<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-		ZStack { Stripes(); content() }
-			.frame(width: 420, height: 150)
-			.clipShape(RoundedRectangle(cornerRadius: 12))
 	}
 }
 
@@ -692,7 +752,7 @@ struct StatusPage: View {
 // MARK: registry
 
 enum Pages {
-	static let names = ["button", "select", "menu", "input", "sidebar", "toolbar", "tooltip", "checkbox", "radio", "list", "scrollbar", "glass", "status"]
+	static let names = ["button", "select", "menu", "input", "sidebar", "toolbar", "tooltip", "checkbox", "radio", "list", "scrollbar", "glass", "liquid", "status"]
 
 	/// Pages that are a whole window rather than content in the demo's page frame.
 	static let windowed: Set<String> = ["sidebar", "toolbar"]
@@ -711,6 +771,7 @@ enum Pages {
 		case "list": return AnyView(ListPage())
 		case "scrollbar": return AnyView(ScrollbarPage())
 		case "glass": return AnyView(GlassPage())
+		case "liquid": return AnyView(LiquidPage())
 		case "status": return AnyView(StatusPage())
 		default: fatalError("unknown page \(name); one of \(names.joined(separator: ", "))")
 		}

@@ -9,7 +9,9 @@
 		"screenshot": "pnpm --filter ghia-swiftui-demo screenshot",
 		"live-capture": "pnpm --filter ghia-swiftui-demo live-capture",
 		"glass-check": "pnpm --filter ghia-swiftui-demo glass-check",
-		"window-check": "pnpm --filter ghia-swiftui-demo window-check"
+		"window-check": "pnpm --filter ghia-swiftui-demo window-check",
+		"reference": "pnpm --filter ghia-swiftui-reference capture",
+		"compare": "pnpm --filter ghia-swiftui-reference compare"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.4",

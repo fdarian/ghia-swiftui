@@ -10,6 +10,8 @@ struct Options {
 	var click: CGPoint?
 	var hover: CGPoint?
 	var flash = false
+	var focus: String?
+	var scrollInner: CGFloat = 0
 	var key = "none"
 	var hold = false
 	var front = false
@@ -43,6 +45,8 @@ func parse() -> Options {
 		case "--click": options.click = point(value(argument))
 		case "--hover": options.hover = point(value(argument))
 		case "--flash": options.flash = true
+		case "--focus": options.focus = value(argument)
+		case "--scroll-inner": options.scrollInner = CGFloat(Double(value(argument)) ?? 0)
 		case "--key": options.key = value(argument)
 		case "--hold": options.hold = true
 		case "--front": options.front = true
@@ -50,7 +54,7 @@ func parse() -> Options {
 		case "--delay": options.delay = Double(value(argument)) ?? 1.8
 		default:
 			guard options.page.isEmpty, Pages.names.contains(argument) else {
-				fatalError("usage: swiftui-reference <\(Pages.names.joined(separator: "|"))> [--scheme light|dark] [--out file.png] [--size WxH] [--scroll pt] [--click x,y] [--hover x,y] [--flash] [--key none|panel|override] [--front] [--hold] [--dump]")
+				fatalError("usage: swiftui-reference <\(Pages.names.joined(separator: "|"))> [--scheme light|dark] [--out file.png] [--size WxH] [--scroll pt] [--scroll-inner pt] [--flash] [--focus default|glass] [--click x,y] [--hover x,y] [--flash] [--key none|panel|override] [--front] [--hold] [--dump]")
 			}
 			options.page = argument
 		}
@@ -84,6 +88,11 @@ func allViews(_ view: NSView) -> [NSView] {
 	[view] + view.subviews.flatMap(allViews)
 }
 
+if CommandLine.arguments.contains("--screen") {
+	let frame = (NSScreen.main ?? NSScreen.screens[0]).frame
+	print(Int(frame.width), Int(frame.height))
+	exit(0)
+}
 let options = parse()
 let application = NSApplication.shared
 application.setActivationPolicy(.accessory)
@@ -98,18 +107,21 @@ case "panel": window = KeyPanel(contentRect: rect, styleMask: style.union(.nonac
 default: window = PlainWindow(contentRect: rect, styleMask: style, backing: .buffered, defer: false)
 }
 window.isReleasedWhenClosed = false
-window.titlebarAppearsTransparent = true
-window.titleVisibility = .hidden
+let windowed = Pages.windowed.contains(options.page)
+if !windowed {
+	window.titlebarAppearsTransparent = true
+	window.titleVisibility = .hidden
+}
 window.backgroundColor = NSColor(options.dark ? .black : .white)
 window.isOpaque = true
 window.hasShadow = false
-let windowed = Pages.windowed.contains(options.page)
 if !windowed {
 	for button: NSWindow.ButtonType in [.closeButton, .miniaturizeButton, .zoomButton] {
 		window.standardWindowButton(button)?.isHidden = true
 	}
 }
 
+requestedFocus = options.focus
 let root = Pages.view(options.page)
 	.background(windowed ? nil : backdropColor(dark: options.dark))
 	.ignoresSafeArea()
@@ -163,6 +175,10 @@ func prepare() {
 	if let point = options.hover { send(.mouseMoved, at: point) }
 	if options.scroll != 0, let scroller = scrollViews().first, let document = scroller.documentView {
 		document.scroll(NSPoint(x: 0, y: options.scroll))
+		scroller.reflectScrolledClipView(scroller.contentView)
+	}
+	if options.scrollInner != 0, let scroller = scrollViews().last, let document = scroller.documentView {
+		document.scroll(NSPoint(x: 0, y: options.scrollInner))
 		scroller.reflectScrolledClipView(scroller.contentView)
 	}
 	if options.flash { scrollViews().forEach { $0.flashScrollers() } }
