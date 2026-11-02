@@ -4,7 +4,7 @@
 
 - `src/demos/<name>.tsx` — one demo per component, listed in `src/demos/index.ts` (`name` is the slug the scripts and test ids use, `title` the sidebar label, `groups` the sidebar sections). A demo that needs interaction exports a `scenario` that drives it through `Shot`.
 - `src/app.tsx` — the shell: `SplitView` with a `Sidebar` of demos. `src/main.tsx` is the real entry (`pnpm start`).
-- `scripts/` — `screenshot` (offscreen `createTestRoot`, no window; shows the glass fallback), `live-capture` (real window, composited pixels, real glass), `glass-check`, `window-check`, `check-single-instance`. `live-window.tsx` and `window-pixels.ts` are their shared helpers.
+- `scripts/` — `screenshot` (offscreen `createTestRoot`, no window; shows the glass fallback), `live-capture` (real window, composited pixels, real glass), `glass-check`, `window-check`, `check-single-instance`. `live-window.tsx` and `window-pixels.ts` are their shared helpers; `frame-trace.ts` and `frame-sampler.ts` (a worker) back `live-capture`'s `trace=` step, which counts the composited frames around a click.
 
 ## Verifying a change
 
