@@ -31,6 +31,7 @@ import {
 	ToolbarActions,
 	ToolbarContent,
 	ToolbarDescription,
+	ToolbarScrolledContext,
 	ToolbarTitle,
 } from '#src/components/toolbar.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
@@ -522,19 +523,21 @@ export function ScrollArea(props: ScrollAreaProps) {
 				}}
 			>
 				<MeasuredContainer position="top" onHeightChange={setToolbarHeight}>
-					<Show
-						when={own.toolbar}
-						fallback={
-							<BuiltToolbar
-								title={own.title}
-								subtitle={own.subtitle}
-								actions={own.actions}
-								leading={own.leading}
-							/>
-						}
-					>
-						{(toolbar: Accessor<JSX.Element>) => toolbar()}
-					</Show>
+					<ToolbarScrolledContext.Provider value={() => root.offset().y > 0}>
+						<Show
+							when={own.toolbar}
+							fallback={
+								<BuiltToolbar
+									title={own.title}
+									subtitle={own.subtitle}
+									actions={own.actions}
+									leading={own.leading}
+								/>
+							}
+						>
+							{(toolbar: Accessor<JSX.Element>) => toolbar()}
+						</Show>
+					</ToolbarScrolledContext.Provider>
 				</MeasuredContainer>
 				{/* Reports the area between toolbar and footer: that, not the whole scroller, is what the thumb's track spans. */}
 				<div

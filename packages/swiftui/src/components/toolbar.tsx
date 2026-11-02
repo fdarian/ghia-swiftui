@@ -16,9 +16,11 @@ import {
 import { Text } from '#src/components/text.tsx';
 import type { HostAttributes } from '#src/host-props.ts';
 import { nodesOf } from '#src/resolved.ts';
+import { withAlpha } from '#src/tokens/color-math.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
 
 export type { ToolbarInset };
+export { ToolbarScrolledContext };
 
 /** Clears the traffic lights. */
 const WINDOW_CONTROLS_INSET = 80;
@@ -46,6 +48,12 @@ interface ToolbarContextValue {
 }
 
 const ToolbarContext = createContext<ToolbarContextValue>();
+
+/** Whether the content has scrolled under the toolbar: a `ScrollArea` publishes it to the toolbar it builds or is given. */
+const ToolbarScrolledContext = createContext<() => boolean>();
+
+/** How much of the window's solid background shows over a scrolled toolbar's blur: enough that glass controls scrolling under it stay readable, which a backdrop blur cannot do (it cannot see a native view). */
+const SCROLLED_FILL_ALPHA = 0.8;
 
 /** The root elements `ToolbarRow` made: a host element carries no component identity, so `Toolbar` recognises composed rows by these. */
 const rowElements = new WeakSet<object>();
@@ -108,6 +116,13 @@ export interface ToolbarProps extends HostAttributes {
 	 */
 	inset?: ToolbarInset;
 	background?: 'progressive-blur' | 'full-blur';
+	/**
+	 * Scroll edge: while false there is no blur, fill or hairline; once true the
+	 * `background` blur shows under a translucent fill, with a hairline on the
+	 * bar's far edge. Left unset, a toolbar in a `ScrollArea` takes it from the
+	 * area's scroll offset, and one outside shows its blur always.
+	 */
+	scrolled?: boolean;
 	disableLayoutTransition?: boolean;
 }
 
@@ -125,6 +140,7 @@ export function Toolbar(props: ToolbarProps) {
 		'position',
 		'inset',
 		'background',
+		'scrolled',
 		'disableLayoutTransition',
 		'style',
 		'children',
@@ -134,6 +150,10 @@ export function Toolbar(props: ToolbarProps) {
 	const inSidebar = useSidebarContext();
 	const position = () => own.position ?? 'top';
 	const background = () => own.background ?? 'progressive-blur';
+	const scrolledByArea = useContext(ToolbarScrolledContext);
+	const scrolled = () => own.scrolled ?? scrolledByArea?.();
+	const isScrollEdge = () => scrolled() !== undefined;
+	const showsBackground = () => scrolled() ?? true;
 
 	const inset = (): ToolbarInset => {
 		if (own.inset !== undefined) return own.inset;
@@ -173,14 +193,20 @@ export function Toolbar(props: ToolbarProps) {
 				}}
 			>
 				{/* A sidebar's glass is a native view, which a backdrop blur over it cannot see; `ScrollArea` fades the list out there instead. */}
-				<Show when={background() === 'progressive-blur' && !inSidebar}>
+				<Show
+					when={
+						background() === 'progressive-blur' &&
+						!inSidebar &&
+						showsBackground()
+					}
+				>
 					<ProgressiveBlur
 						position={position()}
 						height="100%"
 						style={{ zIndex: -1 }}
 					/>
 				</Show>
-				<Show when={background() === 'full-blur'}>
+				<Show when={background() === 'full-blur' && showsBackground()}>
 					<div
 						style={{
 							position: 'absolute',
@@ -190,10 +216,44 @@ export function Toolbar(props: ToolbarProps) {
 							left: 0,
 							zIndex: -1,
 							backdropFilter: 'blur(24px)',
-							borderStyle: 'solid',
-							borderColor: semanticColors.borderTertiary,
-							borderTopWidth: position() === 'bottom' ? 1 : 0,
-							borderBottomWidth: position() === 'bottom' ? 0 : 1,
+							...(isScrollEdge()
+								? {}
+								: {
+										borderStyle: 'solid',
+										borderColor: semanticColors.borderTertiary,
+										borderTopWidth: position() === 'bottom' ? 1 : 0,
+										borderBottomWidth: position() === 'bottom' ? 0 : 1,
+									}),
+						}}
+					/>
+				</Show>
+				<Show when={isScrollEdge() && !inSidebar && showsBackground()}>
+					{/* Over the blur, not under it: a native glass control scrolling beneath is invisible to the blur, so the fill is what keeps it from colliding with the title. */}
+					<div
+						style={{
+							pointerEvents: 'none',
+							position: 'absolute',
+							top: 0,
+							right: 0,
+							bottom: 0,
+							left: 0,
+							zIndex: -1,
+							backgroundColor: withAlpha(
+								semanticColors.backgroundSolid,
+								SCROLLED_FILL_ALPHA,
+							),
+						}}
+					/>
+					<div
+						style={{
+							pointerEvents: 'none',
+							position: 'absolute',
+							left: 0,
+							right: 0,
+							height: 1,
+							zIndex: -1,
+							backgroundColor: semanticColors.borderSeparator,
+							...(position() === 'bottom' ? { top: 0 } : { bottom: 0 }),
 						}}
 					/>
 				</Show>
