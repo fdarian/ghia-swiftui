@@ -185,10 +185,17 @@ export function ScrollAreaDemo() {
 export async function scrollAreaScenario(shot: Shot) {
 	// The track exists once the content overflows, and the wheel scrolls it.
 	shot.expectPresent('basic-y-track');
+	// Bars are hidden at rest, shown for a wheel scroll, and gone again 1s + 200ms after it stops.
+	await shot.capture('bar-rest');
 	await shot.wheel('basic', 200);
 	const scrolled = shot.scrollMetrics('basic-viewport');
 	if (scrolled.scrollTop <= 0) throw new Error('the wheel did not scroll');
 	await shot.capture('scrolled');
+	await shot.wait(1300);
+	await shot.capture('bar-faded');
+	await shot.hover('basic-y-track');
+	await shot.capture('bar-track-hover');
+	await shot.leave();
 
 	await shot.scrollTo('fade-viewport', 120);
 	await shot.capture('fade-middle');

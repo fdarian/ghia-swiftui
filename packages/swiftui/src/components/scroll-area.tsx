@@ -50,6 +50,9 @@ const TRACK_SIZE = 15;
 const BAR_MARGIN = 3;
 const BAR_WIDTH = 8;
 const BAR_HOVER_WIDTH = 12;
+/** How long a bar stays fully visible once nothing holds it, then how long it takes to fade out (a macOS overlay scroller's, and ghia's own). */
+const BAR_IDLE_MS = 1000;
+const BAR_FADE_MS = 200;
 
 export interface ScrollAreaControl {
 	/** Scroll to bottom unconditionally, properly setting internal tracking state. */
@@ -122,6 +125,16 @@ function Scrollbar(props: {
 	const vertical = () => props.axis === 'y';
 	const thickness = () =>
 		props.bar.hovered() || props.bar.dragging() ? BAR_HOVER_WIDTH : BAR_WIDTH;
+	const held = () =>
+		props.bar.scrolling() || props.bar.hovered() || props.bar.dragging();
+	const [shown, setShown] = createSignal(false);
+	let idleTimer: ReturnType<typeof setTimeout> | undefined;
+	createEffect(() => {
+		clearTimeout(idleTimer);
+		if (held()) setShown(true);
+		else idleTimer = setTimeout(() => setShown(false), BAR_IDLE_MS);
+	});
+	onCleanup(() => clearTimeout(idleTimer));
 	return (
 		<Show when={props.bar.span() !== null}>
 			<div
@@ -133,6 +146,8 @@ function Scrollbar(props: {
 					userSelect: 'none',
 					display: 'flex',
 					flexDirection: 'column',
+					opacity: shown() ? 1 : 0,
+					transition: shown() ? 'none' : `opacity ${BAR_FADE_MS}ms ease`,
 					...(vertical()
 						? {
 								right: 0,
