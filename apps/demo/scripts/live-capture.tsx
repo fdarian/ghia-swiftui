@@ -8,8 +8,8 @@
  *   pnpm live-capture <demo> [step...] [--out dir]
  *
  * Steps run in order: `shot=<name>` writes `<name>.png`, `click=<testId>`,
- * `rightclick=<testId>`, `hover=<testId>`, `wheel=<testId>:<deltaY>`, `key=<key>`, `wait=<ms>`, `dark`, `light`,
- * `system` (the shell's scheme choices), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--backdrop` paints an opaque window
+ * `rightclick=<testId>`, `hover=<testId>`, `wheel=<testId>:<deltaY>`, `bounds=<testId>` (prints the box), `drag=<testId>:<dx>` (a horizontal drag by `dx` points, fractions allowed), `key=<key>`, `wait=<ms>`, `dark`, `light`,
+ * `system` (the shell's scheme choices), `move=<x>:<y>` (the window's bottom-left corner in screen points; park it with a strip on the screen's edge showing when other windows cover it). `--storage <key>=<json>` starts the window with a saved panel layout (a sidebar at a fractional width: `ghia-swiftui-demo-2={"0":243.37}`). `--backdrop` paints an opaque window
  * under the app, so what the glass samples does not depend on the desktop.
  */
 import { mkdirSync } from 'node:fs';
@@ -27,6 +27,19 @@ const outDir =
 const backdropFlag = args.indexOf('--backdrop');
 const backdrop = backdropFlag !== -1;
 if (backdrop) args.splice(backdropFlag, 1);
+const storage: Record<string, string> = {};
+for (
+	let index = args.indexOf('--storage');
+	index !== -1;
+	index = args.indexOf('--storage')
+) {
+	const entry = args.splice(index, 2)[1];
+	const split = entry?.indexOf('=') ?? -1;
+	if (entry === undefined || split === -1) {
+		throw new Error('--storage needs <key>=<value>');
+	}
+	storage[entry.slice(0, split)] = entry.slice(split + 1);
+}
 const [demo, ...steps] = args;
 if (demo === undefined || !demos.some((candidate) => candidate.name === demo)) {
 	console.error(
@@ -36,7 +49,7 @@ if (demo === undefined || !demos.some((candidate) => candidate.name === demo)) {
 }
 mkdirSync(outDir, { recursive: true });
 
-const app = await openLiveWindow({ demo, backdrop });
+const app = await openLiveWindow({ demo, backdrop, storage });
 for (const step of steps) {
 	const [name, value] = step.split('=');
 	switch (name) {
@@ -80,6 +93,20 @@ for (const step of steps) {
 				throw new Error('wheel needs <testId>:<deltaY>');
 			}
 			await app.getByTestId(testId).wheel(0, Number(delta));
+			await sleep(500);
+			break;
+		}
+		case 'bounds': {
+			if (value === undefined) throw new Error('bounds needs a test id');
+			console.log(value, JSON.stringify(await app.getByTestId(value).bounds()));
+			break;
+		}
+		case 'drag': {
+			const [testId, delta] = (value ?? '').split(':');
+			if (testId === undefined || delta === undefined) {
+				throw new Error('drag needs <testId>:<dx>');
+			}
+			await app.getByTestId(testId).dragBy(Number(delta), 0);
 			await sleep(500);
 			break;
 		}

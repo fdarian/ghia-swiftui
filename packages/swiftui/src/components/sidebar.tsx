@@ -81,10 +81,10 @@ export function Sidebar(props: SidebarProps) {
 					height: '100%',
 					width: '100%',
 					flexShrink: 0,
-					overflow: 'hidden',
 					...own.style,
 				}}
 			>
+				{/* One pixel past the aside, under the panel group's resize handle: the handle is masked and thin, and over a transparent window the desktop shows through it. The aside does not clip, so the content below does. */}
 				<NativeGlass
 					aria-hidden
 					radius={0}
@@ -92,7 +92,7 @@ export function Sidebar(props: SidebarProps) {
 					style={{
 						position: 'absolute',
 						top: 0,
-						right: 0,
+						right: -1,
 						bottom: 0,
 						left: 0,
 					}}

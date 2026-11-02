@@ -24,13 +24,15 @@ export async function openLiveWindow(options: {
 	demo: string;
 	/** Paints an opaque window under the app, so what the glass samples does not depend on the desktop. */
 	backdrop: boolean;
+	/** Panel storage entries the window starts with, as a resize drag would have saved them. */
+	storage?: Record<string, string>;
 }) {
 	if (process.env.GPUIX_BACKGROUND !== '1') {
 		throw new Error(
 			'Set GPUIX_BACKGROUND=1: the window must open behind the active app',
 		);
 	}
-	const memory = new Map<string, string>();
+	const memory = new Map<string, string>(Object.entries(options.storage ?? {}));
 	setPanelStorage({
 		get: (key) => memory.get(key),
 		set: (key, value) => {
