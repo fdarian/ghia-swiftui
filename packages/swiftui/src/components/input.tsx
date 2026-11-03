@@ -210,7 +210,6 @@ function GlassShell(props: {
 						}
 					: { duration: 0 }
 			}
-			// The wiggle is a transform, never opacity: no ancestor of the glass may have one.
 			style={{ position: 'relative', display: 'flex', ...props.style }}
 		>
 			<NativeGlass

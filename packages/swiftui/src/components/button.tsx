@@ -232,7 +232,7 @@ export function Button(props: ButtonProps) {
 			: { paddingInline: bare() ? 0 : size().paddingInline }),
 		borderRadius: radius(),
 		...variantStyle(variant()),
-		// A glass button dims its content instead: opacity on the glass itself would draw the label under the glass.
+		// A glass button dims only its content; the glass keeps its strength.
 		...(behavior.disabled === true
 			? isGlass()
 				? { pointerEvents: 'none' }

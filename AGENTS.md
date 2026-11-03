@@ -12,7 +12,6 @@ SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.11.1, Bun runti
 - Match SwiftUI as closely as possible. Where SwiftUI draws glass, use real `NativeGlass`, never a tint plus blur. Where syne and SwiftUI disagree, SwiftUI wins. In-window emulation only where macOS has no element to use, and then it is recorded in `DRIFT.md`.
 - The SwiftUI reference is the target. Before tuning a component's look, capture it beside ours with `pnpm compare <shot>` (list in `apps/swiftui-reference/shots.ts`) and read the PNG; `--zoom x:y:w:h@N` enlarges a region of both sides to read radius, edge, padding and colour. Tune against that image, not against memory or a screen recording.
 - Nothing a script launches may cover the user's work or take focus from their app: see [Test windows](#test-windows).
-- No ancestor of a `NativeGlass` has `opacity`, animated or static: the group it forms is drawn before the glass layer, so the glass refracts its own content and its shadow is cut square. Enter and leave with `y` and `scale`; dim a disabled glass control's content.
 
 ## Commands
 

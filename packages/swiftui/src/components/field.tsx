@@ -333,7 +333,7 @@ function FieldRow(props: FieldProps) {
 							},
 						}
 					: {}),
-				// No opacity: a glass control inside would be drawn under its own glass. The label, description and controls dim themselves.
+				// No opacity on the row: the label, description and controls dim themselves.
 				...(isDisabled() ? { pointerEvents: 'none' } : {}),
 				...(own['data-invalid'] === true ? { color: colors.red } : {}),
 				...own.style,

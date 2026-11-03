@@ -292,7 +292,7 @@ export function SelectTrigger(props: SelectTriggerProps) {
 		...(isInvalid(rest['aria-invalid'])
 			? { outline: `1px solid ${colors.red}` }
 			: {}),
-		// A glass trigger dims its content instead: opacity on the glass itself would draw the label under the glass.
+		// A glass trigger dims only its content; the glass keeps its strength.
 		...(context.disabled()
 			? {
 					pointerEvents: 'none',

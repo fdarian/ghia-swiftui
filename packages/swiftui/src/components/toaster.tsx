@@ -42,8 +42,8 @@ const PILL_RADIUS = 33;
 
 /**
  * How far a toast starts and leaves below its resting place: the offset from
- * the window's edge plus the height of a toast with a description. There is no
- * opacity above the glass, so the window's edge is what hides it.
+ * the window's edge plus the height of a toast with a description. A toast has
+ * no fade, so the window's edge is what hides it.
  */
 const TRAVEL = OFFSET + 120;
 
