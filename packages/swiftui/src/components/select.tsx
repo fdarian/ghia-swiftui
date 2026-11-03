@@ -572,7 +572,6 @@ export function SelectContent(props: SelectContentProps) {
 			>
 				<div
 					style={{
-						position: 'relative',
 						display: 'flex',
 						flexDirection: 'column',
 						pointerEvents: 'auto',

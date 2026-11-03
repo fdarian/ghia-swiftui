@@ -1,5 +1,5 @@
 import type { StyleDesc } from '@ghia/solid';
-import { createEffect, createSignal, Show, splitProps } from 'solid-js';
+import { createEffect, createSignal, splitProps } from 'solid-js';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import {
@@ -25,11 +25,8 @@ export interface NativeGlassProps extends HostAttributes {
 	 */
 	fallback?: StyleDesc;
 	/**
-	 * A `box-shadow` for the glass, drawn on an element of its own under it:
-	 * a shadow on the glass's box is not painted, and one on a blurred
-	 * fallback is cut square at its edge. The element fills the nearest
-	 * positioned ancestor, so give the glass a `position: relative` box of its
-	 * size.
+	 * A `box-shadow` on the glass's box, the real glass and the fallback alike.
+	 * A `boxShadow` in `style` overrides it.
 	 */
 	shadow?: string;
 }
@@ -67,41 +64,23 @@ export function NativeGlass(props: NativeGlassProps) {
 		tint: tintFromColor(own.tint),
 		cornerRadius: own.radius,
 	});
-	const shadow = () => (
-		<Show when={own.shadow} keyed>
-			{(boxShadow: string) => (
-				<div
-					style={{
-						position: 'absolute',
-						top: 0,
-						right: 0,
-						bottom: 0,
-						left: 0,
-						borderRadius: own.radius,
-						boxShadow,
-						pointerEvents: 'none',
-					}}
-				/>
-			)}
-		</Show>
-	);
+	const shadow = (): StyleDesc =>
+		own.shadow === undefined ? {} : { boxShadow: own.shadow };
 
 	if (!nativeGlassAvailable()) {
 		return (
-			<>
-				{shadow()}
-				<div
-					{...rest}
-					style={{
-						borderRadius: own.radius,
-						overflow: 'visible',
-						...fallback(),
-						...own.style,
-					}}
-				>
-					{own.children}
-				</div>
-			</>
+			<div
+				{...rest}
+				style={{
+					borderRadius: own.radius,
+					overflow: 'visible',
+					...fallback(),
+					...shadow(),
+					...own.style,
+				}}
+			>
+				{own.children}
+			</div>
 		);
 	}
 
@@ -115,32 +94,30 @@ export function NativeGlass(props: NativeGlassProps) {
 	});
 
 	return (
-		<>
-			{shadow()}
-			<nativeview
-				{...rest}
-				onAttach={(view) => {
-					if (!contentIsOnScreen(view)) {
-						setOffscreen(true);
-						return;
-					}
-					attached = attachNativeGlass(view, options());
-					setHandle(attached);
-				}}
-				// Touches only the view: a call back into ghia from here fails.
-				onDetach={() => {
-					attached?.detach();
-					attached = undefined;
-				}}
-				style={{
-					borderRadius: own.radius,
-					overflow: 'visible',
-					...(offscreen() ? fallback() : {}),
-					...own.style,
-				}}
-			>
-				{own.children}
-			</nativeview>
-		</>
+		<nativeview
+			{...rest}
+			onAttach={(view) => {
+				if (!contentIsOnScreen(view)) {
+					setOffscreen(true);
+					return;
+				}
+				attached = attachNativeGlass(view, options());
+				setHandle(attached);
+			}}
+			// Touches only the view: a call back into ghia from here fails.
+			onDetach={() => {
+				attached?.detach();
+				attached = undefined;
+			}}
+			style={{
+				borderRadius: own.radius,
+				overflow: 'visible',
+				...(offscreen() ? fallback() : {}),
+				...shadow(),
+				...own.style,
+			}}
+		>
+			{own.children}
+		</nativeview>
 	);
 }

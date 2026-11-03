@@ -14,7 +14,7 @@ export interface GlassPanelProps extends HostAttributes {
 	radius?: number;
 	/** The look while there is no real glass; see `NativeGlass`. */
 	fallback?: StyleDesc;
-	/** A `box-shadow` on an element under the glass; see `NativeGlass`. A panel has none by default. */
+	/** A `box-shadow` on the panel's box; see `NativeGlass`. A panel has none by default. */
 	shadow?: string;
 }
 

@@ -287,7 +287,6 @@ export function MenuPopup(props: MenuPopupProps) {
 		>
 			<div
 				style={{
-					position: 'relative',
 					display: 'flex',
 					flexDirection: 'column',
 					pointerEvents: 'auto',

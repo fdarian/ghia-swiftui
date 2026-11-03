@@ -123,7 +123,7 @@ export function Toast(props: ToastProps) {
 			>
 				<Icon name="x" size={12} />
 			</div>
-			<div style={{ position: 'relative', display: 'flex' }}>
+			<div style={{ display: 'flex' }}>
 				<NativeGlass
 					radius={PILL_RADIUS}
 					shadow={styleTokens.shadowGlassPopover}
