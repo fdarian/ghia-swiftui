@@ -29,52 +29,22 @@ export interface NativeGlassProps extends HostAttributes {
 	 * a shadow on the glass's box is not painted, and one on a blurred
 	 * fallback is cut square at its edge. The element fills the nearest
 	 * positioned ancestor, so give the glass a `position: relative` box of its
-	 * size. It appears with the glass, never before it.
+	 * size.
 	 */
 	shadow?: string;
 }
 
-/** Overrides that stop the box painting anything of its own. */
-const hiddenPaint: StyleDesc = {
-	backgroundColor: 'transparent',
-	backgroundImage: 'none',
-	borderColor: 'transparent',
-	outlineColor: 'transparent',
-	boxShadow: 'none',
-};
-
 /**
  * A box whose background is a real `NSGlassEffectView`, which samples what is
  * painted beneath it in the window (GPUI's own content included) and refracts
- * it. Children paint above the glass, and a `NativeGlass` among them is a
- * layer of its own above this one.
+ * it. Children paint above the glass from the first frame, and a `NativeGlass`
+ * among them is a layer of its own above this one.
  *
  * Glass is only present when this macOS has the class and the window is on a
  * screen; otherwise the box wears the `fallback` material, so a surface never
- * renders empty. While real glass is expected but the view has not attached
- * (ghia calls `onAttach` after the first frame that shows the surface) the box
- * paints nothing and its children are invisible: no fallback look is ever
- * shown first. The glass view is added in `onAttach` and the children and
- * shadow shown in the same tick; ghia draws them a frame later, so the glass
- * is up first (measured on the select popup, never the other way round). A
- * reveal timed to the layout pass that shows the children instead put the
- * children on screen without glass in some frames, and did so on every page
- * switch. A failure to create the view throws from `onAttach` (reported like
- * any handler's) and leaves the box empty.
- *
- * No ancestor of a `NativeGlass` (nor the element itself) may have `opacity`,
- * animated or static: it becomes an effect group that is drawn before the
- * glass layer, so the children are refracted (blurred text) and the group's
- * bounds cut the shadow square. Enter and leave with `y` and `scale`; dim a
- * disabled glass by putting the opacity on its children.
- *
- * The children sit in a `display: contents` wrapper that holds the
- * `visibility` of that first frame, so it is neither on the glass nor above
- * it (see above) and has no box: the children lay out as direct children of
- * the glass. (`opacity` on a `display: contents` element hides nothing.)
- * The box's own paint (an outline, a fill) is overridden to transparent
- * meanwhile. `visibility: hidden` on the glass itself would hide its surface
- * and `onAttach` would never come.
+ * renders empty. `onAttach` decides which: it runs mid-frame, so it touches
+ * only the view and Solid state. A failure to create the view throws from
+ * `onAttach` (reported like any handler's).
  *
  * `overflow` is `visible` so the glass's own shadow and edge highlight are not
  * masked; pass `overflow: 'hidden'` in `style` to clip children to the shape.
@@ -138,8 +108,6 @@ export function NativeGlass(props: NativeGlassProps) {
 	const [handle, setHandle] = createSignal<NativeGlassHandle>();
 	const [offscreen, setOffscreen] = createSignal(false);
 	let attached: NativeGlassHandle | undefined;
-	/** Real glass is expected and has not attached: nothing of the surface may show. */
-	const waiting = () => handle() === undefined && !offscreen();
 
 	createEffect(() => {
 		const current = handle();
@@ -148,7 +116,7 @@ export function NativeGlass(props: NativeGlassProps) {
 
 	return (
 		<>
-			<Show when={!waiting()}>{shadow()}</Show>
+			{shadow()}
 			<nativeview
 				{...rest}
 				onAttach={(view) => {
@@ -169,18 +137,9 @@ export function NativeGlass(props: NativeGlassProps) {
 					overflow: 'visible',
 					...(offscreen() ? fallback() : {}),
 					...own.style,
-					// The caller's own paint (an outline, a fill) is part of the surface too.
-					...(waiting() ? hiddenPaint : {}),
 				}}
 			>
-				<div
-					style={{
-						display: 'contents',
-						visibility: waiting() ? 'hidden' : 'visible',
-					}}
-				>
-					{own.children}
-				</div>
+				{own.children}
 			</nativeview>
 		</>
 	);
