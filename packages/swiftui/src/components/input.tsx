@@ -3,7 +3,7 @@ import {
 	motion,
 	type StyleDesc,
 } from '@ghia/solid';
-import { children, createSignal, type JSX, Show, splitProps } from 'solid-js';
+import { createSignal, type JSX, Show, splitProps } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
 import { useFieldDisabled } from '#src/components/field-disabled-context.ts';
 import { NativeGlass } from '#src/components/native-glass.tsx';
@@ -196,11 +196,23 @@ function GlassShell(props: {
 	style: StyleDesc | undefined;
 	field: () => JSX.Element;
 }) {
-	// Resolved once, outside `motion.div`'s own tracking: its `animate` follows
-	// `focused`, and children built inside it would be rebuilt on every focus
-	// change, taking focus from the field.
-	const content = children(() => (
-		<>
+	return (
+		<motion.div
+			animate={{ scale: props.focused ? [1, WIGGLE_SCALE, 1] : 1 }}
+			transition={
+				props.focused
+					? {
+							scale: {
+								duration: WIGGLE_DURATION,
+								times: [0, 0.5, 1],
+								ease: ['easeOut', 'easeIn'],
+							},
+						}
+					: { duration: 0 }
+			}
+			// The wiggle is a transform, never opacity: no ancestor of the glass may have one.
+			style={{ position: 'relative', display: 'flex', ...props.style }}
+		>
 			<NativeGlass
 				radius={props.radius}
 				style={{
@@ -231,26 +243,6 @@ function GlassShell(props: {
 			<Show when={props.focused}>
 				<FocusRing radius={props.radius} />
 			</Show>
-		</>
-	));
-	return (
-		<motion.div
-			animate={{ scale: props.focused ? [1, WIGGLE_SCALE, 1] : 1 }}
-			transition={
-				props.focused
-					? {
-							scale: {
-								duration: WIGGLE_DURATION,
-								times: [0, 0.5, 1],
-								ease: ['easeOut', 'easeIn'],
-							},
-						}
-					: { duration: 0 }
-			}
-			// The wiggle is a transform, never opacity: no ancestor of the glass may have one.
-			style={{ position: 'relative', display: 'flex', ...props.style }}
-		>
-			{content()}
 		</motion.div>
 	);
 }
