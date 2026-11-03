@@ -13,8 +13,8 @@ macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. `ghia-swiftui` is n
 ```jsonc
 // package.json
 "dependencies": {
-	"@ghia/native": "0.11.0",
-	"@ghia/solid": "0.11.0",
+	"@ghia/native": "0.11.1",
+	"@ghia/solid": "0.11.1",
 	"ghia-swiftui": "github:fdarian/ghia-swiftui#path:/packages/swiftui",
 	"solid-js": "1.9.15"
 }
@@ -25,12 +25,12 @@ macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. `ghia-swiftui` is n
 ```yaml
 # pnpm-workspace.yaml
 overrides:
-  "@gpuix/solid": "npm:@ghia/solid@0.11.0"
-  "@gpuix/native": "npm:@ghia/native@0.11.0"
+  "@gpuix/solid": "npm:@ghia/solid@0.11.1"
+  "@gpuix/native": "npm:@ghia/native@0.11.1"
 packageExtensions:
   base-ui-solid-gpuix:
     dependencies:
-      "@ghia/solid": "0.11.0"
+      "@ghia/solid": "0.11.1"
 # base-ui-solid-gpuix arrives through ghia-swiftui, as a git subdependency.
 blockExoticSubdeps: false
 ```

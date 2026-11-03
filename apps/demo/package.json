@@ -18,8 +18,8 @@
 		"glass-check": "GPUIX_BACKGROUND=1 bun scripts/glass-check.tsx live && bun scripts/glass-check.tsx fallback"
 	},
 	"dependencies": {
-		"@ghia/native": "0.11.0",
-		"@ghia/solid": "0.11.0",
+		"@ghia/native": "0.11.1",
+		"@ghia/solid": "0.11.1",
 		"ghia-swiftui": "workspace:*",
 		"solid-js": "1.9.15"
 	},

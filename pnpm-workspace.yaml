@@ -3,13 +3,13 @@ packages:
   - "apps/*"
 enableGlobalVirtualStore: true
 minimumReleaseAgeExclude:
-  - "@ghia/native@0.11.0"
-  - "@ghia/solid@0.11.0"
+  - "@ghia/native@0.11.1"
+  - "@ghia/solid@0.11.1"
 overrides:
-  "@gpuix/solid": "npm:@ghia/solid@0.11.0"
-  "@gpuix/native": "npm:@ghia/native@0.11.0"
+  "@gpuix/solid": "npm:@ghia/solid@0.11.1"
+  "@gpuix/native": "npm:@ghia/native@0.11.1"
 # base-ui-solid-gpuix is compiled by the Solid preload, which emits imports of `@ghia/solid`, and TypeScript resolves `jsxImportSource` from the file; neither is the alias name it declares.
 packageExtensions:
   base-ui-solid-gpuix:
     dependencies:
-      "@ghia/solid": "0.11.0"
+      "@ghia/solid": "0.11.1"
