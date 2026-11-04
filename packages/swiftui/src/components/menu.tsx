@@ -47,8 +47,6 @@ const PANEL_PADDING_INLINE = 5;
 const ROW_RADIUS = 7;
 /** The popup leaves at once, as it appears. */
 const EXIT_MS = 0;
-/** FF focuses the first row two frames after a pointer open, once the popup itself holds focus. */
-const OPEN_FOCUS_MS = 32;
 
 type MenuRootState = ReturnType<typeof createMenuRoot>;
 
@@ -229,23 +227,12 @@ function remapEmacsNavigationKey(event: KeyEvent): KeyEvent {
 
 export interface MenuPopupProps extends Omit<GlassPanelProps, 'onKeyDown'> {
 	onKeyDown?: (event: KeyEvent) => void;
-	/**
-	 * Whether a pointer open lights the first enabled row. `false` leaves every
-	 * row unlit until the pointer or a key moves, as NSMenu does; `showContextMenu`
-	 * sets it. Not in syne: its `Menu` is always the lit-on-open one.
-	 */
-	highlightOnOpen?: boolean;
 }
 
 /** The menu surface: a `GlassPanel` that owns the keyboard and the highlight. It appears and leaves at once, with no motion. */
 export function MenuPopup(props: MenuPopupProps) {
 	const root = useMenuScope();
-	const [own, rest] = splitProps(props, [
-		'style',
-		'onKeyDown',
-		'highlightOnOpen',
-		'children',
-	]);
+	const [own, rest] = splitProps(props, ['style', 'onKeyDown', 'children']);
 	const [highlighted, setHighlighted] = createSignal<number | null>(null);
 	let rowCount = 0;
 	const list = createMenuList({
@@ -271,7 +258,8 @@ export function MenuPopup(props: MenuPopupProps) {
 			onMouseMove: () => {},
 			onMouseLeave: () => setHighlighted(null),
 		},
-		openFocusMs: own.highlightOnOpen === false ? null : OPEN_FOCUS_MS,
+		// A pointer open lights no row, as NSMenu: the pointer or a key moves first.
+		openFocusMs: null,
 	});
 	root.watchPopupFocus(list.containsFocus);
 	const panelProps = list.popupProps({

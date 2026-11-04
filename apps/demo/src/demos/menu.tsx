@@ -107,6 +107,8 @@ export async function menuScenario(shot: Shot) {
 	await shot.wait(200);
 	shot.expectPresent('menu-popup');
 	shot.expectText('menu-opens', '1');
+	// A pointer open lights no row: the popup holds focus until the pointer or a key moves.
+	shot.expectFocused('menu-popup');
 	await shot.capture('open');
 	await shot.hover('menu-show');
 	await shot.capture('hover');
@@ -126,14 +128,19 @@ export async function menuScenario(shot: Shot) {
 	shot.expectText('menu-picked', 'show');
 	shot.expectAbsent('menu-popup');
 
-	// Keyboard: ArrowDown on the focused trigger opens on the first row, Ctrl+N steps (the disabled row is a stop too), Enter picks.
+	// Keyboard: ArrowDown on the focused trigger opens on the first row, Ctrl+N steps over the disabled row, Enter picks.
 	await shot.focus('menu-trigger');
 	await shot.keys('ArrowDown');
 	await shot.wait(200);
 	shot.expectPresent('menu-popup');
-	await shot.keys('Control+n Control+n');
+	shot.expectFocused('menu-show');
+	await shot.keys('Control+n');
+	shot.expectFocused('menu-delete');
 	await shot.capture('keyboard');
-	await shot.keys('Control+p Control+n');
+	await shot.keys('Control+n');
+	shot.expectFocused('menu-show');
+	await shot.keys('Control+p');
+	shot.expectFocused('menu-delete');
 	await shot.keys('Enter');
 	await shot.wait(200);
 	shot.expectText('menu-picked', 'delete');
