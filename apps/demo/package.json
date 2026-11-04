@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"start": "bun --hot src/main.tsx",
+		"release:binary": "bun scripts/release-binary.ts",
 		"screenshot": "bun scripts/screenshot.tsx",
 		"check:single-instance": "bun scripts/check-single-instance.ts",
 		"check:type": "tsc",
