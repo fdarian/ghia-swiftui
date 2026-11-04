@@ -11,21 +11,33 @@ const tokenEntries = Object.fromEntries(
 		]),
 );
 
-export default defineConfig({
-	entry: {
-		index: 'src/index.ts',
-		'native-glass': 'src/native-glass.ts',
-		objc: 'src/objc.ts',
-		...tokenEntries,
+export default defineConfig([
+	{
+		entry: {
+			index: 'src/index.ts',
+			'native-glass': 'src/native-glass.ts',
+			objc: 'src/objc.ts',
+			...tokenEntries,
+		},
+		format: ['esm'],
+		dts: true,
+		// The two configs build in parallel into one dir: this one must not wipe cli.js.
+		clean: ['dist/**', '!dist/cli.js'],
+		outDir: 'dist',
+		fixedExtension: false,
+		deps: { neverBundle: ['bun:ffi'] },
+		// Same compile as @ghia/solid/bun-plugin: universal output importing from @ghia/solid, never solid-js/web.
+		plugins: [
+			solid({ solid: { generate: 'universal', moduleName: '@ghia/solid' } }),
+		],
 	},
-	format: ['esm'],
-	dts: true,
-	clean: true,
-	outDir: 'dist',
-	fixedExtension: false,
-	deps: { neverBundle: ['bun:ffi'] },
-	// Same compile as @ghia/solid/bun-plugin: universal output importing from @ghia/solid, never solid-js/web.
-	plugins: [
-		solid({ solid: { generate: 'universal', moduleName: '@ghia/solid' } }),
-	],
-});
+	{
+		entry: { cli: 'src/cli.ts' },
+		format: ['esm'],
+		platform: 'node',
+		dts: false,
+		clean: false,
+		outDir: 'dist',
+		fixedExtension: false,
+	},
+]);
