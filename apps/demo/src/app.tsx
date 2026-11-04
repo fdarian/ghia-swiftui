@@ -1,4 +1,10 @@
 import {
+	type DomEvent,
+	type HostElement,
+	type KeyEvent,
+	window,
+} from '@ghia/solid';
+import {
 	applyColorScheme,
 	Button,
 	ButtonDefaultsProvider,
@@ -19,7 +25,7 @@ import {
 	TooltipProvider,
 } from 'ghia-swiftui';
 import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors';
-import { createSignal, For, Show } from 'solid-js';
+import { createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { type Demo, demos, filterDemoSections } from '#src/demos/index.ts';
 
 export const WINDOW_TITLE = 'ghia-swiftui';
@@ -37,6 +43,29 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 	const [scheme, setScheme] = createSignal<string>('system');
 	const [query, setQuery] = createSignal('');
 	const sections = () => filterDemoSections(query());
+	let search: HostElement | undefined;
+
+	onMount(() => {
+		const onKeyDown = (domEvent: DomEvent) => {
+			const event = domEvent as KeyEvent;
+			if (
+				event.metaKey !== true ||
+				event.ctrlKey === true ||
+				event.altKey === true ||
+				event.shiftKey === true ||
+				event.key?.toLowerCase() !== 'f'
+			) {
+				return;
+			}
+			if (search === undefined) throw new Error('nav-search has no element');
+			event.preventDefault();
+			search.focus();
+			search.select();
+		};
+		window.addEventListener('keydown', onKeyDown);
+		onCleanup(() => window.removeEventListener('keydown', onKeyDown));
+	});
+
 	return (
 		<Sidebar
 			testId="nav"
@@ -52,6 +81,9 @@ function DemoNav(props: { selected: Demo; onSelect: (demo: Demo) => void }) {
 					</ToolbarRow>
 					<ToolbarRow>
 						<Input
+							ref={(element) => {
+								search = element;
+							}}
 							testId="nav-search"
 							variant="glass"
 							leading={<Icon name="search" />}

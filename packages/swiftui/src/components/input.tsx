@@ -1,4 +1,5 @@
 import {
+	type HostElement,
 	type InputProps as HostInputProps,
 	motion,
 	type StyleDesc,
@@ -63,6 +64,7 @@ export interface InputProps extends Omit<HostInputProps, 'style'> {
 	/** Called with the text after every edit; `onChange` carries the same as an event. */
 	onValueChange?: (value: string) => void;
 	style?: StyleDesc;
+	ref?: (element: HostElement) => void;
 }
 
 /** The focus ring's spread and alpha as it appears, and as it settles (Apple Mail's search field). */
