@@ -1,6 +1,7 @@
-import type { HostElement, StyleDesc } from '@ghia/solid';
+import type { HostElement, KeyEvent, StyleDesc } from '@ghia/solid';
 import {
 	createPlacementState,
+	isChord,
 	POPUP_MARGIN,
 } from 'base-ui-solid-gpuix/internals';
 import { createSelectRoot } from 'base-ui-solid-gpuix/select';
@@ -25,6 +26,7 @@ import { NativeGlass } from '#src/components/native-glass.tsx';
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { Icon } from '#src/icons/icon.tsx';
+import { isListNavigationKey, stepToEnabledRow } from '#src/list-keys.ts';
 import { SHADOW_PAD } from '#src/popup.tsx';
 import { withAlpha } from '#src/tokens/color-math.ts';
 import { colors } from '#src/tokens/colors.ts';
@@ -599,6 +601,22 @@ export function SelectContent(props: SelectContentProps) {
 					>
 						<div
 							{...root.popupProps}
+							onKeyDown={(event: KeyEvent) => {
+								if (isListNavigationKey(event.key) && !isChord(event)) {
+									stepToEnabledRow({
+										event,
+										key: event.key,
+										forward: root.popupProps.onKeyDown,
+										highlighted: context.highlighted,
+										setHighlighted: context.setHighlighted,
+										isDisabled: (index) =>
+											context.options()[index]?.disabled === true,
+										rowCount: () => context.options().length,
+									});
+									return;
+								}
+								root.popupProps.onKeyDown(event);
+							}}
 							ref={root.popupRef}
 							onLayout={() => context.setMeasured(true)}
 							style={{

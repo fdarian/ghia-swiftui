@@ -1,6 +1,7 @@
 import { DismissableLayer, type HostElement, type KeyEvent } from '@ghia/solid';
 import {
 	createPlacementState,
+	isChord,
 	POPUP_MARGIN,
 } from 'base-ui-solid-gpuix/internals';
 import {
@@ -25,6 +26,11 @@ import {
 import { glass } from '#src/glass.ts';
 import type { HostAttributes } from '#src/host-props.ts';
 import { IconSizeContext } from '#src/icons/icon-size.ts';
+import {
+	isListNavigationKey,
+	stepToEnabledRow,
+	withKey,
+} from '#src/list-keys.ts';
 import { anchoredShift, SHADOW_PAD } from '#src/popup.tsx';
 import { litRow } from '#src/tokens/lit-row.ts';
 import { semanticColors } from '#src/tokens/semantic-colors.ts';
@@ -218,10 +224,7 @@ function remapEmacsNavigationKey(event: KeyEvent): KeyEvent {
 	const key =
 		event.key === 'n' ? 'ArrowDown' : event.key === 'p' ? 'ArrowUp' : undefined;
 	if (key === undefined) return event;
-	return Object.create(event, {
-		key: { value: key },
-		ctrlKey: { value: false },
-	});
+	return withKey(event, key);
 }
 
 export interface MenuPopupProps extends Omit<GlassPanelProps, 'onKeyDown'> {
@@ -275,7 +278,6 @@ export function MenuPopup(props: MenuPopupProps) {
 		id: root.popupId,
 		labelledBy: root.triggerId,
 	});
-
 	return (
 		<MenuListContext.Provider
 			value={{
@@ -308,7 +310,21 @@ export function MenuPopup(props: MenuPopupProps) {
 					}}
 					onKeyDown={(event: KeyEvent) => {
 						own.onKeyDown?.(event);
-						panelProps.onKeyDown(remapEmacsNavigationKey(event));
+						const mapped = remapEmacsNavigationKey(event);
+						if (isListNavigationKey(mapped.key) && !isChord(mapped)) {
+							stepToEnabledRow({
+								event: mapped,
+								key: mapped.key,
+								forward: panelProps.onKeyDown,
+								highlighted,
+								setHighlighted,
+								isDisabled: (index) =>
+									list.itemHost.rows.get(index)?.disabled() === true,
+								rowCount: () => list.itemHost.rows.size,
+							});
+							return;
+						}
+						panelProps.onKeyDown(mapped);
 					}}
 					onMouseEnter={list.handlers.onMouseEnter}
 					onMouseMove={list.handlers.onMouseMove}
