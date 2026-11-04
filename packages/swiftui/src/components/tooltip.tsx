@@ -1,9 +1,6 @@
 import type { StyleDesc } from '@ghia/solid';
 import { DismissableLayer, motion } from '@ghia/solid';
-import {
-	createPlacementState,
-	POPUP_MARGIN,
-} from 'base-ui-solid-gpuix/internals';
+import { createPlacementState, POPUP_MARGIN } from 'ghia-base-ui/internals';
 import {
 	createTooltipPopup,
 	createTooltipProvider,
@@ -11,7 +8,7 @@ import {
 	createTooltipTrigger,
 	TooltipProviderContext,
 	useTooltipProvider,
-} from 'base-ui-solid-gpuix/tooltip';
+} from 'ghia-base-ui/tooltip';
 import {
 	type Accessor,
 	createComputed,

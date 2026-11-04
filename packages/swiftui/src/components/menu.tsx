@@ -3,14 +3,14 @@ import {
 	createPlacementState,
 	isChord,
 	POPUP_MARGIN,
-} from 'base-ui-solid-gpuix/internals';
+} from 'ghia-base-ui/internals';
 import {
 	createMenuItem,
 	createMenuList,
 	createMenuRoot,
 	createMenuTrigger,
 	type MenuItemHost,
-} from 'base-ui-solid-gpuix/menu';
+} from 'ghia-base-ui/menu';
 import {
 	createContext,
 	createSignal,

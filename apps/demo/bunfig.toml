@@ -1,4 +1,4 @@
-preload = ["@ghia/solid/preload", "ghia-swiftui/preload"]
+preload = ["@ghia/solid/preload"]
 
 [test]
-preload = ["@ghia/solid/preload", "ghia-swiftui/preload"]
+preload = ["@ghia/solid/preload"]

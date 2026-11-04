@@ -8,7 +8,7 @@ import {
 	createScrollAreaRoot,
 	createScrollAreaScrollbar,
 	type ScrollAreaAxis,
-} from 'base-ui-solid-gpuix/scroll-area';
+} from 'ghia-base-ui/scroll-area';
 import {
 	type Accessor,
 	createEffect,

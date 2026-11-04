@@ -1,5 +1,5 @@
-import { createCheckboxRoot } from 'base-ui-solid-gpuix/checkbox';
-import { createCheckboxGroup } from 'base-ui-solid-gpuix/checkbox-group';
+import { createCheckboxRoot } from 'ghia-base-ui/checkbox';
+import { createCheckboxGroup } from 'ghia-base-ui/checkbox-group';
 import { createSignal, Show, splitProps } from 'solid-js';
 import { isInvalid } from '#src/aria.ts';
 import { useFieldDisabled } from '#src/components/field-disabled-context.ts';

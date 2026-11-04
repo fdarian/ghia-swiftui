@@ -3,8 +3,8 @@ import {
 	createPlacementState,
 	isChord,
 	POPUP_MARGIN,
-} from 'base-ui-solid-gpuix/internals';
-import { createSelectRoot } from 'base-ui-solid-gpuix/select';
+} from 'ghia-base-ui/internals';
+import { createSelectRoot } from 'ghia-base-ui/select';
 import {
 	createComputed,
 	createContext,

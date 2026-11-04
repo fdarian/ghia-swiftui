@@ -5,7 +5,6 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./preload": "./src/preload.ts",
 		"./tokens/*": "./src/tokens/*.ts",
 		"./native-glass": "./src/native-glass.ts",
 		"./objc": "./src/objc.ts"
@@ -18,10 +17,7 @@
 		"check:lint": "biome check"
 	},
 	"dependencies": {
-		"@babel/core": "7.29.7",
-		"@babel/preset-typescript": "7.29.7",
-		"babel-preset-solid": "1.9.15",
-		"base-ui-solid-gpuix": "github:fdarian/base-ui-solid-gpuix#2528eb57d43d01d49f84b9cf7787fbcecc8496dc"
+		"ghia-base-ui": "0.1.1"
 	},
 	"peerDependencies": {
 		"@ghia/solid": "0.11.1",
@@ -31,7 +27,6 @@
 		"@ghia/native": "0.11.1",
 		"@ghia/solid": "0.11.1",
 		"@total-typescript/tsconfig": "1.0.4",
-		"@types/babel__core": "7.20.5",
 		"@types/bun": "1.4.4",
 		"solid-js": "1.9.15",
 		"typescript": "7.0.2"
