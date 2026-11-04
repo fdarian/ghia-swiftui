@@ -11,10 +11,13 @@
 		"glass-check": "pnpm --filter ghia-swiftui-demo glass-check",
 		"window-check": "pnpm --filter ghia-swiftui-demo window-check",
 		"reference": "pnpm --filter ghia-swiftui-reference capture",
-		"compare": "pnpm --filter ghia-swiftui-reference compare"
+		"compare": "pnpm --filter ghia-swiftui-reference compare",
+		"ci:version": "changeset version",
+		"ci:release": "pnpm --filter ghia-swiftui build && pnpm --filter ghia-swiftui-demo release:binary && changeset publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.4",
+		"@changesets/cli": "3.0.3",
 		"turbo": "2.11.10"
 	}
 }
