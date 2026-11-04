@@ -59,7 +59,14 @@ function run(command: string[]) {
 const build = await Bun.build({
 	entrypoints: [`${demo}/src/main.tsx`],
 	plugins: [createSolidPlugin(), embedNativeAddon],
-	compile: { target: `bun-${TARGET}`, outfile: binary },
+	// The gallery runs in the user's cwd: a project's bunfig preload or .env
+	// would otherwise load into it and fail with `preload not found`.
+	compile: {
+		target: `bun-${TARGET}`,
+		outfile: binary,
+		autoloadBunfig: false,
+		autoloadDotenv: false,
+	},
 	minify: true,
 });
 if (!build.success) {
