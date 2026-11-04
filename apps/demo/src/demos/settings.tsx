@@ -96,11 +96,7 @@ export function SettingsDemo() {
 						description="Only one player is polled at a time."
 					>
 						<Select value={source()} onValueChange={setSource}>
-							<SelectTrigger
-								testId="settings-source"
-								size="small"
-								variant="transparent"
-							>
+							<SelectTrigger testId="settings-source" variant="transparent">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -129,7 +125,6 @@ export function SettingsDemo() {
 							min={1}
 							max={365}
 							step={1}
-							size="small"
 							style={{ width: 112 }}
 						/>
 					</Field>
