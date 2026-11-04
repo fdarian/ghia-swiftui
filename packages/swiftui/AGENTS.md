@@ -1,11 +1,10 @@
-`ghia-swiftui`: the component library. Source only: `exports` point at TS (`.` is `src/index.ts`, `./preload`, `./tokens/*`, `./objc`).
+`ghia-swiftui`: the component library. Source only: `exports` point at TS (`.` is `src/index.ts`, `./tokens/*`, `./objc`).
 
 ## Layout
 
 - `src/components/<name>.tsx` — one file per component, plus `*-context.ts` for shared context. Public names are re-exported from `src/index.ts`; a component that is not there is internal (`ProgressiveBlur`, `NativeGlass`).
 - `src/tokens/` — colours, typography and style as objects of getters (`define-tokens.ts`) over the scheme and accent signals. Read them inside JSX props or effects, never at module scope.
 - `src/native-glass.ts`, `src/objc.ts` — real `NSGlassEffectView` from `bun:ffi` on libobjc, inside `<nativeview>`; `components/native-glass.tsx` wraps it and falls back to `glass.ts` (in-window material) when there is no view.
-- `src/preload.ts` — Bun plugin that compiles base-ui-solid-gpuix's TSX; consumers list it in `bunfig.toml`.
 - `src/panel-storage.ts` — layouts persist through a storage the app sets (`setPanelStorage`); there is no default.
 
 ## Conventions

@@ -20,31 +20,16 @@ macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. `ghia-swiftui` is n
 }
 ```
 
-`ghia-swiftui` builds on [`base-ui-solid-gpuix`](https://github.com/fdarian/base-ui-solid-gpuix), which is also a git dependency and imports ghia under its old name, `@gpuix/solid`. Settings a dependency declares do not reach your install, so repeat them:
+pnpm may also ask you to exempt the `@ghia/*` versions and `ghia-base-ui` from `minimumReleaseAge`; it adds the `minimumReleaseAgeExclude` entries itself.
 
-```yaml
-# pnpm-workspace.yaml
-overrides:
-  "@gpuix/solid": "npm:@ghia/solid@0.11.1"
-  "@gpuix/native": "npm:@ghia/native@0.11.1"
-packageExtensions:
-  base-ui-solid-gpuix:
-    dependencies:
-      "@ghia/solid": "0.11.1"
-# base-ui-solid-gpuix arrives through ghia-swiftui, as a git subdependency.
-blockExoticSubdeps: false
-```
-
-pnpm may also ask you to exempt the two `@ghia/*` versions from `minimumReleaseAge`; it adds the `minimumReleaseAgeExclude` entries itself.
-
-Both preloads go in `bunfig.toml`, `ghia-swiftui/preload` second. The first compiles your JSX for ghia; the second compiles the TSX that `base-ui-solid-gpuix` ships as source, which Bun would otherwise compile with a JSX runtime that reads props once.
+Put the ghia preload in `bunfig.toml`; it compiles your JSX for ghia.
 
 ```toml
 # bunfig.toml
-preload = ["@ghia/solid/preload", "ghia-swiftui/preload"]
+preload = ["@ghia/solid/preload"]
 
 [test]
-preload = ["@ghia/solid/preload", "ghia-swiftui/preload"]
+preload = ["@ghia/solid/preload"]
 ```
 
 For TypeScript, set `"jsx": "preserve"` and `"jsxImportSource": "@ghia/solid"`, and leave the DOM lib out (`@total-typescript/tsconfig/bundler/no-dom/app` does): with it, the library's source reports errors.
@@ -52,7 +37,7 @@ For TypeScript, set `"jsx": "preserve"` and `"jsxImportSource": "@ghia/solid"`, 
 <details>
 <summary>Installing from a local checkout</summary>
 
-Point the dependency at the package folder, `"ghia-swiftui": "file:../ghia-swiftui/packages/swiftui"`. The pnpm settings above stay the same.
+Point the dependency at the package folder, `"ghia-swiftui": "file:../ghia-swiftui/packages/swiftui"`.
 
 </details>
 

@@ -30,9 +30,8 @@ The one rule for every window a script opens (demo and reference); the workspace
 
 ## Gotchas
 
-- `base-ui-solid-gpuix` (headless primitives, a git dependency pinned to a SHA) imports ghia as `@gpuix/solid`. `pnpm-workspace.yaml` aliases that name to `@ghia/solid` (`overrides`) and adds `@ghia/solid` to the package's dependencies (`packageExtensions`). Do not edit that repo, or the ghia fork it runs on (`~/code/fdarian/ghia`), from here.
+- `ghia-base-ui` (headless primitives, from npm, pinned) ships compiled JS, so a bunfig needs only `@ghia/solid/preload`. Do not edit it, or the ghia fork (`~/code/fdarian/ghia`), from here.
 - Exactly one runtime instance of `solid-js` and `@ghia/solid` may exist: a second gives a second reactive graph and fails silently. `pnpm --filter ghia-swiftui-demo check:single-instance` verifies it; run it after touching dependencies.
-- A bunfig must list `ghia-swiftui/preload` after `@ghia/solid/preload` (both `preload` and `[test] preload`): base-ui ships TSX source that the ghia preload skips.
 
 ## Where things are written down
 
