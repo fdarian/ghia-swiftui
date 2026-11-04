@@ -2,20 +2,22 @@
 
 SwiftUI-look [Solid](https://www.solidjs.com) components for macOS apps on [ghia](https://github.com/fdarian/ghia) (`@ghia/solid`, Bun runtime, no webview). The component names, props and variants are those of [syne](https://github.com/fdarian/syne)'s `@syne/ui`, so a syne screen moves over by changing imports and React idioms to Solid ones. Surfaces such as the sidebar, panels, popups and glass buttons are real liquid glass (`NSGlassEffectView`).
 
+To try the components first, run `npx ghia-swiftui` on an Apple Silicon Mac. It opens the component gallery, downloading a signed binary from the GitHub Release on the first run.
+
 | Light                                                                                | Dark                                                |
 | ------------------------------------------------------------------------------------ | --------------------------------------------------- |
 | ![The syne main window composed from the library, light](docs/main-window-light.png) | ![The same window, dark](docs/main-window-dark.png) |
 
 ## Install
 
-macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. `ghia-swiftui` is not on npm; take it from git.
+macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. Install `ghia-swiftui` from npm together with its peers.
 
 ```jsonc
 // package.json
 "dependencies": {
 	"@ghia/native": "0.11.1",
 	"@ghia/solid": "0.11.1",
-	"ghia-swiftui": "github:fdarian/ghia-swiftui#path:/packages/swiftui",
+	"ghia-swiftui": "0.1.0",
 	"solid-js": "1.9.15"
 }
 ```

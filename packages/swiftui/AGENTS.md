@@ -1,4 +1,4 @@
-`ghia-swiftui`: the component library. Source only: `exports` point at TS (`.` is `src/index.ts`, `./tokens/*`, `./objc`).
+`ghia-swiftui`: the component library. In the workspace, `exports` point at TS (`.` is `src/index.ts`, `./tokens/*`, `./objc`); `publishConfig` swaps them for the `tsdown` build in `dist` on publish, and adds the `ghia-swiftui` bin (`src/cli.ts`, which fetches the gallery binary from the GitHub Release).
 
 ## Layout
 

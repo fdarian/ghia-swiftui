@@ -2,8 +2,8 @@ SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.11.1, Bun runti
 
 ## Layout
 
-- [`packages/swiftui/`](packages/swiftui/AGENTS.md) — the library, `ghia-swiftui`, consumed as TS source (no build step).
-- [`apps/demo/`](apps/demo/AGENTS.md) — private native-window showcase of every component, plus the capture and check scripts.
+- [`packages/swiftui/`](packages/swiftui/AGENTS.md) — the library, `ghia-swiftui`, published to npm. Workspace consumers import its TS source; `tsdown` builds `dist` for the published package.
+- [`apps/demo/`](apps/demo/AGENTS.md) — private native-window showcase of every component, plus the capture and check scripts. `release:binary` compiles it into the gallery that `npx ghia-swiftui` runs.
 - [`apps/swiftui-reference/`](apps/swiftui-reference/AGENTS.md) — private minimal SwiftUI macOS app that shows the system's real control for each demo page, and the scripts that put it beside ours.
 - [`README.md`](README.md) — install and setup for a consumer; the only copy of that, keep it true when setup changes.
 

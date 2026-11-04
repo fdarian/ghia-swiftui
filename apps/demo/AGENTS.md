@@ -1,4 +1,4 @@
-`ghia-swiftui-demo`: a native window that shows every `ghia-swiftui` component, and the scripts that capture and check it. Private; not published.
+`ghia-swiftui-demo`: a native window that shows every `ghia-swiftui` component, and the scripts that capture and check it. Private package, never published itself; `release:binary` compiles it into the signed darwin-arm64 gallery binary that `npx ghia-swiftui` downloads from the GitHub Release.
 
 ## Layout
 
