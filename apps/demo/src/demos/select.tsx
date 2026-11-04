@@ -191,6 +191,12 @@ export async function selectScenario(shot: Shot) {
 
 	await shot.click('select-controlled');
 	shot.expectText('select-opens', '1');
+	// A pointer open hands focus to the picked row, so the arrows move from it and step over the disabled Tidal.
+	shot.expectFocused('select-controlled-spotify');
+	await shot.keys('ArrowDown');
+	shot.expectFocused('select-controlled-youtube');
+	await shot.keys('ArrowUp');
+	shot.expectFocused('select-controlled-spotify');
 	await shot.click('select-controlled-apple-music');
 	await shot.wait(400);
 	shot.expectText('select-value', 'apple-music');

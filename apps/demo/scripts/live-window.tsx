@@ -5,7 +5,7 @@
  * No OS input is posted and no other app is touched.
  */
 import './background.ts';
-import { GpuixRenderer, render, useGpuixRequired } from '@ghia/solid';
+import { document, GpuixRenderer, render, useGpuixRequired } from '@ghia/solid';
 import { connectTest, liveRendererAsTest } from '@ghia/solid/automation';
 import { setPanelStorage } from 'ghia-swiftui';
 import { App } from '#src/app.tsx';
@@ -19,6 +19,14 @@ function Probe(props: {
 }) {
 	props.onRenderer(useGpuixRequired());
 	return null;
+}
+
+/** The test id of the element holding focus, or `undefined` when it has none. */
+export function focusedTestId() {
+	const element = document.activeElement;
+	if (element === null) return undefined;
+	const testId = element.props.get('testId');
+	return typeof testId === 'string' ? testId : `<${element.type}>`;
 }
 
 export async function openLiveWindow(options: {

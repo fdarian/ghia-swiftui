@@ -70,6 +70,9 @@ interface SelectContextValue {
 	disabled: () => boolean;
 	highlighted: () => number | null;
 	setHighlighted: (index: number | null) => void;
+	measured: () => boolean;
+	setRowElement: (index: number, element: HostElement) => void;
+	rowElement: (index: number) => HostElement | undefined;
 	/** What the trigger reports so the popup can line an item up with its label. */
 	trigger: () => { height: number; labelInset: number };
 	setTrigger: (metrics: { height: number; labelInset: number }) => void;
@@ -113,6 +116,7 @@ export function Select(props: SelectProps) {
 	const [trigger, setTrigger] = createSignal({ height: 32, labelInset: 13 });
 	const [bleed, setBleed] = createSignal(0);
 	const [measured, setMeasured] = createSignal(false);
+	const rowElements = new Map<number, HostElement>();
 	const root = createSelectRoot<string, SelectOption>({
 		items: options,
 		value: () => props.value,
@@ -151,6 +155,9 @@ export function Select(props: SelectProps) {
 				disabled,
 				highlighted,
 				setHighlighted,
+				measured,
+				setRowElement: (index, element) => rowElements.set(index, element),
+				rowElement: (index) => rowElements.get(index),
 				trigger,
 				setTrigger,
 				setBleed,
@@ -550,6 +557,17 @@ export function SelectContent(props: SelectContentProps) {
 	createEffect(() => {
 		if (!root.presence.mounted()) context.setMeasured(false);
 	});
+	let popup: HostElement | undefined;
+	// The primitive's `open` focuses the row while the popup is still being built, and an element that is not laid out yet drops the focus, so keys stay on the trigger. Once the popup is measured, focus goes to the highlighted row, or to the popup when the pointer opened it with nothing picked.
+	createEffect(
+		on(context.measured, (isMeasured) => {
+			if (!isMeasured || !root.presence.open() || popup === undefined) return;
+			if (popup.matches(':focus-within')) return;
+			const index = context.highlighted();
+			const target = index === null ? popup : context.rowElement(index);
+			target?.focus({ preventScroll: true });
+		}),
+	);
 
 	return (
 		<Show when={root.presence.mounted()}>
@@ -617,7 +635,10 @@ export function SelectContent(props: SelectContentProps) {
 								}
 								root.popupProps.onKeyDown(event);
 							}}
-							ref={root.popupRef}
+							ref={(element: HostElement) => {
+								popup = element;
+								root.popupRef(element);
+							}}
 							onLayout={() => context.setMeasured(true)}
 							style={{
 								display: 'flex',
@@ -673,7 +694,10 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 			onMouseLeave={() => {
 				if (context.highlighted() === props.index) context.setHighlighted(null);
 			}}
-			ref={(element) => root.itemRef(props.index, element)}
+			ref={(element) => {
+				context.setRowElement(props.index, element);
+				root.itemRef(props.index, element);
+			}}
 			style={{
 				display: 'flex',
 				flexDirection: 'row',
