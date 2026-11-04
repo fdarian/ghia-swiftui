@@ -1,6 +1,12 @@
 {
 	"name": "ghia-swiftui",
 	"version": "0.0.0",
+	"description": "SwiftUI-style component library for ghia: native macOS controls, glass, and design tokens on GPUI.",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/fdarian/ghia-swiftui.git",
+		"directory": "packages/swiftui"
+	},
 	"license": "MIT",
 	"type": "module",
 	"exports": {
@@ -13,6 +19,7 @@
 		"#src/*": "./src/*"
 	},
 	"scripts": {
+		"build": "tsdown",
 		"check:type": "tsc",
 		"check:lint": "biome check"
 	},
@@ -28,7 +35,34 @@
 		"@ghia/solid": "0.11.1",
 		"@total-typescript/tsconfig": "1.0.4",
 		"@types/bun": "1.4.4",
+		"rolldown-plugin-solid": "0.2.1",
 		"solid-js": "1.9.15",
+		"tsdown": "0.23.5",
 		"typescript": "7.0.2"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"publishConfig": {
+		"exports": {
+			".": {
+				"types": "./dist/index.d.ts",
+				"import": "./dist/index.js"
+			},
+			"./tokens/*": {
+				"types": "./dist/tokens/*.d.ts",
+				"import": "./dist/tokens/*.js"
+			},
+			"./native-glass": {
+				"types": "./dist/native-glass.d.ts",
+				"import": "./dist/native-glass.js"
+			},
+			"./objc": {
+				"types": "./dist/objc.d.ts",
+				"import": "./dist/objc.js"
+			}
+		}
 	}
 }
