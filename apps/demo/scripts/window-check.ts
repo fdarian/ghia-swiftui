@@ -33,8 +33,8 @@ const lights = {
 /** A window is launched against `home`, so the layout it saves is this check's own. */
 function open(home: string) {
 	return launch({
-		command: 'bun',
-		args: ['src/main.tsx'],
+		command: 'node_modules/.bin/ghia',
+		args: ['dev', 'src/main.tsx'],
 		cwd: new URL('..', import.meta.url).pathname,
 		env: { ...process.env, GPUIX_BACKGROUND: '1', HOME: home },
 	});
@@ -234,7 +234,7 @@ for (const check of pixelChecks) {
 	let status = NOT_CHECKABLE;
 	for (let attempt = 1; attempt <= 3 && status === NOT_CHECKABLE; attempt++) {
 		const child = Bun.spawnSync({
-			cmd: ['bun', ...check.args],
+			cmd: ['bun', 'scripts/run.ts', ...check.args],
 			cwd: new URL('..', import.meta.url).pathname,
 			env: { ...process.env, GPUIX_BACKGROUND: '1' },
 			stdout: 'inherit',

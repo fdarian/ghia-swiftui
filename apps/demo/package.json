@@ -7,26 +7,28 @@
 		"#src/*": "./src/*"
 	},
 	"scripts": {
-		"start": "bun --hot src/main.tsx",
+		"start": "ghia dev src/main.tsx",
 		"release:binary": "bun scripts/release-binary.ts",
-		"screenshot": "bun scripts/screenshot.tsx",
+		"screenshot": "bun scripts/run.ts scripts/screenshot.tsx",
 		"check:single-instance": "bun scripts/check-single-instance.ts",
 		"check:type": "tsc",
 		"check:lint": "biome check",
 		"window-check": "bun scripts/window-check.ts",
-		"live-capture": "bun scripts/live-capture.tsx",
-		"scroll-edge-check": "bun scripts/scroll-edge-check.tsx",
-		"glass-check": "GPUIX_BACKGROUND=1 bun scripts/glass-check.tsx live && bun scripts/glass-check.tsx fallback"
+		"live-capture": "bun scripts/run.ts scripts/live-capture.tsx",
+		"scroll-edge-check": "bun scripts/run.ts scripts/scroll-edge-check.tsx",
+		"glass-check": "GPUIX_BACKGROUND=1 bun scripts/run.ts scripts/glass-check.tsx live && bun scripts/run.ts scripts/glass-check.tsx fallback"
 	},
 	"dependencies": {
-		"@ghia/native": "0.11.1",
-		"@ghia/solid": "0.11.1",
+		"@ghia/native": "0.12.1",
+		"@ghia/solid": "0.12.1",
+		"ghia": "0.12.1",
 		"ghia-swiftui": "workspace:*",
 		"solid-js": "1.9.15"
 	},
 	"devDependencies": {
 		"@total-typescript/tsconfig": "1.0.4",
 		"@types/bun": "1.4.4",
-		"typescript": "7.0.2"
+		"typescript": "7.0.2",
+		"vite": "8.3.7"
 	}
 }
