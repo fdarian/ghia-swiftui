@@ -17,10 +17,26 @@ Items 1 to 10 of the earlier list are resolved. They were checked in ghia-swiftu
 // GPUIX_BACKGROUND=1, createTestRoot or a live window
 const ring = { boxShadow: '0 0 0 3px #f00' };
 <>
-  <div testId="a" tabIndex={0} style={{ width: 100, height: 40, focusVisible: ring }} />
-  <div testId="b" tabIndex={0} style={{ width: 100, height: 40, focusVisible: ring, transition: 'background-color 100ms' }} />
-</>
+	<div
+		testId="a"
+		tabIndex={0}
+		style={{ width: 100, height: 40, focusVisible: ring }}
+	/>
+	<div
+		testId="b"
+		tabIndex={0}
+		style={{
+			width: 100,
+			height: 40,
+			focusVisible: ring,
+			transition: 'background-color 100ms',
+		}}
+	/>
+</>;
 // focusElement(a)                                 -> red ring
 // focusElement(b)                                 -> no ring; pixels equal the unfocused background
 // simulateKeystrokes('Tab'), then focusElement(b) -> ring
 ```
+
+- **Status: fixed** (ghia `main` 521b773c, Round 47; not on npm until the next release after 0.11.1). On an element with a transition, the style code decided `:focus-visible` from the last input device (keyboard or not) instead of from the focus state the plain path uses. Before any key press that said no, so the ring was dropped. A text field focused by a click lost its ring the same way. Both paths now read the focus state. Pinned by 28 pixel tests, with and without a transition, before and after a `Tab`. They also check that a transition on the focus style still runs. `:hover`, `:active`, `focusWithin`, `hasFocus` and `hasFocusVisible` didn't share the flaw. Syne's 100ms transition on `Button` can come back.
+  - **Also changed** (ghia `main` b59ebf3e, Round 48): which script focus shows `:focus-visible` now follows Chrome. A key press turns it on for the window, a mouse press that moves focus turns it off, a script focus leaves it as it is, and a text field always shows it. Three cases changed. A script focus after a press on blank body now shows the ring. So does one after Tab and then a click on blank body. A script focus after a click and then a text field no longer inherits the text field's ring. Checked against headless Chrome in 41 sequences, by pixel. One gap: CapsLock alone doesn't turn it on, because gpui reports CapsLock as a modifier.

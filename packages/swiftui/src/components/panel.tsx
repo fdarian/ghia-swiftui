@@ -17,14 +17,13 @@ import { PanelContext } from '#src/components/panel-context.ts';
 import { SplitViewColumnContext } from '#src/components/split-view-column-context.ts';
 import { panelStorage } from '#src/panel-storage.ts';
 import { nodesOf } from '#src/resolved.ts';
-import { semanticColors } from '#src/tokens/semantic-colors.ts';
 
 const PANEL_COLLAPSE_DURATION_MS = 200;
 const PANEL_COLLAPSE_EASE_IN = 'cubic-bezier(0.165, 0.84, 0.44, 1)';
 const PANEL_COLLAPSE_EASE_OUT = 'cubic-bezier(0.77, 0, 0.175, 1)';
 const DEFAULT_MIN_SIZE = 50;
 const DEFAULT_SIZE = 200;
-/** The handle's hit target, centred on its 1px line. */
+/** The handle's hit target, centred on the boundary between two panels. */
 const GRABBER_SIZE = 8;
 
 export type PanelOrientation = 'horizontal' | 'vertical';
@@ -125,7 +124,6 @@ function initialSizes(panels: PanelEntry[], storageKey: string): Sizes {
 
 function ResizeHandle(props: {
 	orientation: PanelOrientation;
-	isDragging: boolean;
 	onResize: (delta: number, isDragStart?: boolean, isDragEnd?: boolean) => void;
 	testId?: string;
 }) {
@@ -145,21 +143,7 @@ function ResizeHandle(props: {
 			style={{
 				position: 'relative',
 				flexShrink: 0,
-				backgroundColor: props.isDragging
-					? semanticColors.panelBorderHover
-					: semanticColors.panelBorder,
-				transition: 'background-color 300ms ease',
-				...(horizontal()
-					? {
-							width: 1,
-							maskImage:
-								'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)',
-						}
-					: {
-							height: 1,
-							maskImage:
-								'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
-						}),
+				...(horizontal() ? { width: 0 } : { height: 0 }),
 			}}
 		>
 			<div
@@ -452,7 +436,6 @@ function PanelGroupBody(props: PanelGroupProps) {
 						>
 							<ResizeHandle
 								orientation={orientation()}
-								isDragging={isDragging()}
 								testId={
 									props.testId === undefined
 										? undefined
