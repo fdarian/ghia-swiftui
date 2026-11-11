@@ -1,4 +1,4 @@
-SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.11.1, Bun runtime, no webview). Same component names, props and variants as syne's `packages/ui` (`~/code/fdarian/syne`), so syne migrates by changing imports. pnpm workspace, Biome, turbo for checks only.
+SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.12.1, Vite and Bun runtime, no webview). Same component names, props and variants as syne's `packages/ui` (`~/code/fdarian/syne`), so syne migrates by changing imports. pnpm workspace, Biome, turbo for checks only.
 
 ## Layout
 
@@ -30,7 +30,7 @@ The one rule for every window a script opens (demo and reference); the workspace
 
 ## Gotchas
 
-- `ghia-base-ui` (headless primitives, from npm, pinned) ships compiled JS, so a bunfig needs only `@ghia/solid/preload`. Do not edit it, or the ghia fork (`~/code/fdarian/ghia`), from here.
+- `ghia-base-ui` (headless primitives, from npm, pinned) ships compiled JS, so the Vite config needs only `ghia()` and `solid()`. Do not edit it, or the ghia fork (`~/code/fdarian/ghia`), from here.
 - Exactly one runtime instance of `solid-js` and `@ghia/solid` may exist: a second gives a second reactive graph and fails silently. `pnpm --filter ghia-swiftui-demo check:single-instance` verifies it; run it after touching dependencies.
 
 ## Where things are written down

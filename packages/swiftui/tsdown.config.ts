@@ -26,7 +26,7 @@ export default defineConfig([
 		outDir: 'dist',
 		fixedExtension: false,
 		deps: { neverBundle: ['bun:ffi'] },
-		// Same compile as @ghia/solid/bun-plugin: universal output importing from @ghia/solid, never solid-js/web.
+		// Same compile as `solid()` from @ghia/solid/vite: universal output importing from @ghia/solid, never solid-js/web.
 		plugins: [
 			solid({ solid: { generate: 'universal', moduleName: '@ghia/solid' } }),
 		],

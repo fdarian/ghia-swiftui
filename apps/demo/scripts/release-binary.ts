@@ -1,11 +1,13 @@
 /**
  * Compiles the gallery into the darwin-arm64 release tarball and writes its
- * checksum into the library package, which ships it to the npx shim.
+ * checksum into the library package, which ships it to the npx shim. `ghia`
+ * bundles the app into `dist/main.js`; the compile is done here and not by
+ * `ghia build` so that it can turn off the bunfig and .env autoload.
  * Run after the library build: that build owns `packages/swiftui/dist`.
  */
 import { resolve } from 'node:path';
-import { createSolidPlugin } from '@ghia/solid/bun-plugin';
 import type { BunPlugin } from 'bun';
+import { build as viteBuild } from 'ghia';
 
 const NAME = 'ghia-swiftui';
 const TARGET = 'darwin-arm64';
@@ -56,9 +58,12 @@ function run(command: string[]) {
 	}
 }
 
+process.chdir(demo);
+await viteBuild({ entry: 'src/main.tsx', compile: false });
+
 const build = await Bun.build({
-	entrypoints: [`${demo}/src/main.tsx`],
-	plugins: [createSolidPlugin(), embedNativeAddon],
+	entrypoints: [`${demo}/dist/main.js`],
+	plugins: [embedNativeAddon],
 	// The gallery runs in the user's cwd: a project's bunfig preload or .env
 	// would otherwise load into it and fail with `preload not found`.
 	compile: {

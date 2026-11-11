@@ -1,6 +1,6 @@
 # ghia-swiftui
 
-SwiftUI-look [Solid](https://www.solidjs.com) components for macOS apps on [ghia](https://github.com/fdarian/ghia) (`@ghia/solid`, Bun runtime, no webview). The component names, props and variants are those of [syne](https://github.com/fdarian/syne)'s `@syne/ui`, so a syne screen moves over by changing imports and React idioms to Solid ones. Surfaces such as the sidebar, panels, popups and glass buttons are real liquid glass (`NSGlassEffectView`).
+SwiftUI-look [Solid](https://www.solidjs.com) components for macOS apps on [ghia](https://github.com/fdarian/ghia) (`@ghia/solid`, Vite and Bun, no webview). The component names, props and variants are those of [syne](https://github.com/fdarian/syne)'s `@syne/ui`, so a syne screen moves over by changing imports and React idioms to Solid ones. Surfaces such as the sidebar, panels, popups and glass buttons are real liquid glass (`NSGlassEffectView`).
 
 To try the components first, run `npx ghia-swiftui` on an Apple Silicon Mac. It opens the component gallery, downloading a signed binary from the GitHub Release on the first run.
 
@@ -15,23 +15,30 @@ macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. Install `ghia-swift
 ```jsonc
 // package.json
 "dependencies": {
-	"@ghia/native": "0.11.1",
-	"@ghia/solid": "0.11.1",
+	"@ghia/native": "0.12.1",
+	"@ghia/solid": "0.12.1",
+	"ghia": "0.12.1",
 	"ghia-swiftui": "0.1.0",
 	"solid-js": "1.9.15"
+},
+"devDependencies": {
+	"vite": "8.3.7"
 }
 ```
 
 pnpm may also ask you to exempt the `@ghia/*` versions and `ghia-base-ui` from `minimumReleaseAge`; it adds the `minimumReleaseAgeExclude` entries itself.
 
-Put the ghia preload in `bunfig.toml`; it compiles your JSX for ghia.
+ghia runs on Vite. `ghia()` sets up the environment the app runs in and `solid()` compiles your JSX for ghia.
 
-```toml
-# bunfig.toml
-preload = ["@ghia/solid/preload"]
+```ts
+// vite.config.mts
+import { solid } from '@ghia/solid/vite';
+import { ghia } from 'ghia';
+import { defineConfig } from 'vite';
 
-[test]
-preload = ["@ghia/solid/preload"]
+export default defineConfig({
+	plugins: [ghia(), solid()],
+});
 ```
 
 For TypeScript, set `"jsx": "preserve"` and `"jsxImportSource": "@ghia/solid"`, and leave the DOM lib out (`@total-typescript/tsconfig/bundler/no-dom/app` does): with it, the library's source reports errors.
@@ -109,7 +116,7 @@ render(
 );
 ```
 
-`bun src/main.tsx` opens it. The window is opaque (ghia's default) and ghia paints it black, so the root paints the window colour, as the `div` above does with `backgroundSolid`: a `Sidebar`'s glass samples whatever is painted behind it, and over an unpainted window it reads as a dark grey pane, not the pale frosted sidebar of macOS. An app shell is a `SplitView` with a `Sidebar` in its `sidebar` slot: [`apps/demo/src/app.tsx`](apps/demo/src/app.tsx) is one.
+`ghia dev src/main.tsx` opens it, and `ghia build src/main.tsx` compiles it into one executable. The window is opaque (ghia's default) and ghia paints it black, so the root paints the window colour, as the `div` above does with `backgroundSolid`: a `Sidebar`'s glass samples whatever is painted behind it, and over an unpainted window it reads as a dark grey pane, not the pale frosted sidebar of macOS. An app shell is a `SplitView` with a `Sidebar` in its `sidebar` slot: [`apps/demo/src/app.tsx`](apps/demo/src/app.tsx) is one.
 
 Tokens are plain objects of getters over the colour scheme, imported from their own modules (`import { semanticColors } from 'ghia-swiftui/tokens/semantic-colors'`). The accent is `#138af2` until the app calls `setAccentColor('#rrggbb')`, since ghia cannot read the system accent. `applyColorScheme(true | false)` forces a scheme and `followSystemColorScheme()` returns to the OS.
 
