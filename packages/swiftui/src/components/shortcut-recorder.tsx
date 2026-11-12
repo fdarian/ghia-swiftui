@@ -296,7 +296,7 @@ export function ShortcutRecorder(props: ShortcutRecorderProps) {
 						: {}),
 				}}
 			>
-				<text
+				<span
 					style={{
 						...typography.variants.regular,
 						color: isPlaceholder()
@@ -305,7 +305,7 @@ export function ShortcutRecorder(props: ShortcutRecorderProps) {
 					}}
 				>
 					{label()}
-				</text>
+				</span>
 			</div>
 			<Show when={props.value && !isRecording()}>
 				<Tooltip>

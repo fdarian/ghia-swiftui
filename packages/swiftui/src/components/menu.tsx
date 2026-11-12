@@ -94,7 +94,7 @@ export function MenuRoot(props: MenuRootProps) {
 
 /** The element a press on the trigger's wrapper should hand focus back to: the first tab stop inside it. */
 function firstTabStop(element: HostElement): HostElement | undefined {
-	for (const child of element.children) {
+	for (const child of element.childList) {
 		if (child.kind !== 'element') continue;
 		const tabIndex = child.props.get('tabIndex');
 		if (typeof tabIndex === 'number' && tabIndex >= 0) return child;

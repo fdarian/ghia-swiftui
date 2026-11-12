@@ -218,7 +218,7 @@ export function NumberInput(props: NumberInputProps) {
 				}}
 			/>
 			<Show when={own.unit !== undefined}>
-				<text
+				<span
 					aria-hidden
 					style={{
 						pointerEvents: 'none',
@@ -231,7 +231,7 @@ export function NumberInput(props: NumberInputProps) {
 					}}
 				>
 					{own.unit}
-				</text>
+				</span>
 			</Show>
 			<Show when={own.steppers !== false}>
 				<div

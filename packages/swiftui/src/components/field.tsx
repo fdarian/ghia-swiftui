@@ -449,7 +449,7 @@ export function FieldSeparator(props: HostAttributes) {
 				<Separator
 					style={{ position: 'absolute', top: '50%', left: 0, right: 0 }}
 				/>
-				<text
+				<span
 					style={{
 						position: 'relative',
 						display: 'block',
@@ -463,7 +463,7 @@ export function FieldSeparator(props: HostAttributes) {
 					}}
 				>
 					{own.children}
-				</text>
+				</span>
 			</div>
 		</Show>
 	);
@@ -509,7 +509,7 @@ export function FieldError(props: FieldErrorProps) {
 						}}
 					>
 						<For each={messages()}>
-							{(message) => <text>{`• ${message}`}</text>}
+							{(message) => <span>{`• ${message}`}</span>}
 						</For>
 					</div>
 				</Show>

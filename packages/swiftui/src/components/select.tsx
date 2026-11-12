@@ -411,7 +411,7 @@ export function SelectValue(props: SelectValueProps) {
 	];
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-			<text
+			<span
 				{...rest}
 				style={{
 					minWidth: 0,
@@ -425,10 +425,10 @@ export function SelectValue(props: SelectValueProps) {
 				}}
 			>
 				{selected() === undefined ? own.placeholder : selected()?.label}
-			</text>
+			</span>
 			<div aria-hidden style={{ height: 0, overflow: 'hidden' }}>
 				<For each={labels()}>
-					{(label) => <text style={{ whiteSpace: 'nowrap' }}>{label}</text>}
+					{(label) => <span style={{ whiteSpace: 'nowrap' }}>{label}</span>}
 				</For>
 			</div>
 		</div>
@@ -728,7 +728,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 					<Icon name="check" size={14} strokeWidth={3} />
 				</Show>
 			</div>
-			<text
+			<span
 				style={{
 					...typography.variants.regular,
 					whiteSpace: 'nowrap',
@@ -736,7 +736,7 @@ function SelectRow(props: { option: SelectOption; index: number }) {
 				}}
 			>
 				{props.option.label}
-			</text>
+			</span>
 		</div>
 	);
 }

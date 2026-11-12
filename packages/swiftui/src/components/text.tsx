@@ -89,7 +89,7 @@ export function Text(props: TextProps) {
 			: undefined;
 	};
 	return (
-		<text
+		<span
 			{...rest}
 			role={heading() === undefined ? undefined : 'heading'}
 			aria-level={heading()}
@@ -102,6 +102,6 @@ export function Text(props: TextProps) {
 			}}
 		>
 			{own.children}
-		</text>
+		</span>
 	);
 }
