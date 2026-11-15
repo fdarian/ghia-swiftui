@@ -51,7 +51,14 @@ export type NumberInputSize = keyof typeof sizes;
 export interface NumberInputProps
 	extends Omit<
 		HostInputProps,
-		'style' | 'type' | 'value' | 'onChange' | 'min' | 'max' | 'step'
+		| 'style'
+		| 'type'
+		| 'value'
+		| 'defaultValue'
+		| 'onChange'
+		| 'min'
+		| 'max'
+		| 'step'
 	> {
 	/** Controlled value. Omit for uncontrolled mode. `null` = empty. */
 	value?: number | null;
@@ -187,6 +194,9 @@ export function NumberInput(props: NumberInputProps) {
 					own.ref?.(element);
 				}}
 				onChange={(event) => {
+					if (event.value === undefined) {
+						throw new Error('A number input change event carried no value');
+					}
 					if (event.value === '') {
 						commit(null);
 						return;

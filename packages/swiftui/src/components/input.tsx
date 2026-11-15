@@ -124,6 +124,9 @@ export function Input(props: InputProps) {
 			disabled={disabled()}
 			onChange={(event) => {
 				own.onChange?.(event);
+				if (event.value === undefined) {
+					throw new Error('A text input change event carried no value');
+				}
 				own.onValueChange?.(event.value);
 			}}
 			onFocus={(event) => {
