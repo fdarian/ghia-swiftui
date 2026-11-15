@@ -2,8 +2,10 @@ packages:
   - "packages/*"
   - "apps/*"
 enableGlobalVirtualStore: true
+overrides:
+  ghia: "file:/Users/farreldarian/code/fdarian/ghia/packages/ghia"
+  "@ghia/native": "file:/Users/farreldarian/code/fdarian/ghia/packages/native"
+  "@ghia/solid": "file:/Users/farreldarian/code/fdarian/ghia/packages/solid"
+  ghia-base-ui: "file:/Users/farreldarian/.cache/ghia-local/ghia-base-ui-0.1.1.tgz"
 minimumReleaseAgeExclude:
-  - "@ghia/native@0.12.1"
-  - "@ghia/solid@0.12.1"
-  - "ghia-base-ui@0.1.1"
   - tsdown@0.23.5
