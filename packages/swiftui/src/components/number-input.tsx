@@ -56,6 +56,7 @@ export interface NumberInputProps
 		| 'value'
 		| 'defaultValue'
 		| 'onChange'
+		| 'onInput'
 		| 'min'
 		| 'max'
 		| 'step'
@@ -193,10 +194,7 @@ export function NumberInput(props: NumberInputProps) {
 					input = element;
 					own.ref?.(element);
 				}}
-				onChange={(event) => {
-					if (event.value === undefined) {
-						throw new Error('A number input change event carried no value');
-					}
+				onInput={(event) => {
 					if (event.value === '') {
 						commit(null);
 						return;
