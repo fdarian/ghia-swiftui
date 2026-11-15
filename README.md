@@ -15,9 +15,9 @@ macOS, [Bun](https://bun.sh) and [pnpm](https://pnpm.io) 12. Install `ghia-swift
 ```jsonc
 // package.json
 "dependencies": {
-	"@ghia/native": "0.12.1",
-	"@ghia/solid": "0.12.1",
-	"ghia": "0.12.1",
+	"@ghia/native": "0.13.0",
+	"@ghia/solid": "0.13.0",
+	"ghia": "0.13.0",
 	"ghia-swiftui": "0.1.0",
 	"solid-js": "1.9.15"
 },

@@ -162,12 +162,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  ghia: file:/Users/farreldarian/code/fdarian/ghia/packages/ghia
-  '@ghia/native': file:/Users/farreldarian/code/fdarian/ghia/packages/native
-  '@ghia/solid': file:/Users/farreldarian/code/fdarian/ghia/packages/solid
-  ghia-base-ui: file:/Users/farreldarian/.cache/ghia-local/ghia-base-ui-0.1.1.tgz
-
 importers:
 
   .:
@@ -185,14 +179,14 @@ importers:
   apps/demo:
     dependencies:
       '@ghia/native':
-        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/native
-        version: file:../../../../code/fdarian/ghia/packages/native
+        specifier: 0.13.0
+        version: 0.13.0
       '@ghia/solid':
-        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/solid
-        version: file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+        specifier: 0.13.0
+        version: 0.13.0(ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       ghia:
-        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/ghia
-        version: file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+        specifier: 0.13.0
+        version: 0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       ghia-swiftui:
         specifier: workspace:*
         version: link:../../packages/swiftui
@@ -231,16 +225,16 @@ importers:
 
   packages/swiftui:
     dependencies:
-      '@ghia/solid':
-        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/solid
-        version: file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       ghia-base-ui:
-        specifier: file:/Users/farreldarian/.cache/ghia-local/ghia-base-ui-0.1.1.tgz
-        version: file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz(@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)
+        specifier: 0.2.0
+        version: 0.2.0(@ghia/solid@0.13.0(ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)
     devDependencies:
       '@ghia/native':
-        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/native
-        version: file:../../../../code/fdarian/ghia/packages/native
+        specifier: 0.13.0
+        version: 0.13.0
+      '@ghia/solid':
+        specifier: 0.13.0
+        version: 0.13.0(ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       '@total-typescript/tsconfig':
         specifier: 1.0.4
         version: 1.0.4
@@ -547,13 +541,13 @@ packages:
     peerDependencies:
       effect: ^4.1.2
 
-  '@ghia/native@file:../../../../code/fdarian/ghia/packages/native':
-    resolution: {directory: ../../../../code/fdarian/ghia/packages/native, type: directory}
+  '@ghia/native@0.13.0':
+    resolution: {integrity: sha512-qwgifSLMHUWaRgzTw78zbv3ePNsYq6Ou49HhklcxzTPfWubdCpVW3QMzQV9t1VHfg9murd8T/LYbKAjzrp2AEA==}
 
-  '@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid':
-    resolution: {directory: ../../../../code/fdarian/ghia/packages/solid, type: directory}
+  '@ghia/solid@0.13.0':
+    resolution: {integrity: sha512-fabN3vxQUyuY5yzci3LfbF/JNuUJgn1nW+py5r6u+KM0wxTvR67FHZm+rNwGjXu0yS/qkCxCU89xC7JZLl/MHg==}
     peerDependencies:
-      ghia: workspace:^
+      ghia: ^0.13.0
       solid-js: '>=1.9 <2'
       vite: ^8.0.0
     peerDependenciesMeta:
@@ -1053,18 +1047,17 @@ packages:
     resolution: {integrity: sha512-X6fBC0pmImC70gvX2zm56go9hx0MyoGVdG0tUCkg/D+Xnh5TJsOZ7iDbOdI3PvmtrDxnu1YdDufpK2QJX1Meqw==}
     engines: {node: '>=20.20.0'}
 
-  ghia-base-ui@file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz:
-    resolution: {integrity: sha512-2uoGFMFYQShoCRzQSwbaLDRD2Ry+lCbMeKSgmjf/0ubv9isFkGwjoKPysHlnkcOK+zUvdg/OLMFvEhtrE0olvw==, tarball: file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz}
-    version: 0.1.1
+  ghia-base-ui@0.2.0:
+    resolution: {integrity: sha512-h7uGpmp/M5uIrG/AJxeJHfYiZOZVWcsonyZ3mGtvfPf6AMnPDZRWTulC5MF4SKYrYTkC2+Cy6cUnzVajXOI+2w==}
     peerDependencies:
       '@ghia/solid': '*'
       solid-js: 1.9.15
 
-  ghia@file:../../../../code/fdarian/ghia/packages/ghia:
-    resolution: {directory: ../../../../code/fdarian/ghia/packages/ghia, type: directory}
+  ghia@0.13.0:
+    resolution: {integrity: sha512-BLlIGyqBaR2sS+VOFH82PnKHGkXMSmLXerTVRxYUhtnEBvoRRmFVPsd2yKj7SeiNHmyawNyJQ9fCpn9dPPVuVg==}
     hasBin: true
     peerDependencies:
-      '@ghia/native': workspace:^
+      '@ghia/native': ^0.13.0
       vite: ^8.0.0
 
   hookable@6.1.2:
@@ -1848,21 +1841,21 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@ghia/native@file:../../../../code/fdarian/ghia/packages/native':
+  '@ghia/native@0.13.0':
     dependencies:
       css-select: 7.0.0
       css-what: 8.0.0
       eventsource-parser: 4.1.3
       zod: 4.6.7
 
-  '@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))':
+  '@ghia/solid@0.13.0(ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))':
     dependencies:
-      '@ghia/native': file:../../../../code/fdarian/ghia/packages/native
+      '@ghia/native': 0.13.0
       solid-js: 1.9.15
       solid-refresh: 0.6.3(solid-js@1.9.15)
       vite-plugin-solid: 2.11.15(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
     optionalDependencies:
-      ghia: file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+      ghia: 0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       vite: 8.3.7(@types/node@26.6.6)(yaml@2.9.1)
     transitivePeerDependencies:
       - '@testing-library/jest-dom'
@@ -2204,15 +2197,15 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  ghia-base-ui@file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz(@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15):
+  ghia-base-ui@0.2.0(@ghia/solid@0.13.0(ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15):
     dependencies:
-      '@ghia/solid': file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+      '@ghia/solid': 0.13.0(ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       solid-js: 1.9.15
 
-  ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)):
+  ghia@0.13.0(@ghia/native@0.13.0)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)):
     dependencies:
       '@effect/platform-bun': 4.1.2(effect@4.1.2)
-      '@ghia/native': file:../../../../code/fdarian/ghia/packages/native
+      '@ghia/native': 0.13.0
       effect: 4.1.2
       strip-literal: 4.0.0
       vite: 8.3.7(@types/node@26.6.6)(yaml@2.9.1)
