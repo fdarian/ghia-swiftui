@@ -162,6 +162,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  ghia: file:/Users/farreldarian/code/fdarian/ghia/packages/ghia
+  '@ghia/native': file:/Users/farreldarian/code/fdarian/ghia/packages/native
+  '@ghia/solid': file:/Users/farreldarian/code/fdarian/ghia/packages/solid
+  ghia-base-ui: file:/Users/farreldarian/.cache/ghia-local/ghia-base-ui-0.1.1.tgz
+
 importers:
 
   .:
@@ -179,14 +185,14 @@ importers:
   apps/demo:
     dependencies:
       '@ghia/native':
-        specifier: 0.12.1
-        version: 0.12.1
+        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/native
+        version: file:../../../../code/fdarian/ghia/packages/native
       '@ghia/solid':
-        specifier: 0.12.1
-        version: 0.12.1(ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/solid
+        version: file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       ghia:
-        specifier: 0.12.1
-        version: 0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/ghia
+        version: file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       ghia-swiftui:
         specifier: workspace:*
         version: link:../../packages/swiftui
@@ -225,16 +231,16 @@ importers:
 
   packages/swiftui:
     dependencies:
+      '@ghia/solid':
+        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/solid
+        version: file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       ghia-base-ui:
-        specifier: 0.1.1
-        version: 0.1.1(@ghia/solid@0.12.1(ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)
+        specifier: file:/Users/farreldarian/.cache/ghia-local/ghia-base-ui-0.1.1.tgz
+        version: file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz(@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)
     devDependencies:
       '@ghia/native':
-        specifier: 0.12.1
-        version: 0.12.1
-      '@ghia/solid':
-        specifier: 0.12.1
-        version: 0.12.1(ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+        specifier: file:/Users/farreldarian/code/fdarian/ghia/packages/native
+        version: file:../../../../code/fdarian/ghia/packages/native
       '@total-typescript/tsconfig':
         specifier: 1.0.4
         version: 1.0.4
@@ -541,13 +547,13 @@ packages:
     peerDependencies:
       effect: ^4.1.2
 
-  '@ghia/native@0.12.1':
-    resolution: {integrity: sha512-dX5RoIdf7AxqnezkKQ+ad4Ur+G/jg+V8nDnwqI5e2DA2Aimbdiq0/Okz+hykYEf2k13oGOHY82Jk+CtXgHjEKQ==}
+  '@ghia/native@file:../../../../code/fdarian/ghia/packages/native':
+    resolution: {directory: ../../../../code/fdarian/ghia/packages/native, type: directory}
 
-  '@ghia/solid@0.12.1':
-    resolution: {integrity: sha512-TVNj1Oh7zw5p1DmSaF4ewVk7lg4G5c+bnATsCnaHdQwYIN3WpnBm5o2JeNIXT2BvmpKpw+KJViNxFz1RKf8CNw==}
+  '@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid':
+    resolution: {directory: ../../../../code/fdarian/ghia/packages/solid, type: directory}
     peerDependencies:
-      ghia: ^0.12.1
+      ghia: workspace:^
       solid-js: '>=1.9 <2'
       vite: ^8.0.0
     peerDependenciesMeta:
@@ -916,6 +922,10 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
+  boolbase@2.0.0:
+    resolution: {integrity: sha512-DkVaaQHymRhpYEYo9x1oo7Q7B0Y6KJUsjm3c9eTyFDby4MHLBTwZ6ZDWBel5zrYxj1WsZgC5oLpiz+93MluXeA==}
+    engines: {node: '>=20.19.0'}
+
   browserslist@4.29.5:
     resolution: {integrity: sha512-khTmKu5NGYTotqcYo8Bew2k4RAE9PuXRSFRXG2lQBrCEQHyeQ/vX6gKMxfokwywBsLiXZMnHsmWMG1pnO8J7uQ==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
@@ -933,6 +943,14 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  css-select@7.0.0:
+    resolution: {integrity: sha512-snmjEVXy+1LnwXdxhYvTMj1d9tOh4HxkA1YmoayVBeeyR2C14Pum7fcxJIm4SswYspVy866eYNwlH6xC3/VH5g==}
+    engines: {node: '>=20.19.0'}
+
+  css-what@8.0.0:
+    resolution: {integrity: sha512-DH0Bqq3DNp5tdOReuNyAA+Ev4Y2GS5FMbZpeTLP6C4CDi0h5nL0BmUPChXw3o/qbHLDWHl49sbNqQVY7bMSDdw==}
+    engines: {node: '>=20.19.0'}
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -952,6 +970,22 @@ packages:
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
+
+  dom-serializer@3.1.1:
+    resolution: {integrity: sha512-4MEa38/QexBob6gFNwu+EGdWvhJ1OKuNwdYY3Y3NyeWDQfnGeDYQUDfIRzWu5B5gsv03so2Uxd28YC6zrsx3Lw==}
+    engines: {node: '>=20.19.0'}
+
+  domelementtype@3.0.0:
+    resolution: {integrity: sha512-umCQid3jKbDmVjx8jGaW7uUykm4DEUeyV21hPxNMo2nV955DhUThwqyOIDtreepP31hl84X7G5U9ZfsWvIB3Pg==}
+    engines: {node: '>=20.19.0'}
+
+  domhandler@6.0.1:
+    resolution: {integrity: sha512-gYzvtM72ZtxQO0T048kd6HWSbbGCNOUwcnfQ01cqIJ4X2IYKFFHZ5mKvrQETcFXxsRObZulDaKmy//R7TPtsBg==}
+    engines: {node: '>=20.19.0'}
+
+  domutils@4.0.2:
+    resolution: {integrity: sha512-qI4JLRKnSzqFqr7hAlS5xQDusBCjKSEG4t4+7aNrIQMHBcsC2TGEhuyABJdYkgSewL57PNLYEiibY2iPKhKpaA==}
+    engines: {node: '>=20.19.0'}
 
   dts-resolver@3.0.0:
     resolution: {integrity: sha512-1T1f+z+4tl9XD+m+0HBgWoL/nm0bOIffyWaUuUSBlFg/86IWvfx+wjNaO/ybU0AJzG9/Mi5hBUgGV6zCmWEN7Q==}
@@ -975,6 +1009,10 @@ packages:
   entities@6.0.1:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
     engines: {node: '>=0.12'}
+
+  entities@8.1.0:
+    resolution: {integrity: sha512-kxL7msIffSuh9aaFAMD7rxAIuTRMAHMeBtgHW2yUdWw732ZNh4MehkF2gdjvtdmikkaIP9bFDDJOPlsvm7avrA==}
+    engines: {node: '>=20.19.0'}
 
   escalade@3.2.0:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
@@ -1015,17 +1053,18 @@ packages:
     resolution: {integrity: sha512-X6fBC0pmImC70gvX2zm56go9hx0MyoGVdG0tUCkg/D+Xnh5TJsOZ7iDbOdI3PvmtrDxnu1YdDufpK2QJX1Meqw==}
     engines: {node: '>=20.20.0'}
 
-  ghia-base-ui@0.1.1:
-    resolution: {integrity: sha512-CrgIv7pTIsSGY2/w+sU6kiXXIQkXY2HuFDowMRAfp2lETGGIFXszc5MP7/7n9DVH6VusjNNACH68cgKPqwpx8A==}
+  ghia-base-ui@file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz:
+    resolution: {integrity: sha512-2uoGFMFYQShoCRzQSwbaLDRD2Ry+lCbMeKSgmjf/0ubv9isFkGwjoKPysHlnkcOK+zUvdg/OLMFvEhtrE0olvw==, tarball: file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz}
+    version: 0.1.1
     peerDependencies:
       '@ghia/solid': '*'
       solid-js: 1.9.15
 
-  ghia@0.12.1:
-    resolution: {integrity: sha512-C/8vjaNmomPwzmHkxEEiOBk4328A3c8FV55gop6Y9U1Ot6LvFP86AzgIQFajj8jRvvOCpoqc0gxE+Ururk7OxQ==}
+  ghia@file:../../../../code/fdarian/ghia/packages/ghia:
+    resolution: {directory: ../../../../code/fdarian/ghia/packages/ghia, type: directory}
     hasBin: true
     peerDependencies:
-      '@ghia/native': ^0.12.1
+      '@ghia/native': workspace:^
       vite: ^8.0.0
 
   hookable@6.1.2:
@@ -1051,6 +1090,9 @@ packages:
 
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
+
+  js-tokens@10.0.0:
+    resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -1164,6 +1206,10 @@ packages:
     resolution: {integrity: sha512-6li2QanLsAXpIH2R6j77MzRyvOyrvdTqlKtO4CgBdHGNvN99ZZfyxszHc5o5+IZBWD5u6Hzwg83JoGXmqZNG9Q==}
     engines: {node: '>=18'}
 
+  nth-check@3.0.1:
+    resolution: {integrity: sha512-GX0gsdbGVCgnRgbeGaubfjpBXyYRWOOCVeYh08bSQvDZqxz5ndXs1OTfAt/h36G1xvI94YIspsI0sVFqAV9+RQ==}
+    engines: {node: '>=20.19.0'}
+
   obug@3.0.0:
     resolution: {integrity: sha512-5vvB5+W7ePv+p3uqxi+RcW1XAzLW0/hxt3/4X4Lc4qHudzOhmBiBwOY6DRob4WnanAEGvNcLjF+KNOufrUoEQw==}
     engines: {node: '>=12.20.0'}
@@ -1263,6 +1309,9 @@ packages:
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
     engines: {node: '>=0.10.0'}
+
+  strip-literal@4.0.0:
+    resolution: {integrity: sha512-PaqAvfUZKBwc/SLmNZtHmzK+v19Z4O4eS3cKPeGvbIv/U3pnyEq4Tuw3/4v/FwfM8VQaEawsyCcOQ0P+kpwWWw==}
 
   tinyexec@1.3.1:
     resolution: {integrity: sha512-GCvB3aoys96IuDFBMcTB46JOR6mdMtAToqwiW8JlWhsoh1mhHi/xn9ss/Dg7N555GiJyEt2qzoG/NHCwM6h1EA==}
@@ -1799,19 +1848,21 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@ghia/native@0.12.1':
+  '@ghia/native@file:../../../../code/fdarian/ghia/packages/native':
     dependencies:
+      css-select: 7.0.0
+      css-what: 8.0.0
       eventsource-parser: 4.1.3
       zod: 4.6.7
 
-  '@ghia/solid@0.12.1(ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))':
+  '@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))':
     dependencies:
-      '@ghia/native': 0.12.1
+      '@ghia/native': file:../../../../code/fdarian/ghia/packages/native
       solid-js: 1.9.15
       solid-refresh: 0.6.3(solid-js@1.9.15)
       vite-plugin-solid: 2.11.15(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
     optionalDependencies:
-      ghia: 0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+      ghia: file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       vite: 8.3.7(@types/node@26.6.6)(yaml@2.9.1)
     transitivePeerDependencies:
       - '@testing-library/jest-dom'
@@ -2055,6 +2106,8 @@ snapshots:
 
   baseline-browser-mapping@2.11.35: {}
 
+  boolbase@2.0.0: {}
+
   browserslist@4.29.5:
     dependencies:
       baseline-browser-mapping: 2.11.35
@@ -2074,6 +2127,16 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
+  css-select@7.0.0:
+    dependencies:
+      boolbase: 2.0.0
+      css-what: 8.0.0
+      domhandler: 6.0.1
+      domutils: 4.0.2
+      nth-check: 3.0.1
+
+  css-what@8.0.0: {}
+
   csstype@3.2.3: {}
 
   debug@4.4.3:
@@ -2084,6 +2147,24 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
+  dom-serializer@3.1.1:
+    dependencies:
+      domelementtype: 3.0.0
+      domhandler: 6.0.1
+      entities: 8.1.0
+
+  domelementtype@3.0.0: {}
+
+  domhandler@6.0.1:
+    dependencies:
+      domelementtype: 3.0.0
+
+  domutils@4.0.2:
+    dependencies:
+      dom-serializer: 3.1.1
+      domelementtype: 3.0.0
+      domhandler: 6.0.1
+
   dts-resolver@3.0.0: {}
 
   effect@4.1.2: {}
@@ -2093,6 +2174,8 @@ snapshots:
   empathic@2.1.0: {}
 
   entities@6.0.1: {}
+
+  entities@8.1.0: {}
 
   escalade@3.2.0: {}
 
@@ -2121,16 +2204,17 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  ghia-base-ui@0.1.1(@ghia/solid@0.12.1(ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15):
+  ghia-base-ui@file:../../../../.cache/ghia-local/ghia-base-ui-0.1.1.tgz(@ghia/solid@file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15):
     dependencies:
-      '@ghia/solid': 0.12.1(ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
+      '@ghia/solid': file:../../../../code/fdarian/ghia/packages/solid(ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)))(solid-js@1.9.15)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1))
       solid-js: 1.9.15
 
-  ghia@0.12.1(@ghia/native@0.12.1)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)):
+  ghia@file:../../../../code/fdarian/ghia/packages/ghia(@ghia/native@file:../../../../code/fdarian/ghia/packages/native)(vite@8.3.7(@types/node@26.6.6)(yaml@2.9.1)):
     dependencies:
       '@effect/platform-bun': 4.1.2(effect@4.1.2)
-      '@ghia/native': 0.12.1
+      '@ghia/native': file:../../../../code/fdarian/ghia/packages/native
       effect: 4.1.2
+      strip-literal: 4.0.0
       vite: 8.3.7(@types/node@26.6.6)(yaml@2.9.1)
     transitivePeerDependencies:
       - bufferutil
@@ -2149,6 +2233,8 @@ snapshots:
   is-what@4.1.16: {}
 
   jju@1.4.0: {}
+
+  js-tokens@10.0.0: {}
 
   js-tokens@4.0.0: {}
 
@@ -2225,6 +2311,10 @@ snapshots:
   nanoid@3.3.20: {}
 
   node-releases@2.0.63: {}
+
+  nth-check@3.0.1:
+    dependencies:
+      boolbase: 2.0.0
 
   obug@3.0.0: {}
 
@@ -2322,6 +2412,10 @@ snapshots:
       - supports-color
 
   source-map-js@1.2.2: {}
+
+  strip-literal@4.0.0:
+    dependencies:
+      js-tokens: 10.0.0
 
   tinyexec@1.3.1: {}
 

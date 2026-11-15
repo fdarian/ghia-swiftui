@@ -61,7 +61,7 @@ export interface InputProps extends Omit<HostInputProps, 'style'> {
 	leading?: JSX.Element;
 	/** Control size: a text field is 23 / 26 / 26pt tall with 11 / 13 / 13pt type, as SwiftUI's `.small` / `.regular` / `.large`; the glass pill is 28 / 32 / 36pt. */
 	size?: InputSize;
-	/** Called with the text after every edit; `onChange` carries the same as an event. */
+	/** Called with the text after every edit; `onInput` carries the same as an event. */
 	onValueChange?: (value: string) => void;
 	style?: StyleDesc;
 	ref?: (element: HostElement) => void;
@@ -105,6 +105,7 @@ export function Input(props: InputProps) {
 		'leading',
 		'onValueChange',
 		'onChange',
+		'onInput',
 		'onFocus',
 		'onBlur',
 		'style',
@@ -122,8 +123,9 @@ export function Input(props: InputProps) {
 		<input
 			{...rest}
 			disabled={disabled()}
-			onChange={(event) => {
-				own.onChange?.(event);
+			onChange={own.onChange}
+			onInput={(event) => {
+				own.onInput?.(event);
 				own.onValueChange?.(event.value);
 			}}
 			onFocus={(event) => {

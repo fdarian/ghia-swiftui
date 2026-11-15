@@ -24,15 +24,15 @@
 		"check:lint": "biome check"
 	},
 	"dependencies": {
-		"ghia-base-ui": "0.1.1"
+		"ghia-base-ui": "file:/Users/farreldarian/.cache/ghia-local/ghia-base-ui-0.1.1.tgz"
 	},
 	"peerDependencies": {
 		"@ghia/solid": "0.12.1",
 		"solid-js": "1.9.15"
 	},
 	"devDependencies": {
-		"@ghia/native": "0.12.1",
-		"@ghia/solid": "0.12.1",
+		"@ghia/native": "file:/Users/farreldarian/code/fdarian/ghia/packages/native",
+		"@ghia/solid": "file:/Users/farreldarian/code/fdarian/ghia/packages/solid",
 		"@total-typescript/tsconfig": "1.0.4",
 		"@types/bun": "1.4.4",
 		"rolldown-plugin-solid": "0.2.1",
