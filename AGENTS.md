@@ -1,4 +1,4 @@
-SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.12.1, Vite and Bun runtime, no webview). Same component names, props and variants as syne's `packages/ui` (`~/code/fdarian/syne`), so syne migrates by changing imports. pnpm workspace, Biome, turbo for checks only.
+SwiftUI-look Solid components for macOS on ghia (`@ghia/solid` 0.13.0, Vite and Bun runtime, no webview). Same component names, props and variants as syne's `packages/ui` (`~/code/fdarian/syne`), so syne migrates by changing imports. pnpm workspace, Biome, turbo for checks only.
 
 ## Layout
 
